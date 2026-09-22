@@ -1,3 +1,5 @@
+<img align="center" src="dashboard-demo.png" alt="CS2 Panel dashboard" width="100%">
+### 🔗 [LIVE VIEW](https://gobans.ro/test)
 <div align="center">
 
 # CS2 Panel
