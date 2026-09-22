@@ -1,5 +1,3 @@
-<img align="center" src="dashboard-demo.png" alt="CS2 Panel dashboard" width="100%">
-### 🔗 [LIVE VIEW](https://gobans.ro/test)
 <div align="center">
 
 # CS2 Panel
@@ -9,6 +7,12 @@
 Moderation · Store (PayPal) · Contests · VIP · Stats — in plain PHP, no framework.
 
 `PHP 8.1+` · `MySQL/MariaDB` · [CS2-SimpleAdmin](https://github.com/daffyyyy/CS2-SimpleAdmin) · [K4-Zenith](https://github.com/K4ryuu/K4-Zenith) · [VIPCore](https://github.com/partiusfabaa/cs2-VIPCore)
+
+<img src="dashboard-demo.png" alt="CS2 Panel dashboard" width="100%">
+
+<br>
+
+[![Live Demo](https://img.shields.io/badge/%F0%9F%9A%80_Live_Demo-Try_it_now-e01e37?style=for-the-badge&labelColor=12131a)](https://gobans.ro/test)
 
 </div>
 
