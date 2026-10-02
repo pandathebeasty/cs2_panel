@@ -1,67 +1,49 @@
-<div align="center">
-
 # CS2 Panel
 
-**A fast, modern web admin panel for Counter-Strike 2 servers.**
+A web-based administration panel for Counter-Strike 2 servers, written in plain PHP with no framework dependency. It provides moderation, player statistics, a VIP system, a PayPal store, contests, and a native WeaponPaints loadout editor behind a single Steam-authenticated interface.
 
-Moderation · Store (PayPal) · Contests · VIP · Stats — in plain PHP, no framework.
+**Stack:** PHP 8.1+ · MySQL/MariaDB · Steam OpenID · License-key activation
 
-`PHP 8.1+` · `MySQL/MariaDB` · [CS2-SimpleAdmin](https://github.com/daffyyyy/CS2-SimpleAdmin) · [K4-Zenith](https://github.com/K4ryuu/K4-Zenith) · [VIPCore](https://github.com/partiusfabaa/cs2-VIPCore)
-
-<img src="dashboard-demo.png" alt="CS2 Panel dashboard" width="100%">
-
-<br>
-
-[![Live Demo](https://img.shields.io/badge/%F0%9F%9A%80_Live_Demo-Try_it_now-e01e37?style=for-the-badge&labelColor=12131a)](https://gobans.ro/test)
-
-</div>
+**Integrates with:** [CS2-SimpleAdmin](https://github.com/daffyyyy/CS2-SimpleAdmin) · [K4-Zenith](https://github.com/K4ryuu/K4-Zenith) · [K4-System](https://github.com/K4ryuu/K4-System) · [VIPCore](https://github.com/partiusfabaa/cs2-VIPCore) · [WeaponPaints](https://github.com/Nereziel/cs2-WeaponPaints)
 
 ---
 
-## ✨ Features
+## Features
 
-| Area | What you get |
+| Area | Description |
 |---|---|
-| **Moderation** | Bans, mutes/gags, warnings — paginated, searchable, with Steam avatars. Per-row delete + root-only *delete all* (auto DB backup). |
-| **Servers** | Live A2S status, current map (preview + player count), RCON console, `steam://connect` button. Dead servers never hang the UI. |
-| **Store** 💳 | PayPal shop for VIP + admin packages. Cart, discounts, fees (pass or absorb), donations, order history, refunds, per-buyer email + Discord receipt. |
-| **Contests** 🏆 | Rank/playtime giveaways that auto-award VIP to top players, announced on Discord. |
-| **VIP** | Add/extend/edit/remove (VIPCore). Configurable groups, auto SteamID64 ↔ account_id. |
-| **Stats** | K4-Zenith ranks & playtime leaderboards, per-player + global resets. |
-| **Admins** | CRUD over game admins, admin groups, and separate **panel users**. |
-| **Logs** | Action log (who/what/target/IP) + error log, both filterable. |
+| Moderation | Bans, mutes/gags, and warnings. Paginated and searchable, with Steam avatars. Per-row deletion plus owner-only bulk deletion with an automatic database backup. |
+| Appeals & Reports | Players appeal their own punishments and report others; staff resolve or delete from the panel. |
+| Servers | Live A2S status, current map with preview and player count, an RCON console, and a `steam://connect` action. Unreachable servers never block the interface. |
+| Store | PayPal shop for VIP and admin packages: cart, discount codes, checkout discounts, configurable fees, donations, order history, refunds, and per-purchase email and Discord receipts. |
+| Contests | Rank- or playtime-based giveaways that automatically grant VIP to the top players and announce results on Discord. Winner selection follows the active statistics backend. |
+| VIP | Add, extend, edit, and remove VIP via VIPCore, with configurable groups and automatic SteamID64 to account-id conversion. |
+| Statistics | Ranks, statistics, and playtime leaderboards with per-player and global resets. The backend is selectable between K4-Zenith (JSON storage) and K4-System (flat tables); the two are mutually exclusive. Includes CS2 rank artwork — competitive skill-group badges and the Premier CS-Rating plate coloured by tier. |
+| Skins | A native WeaponPaints loadout editor: weapon skins (paint, wear, seed, StatTrak and count, nametag), knives, gloves, agents (CT/T), music kits, and pins/coins. Supports per-team scoping (T, CT, or both). Authenticates through the panel and reads/writes the plugin's `wp_player_*` tables. |
+| Admins | Management of game admins, admin groups, and separate panel users. |
+| Logs | A filterable action log (actor, action, target, IP) and error log. |
 
-## 🎨 Look & feel
+## Appearance and localization
 
-- **Server-side themes** — set once, applied for everyone on every device.
-- **Presets, a custom builder, and drop-in animated themes** (`assets/css/themes/*.css`, auto-discovered).
-- Light / Dark / System, collapsible sidebar, fully responsive, `prefers-reduced-motion` aware.
-- **4 languages**: English · Română · Русский · Deutsch.
-
-## 🔐 Roles
-
-| Role | Can do |
-|---|---|
-| **Owner** | Everything, incl. panel users & destructive actions. |
-| **Moderator** | Bans & mutes (warnings are view-only). |
-
-Panel access = game admins (`sa_admins` flags) · panel users · `super_admins` in `config.php`.
+- Server-side theming, applied consistently across every device, with presets, a custom theme builder, and additional animated themes.
+- Light, dark, and system modes; collapsible sidebar; responsive layout.
+- Available in English, Romanian, Russian, and German.
 
 ---
 
-## 🚀 Install
+## Installation
 
-1. Upload the project. **DocumentRoot → `public/`** (or use the flat layout — auto-detected).
-2. Ensure PHP can write `config/`, `db_backups/`, and `assets/img/`.
-3. Open the site → complete the **`/install`** wizard (DB + prefix, site URL, root SteamID64, integrations, optional VIP groups & Discord).
-4. Sign in with Steam. Everything else lives in **Settings**.
+1. Upload the project. Point the web server's document root at the project root; `index.php` is the single entry point and `assets/` is served from the same location.
+2. Grant PHP write access to `config/`, `db_backups/`, and `assets/img/`.
+3. Open the site and complete the `/install` wizard: license key, database connection and prefix, site URL, owner SteamID64, integrations, and optional VIP groups and Discord webhook. The wizard includes the statistics backend selector (K4-Zenith or K4-System) and the WeaponPaints (Skins) toggle with its table prefix.
+4. Sign in with Steam. All remaining configuration lives under Settings.
 
 <details>
-<summary><b>Nginx snippet</b></summary>
+<summary>Nginx server block</summary>
 
 ```nginx
 server {
-    root /path/to/cs2-panel/public;
+    root /path/to/cs2-panel;
     index index.php;
     location / { try_files $uri $uri/ /index.php?$query_string; }
     location ~ \.php$ {
@@ -73,62 +55,28 @@ server {
 ```
 </details>
 
-> **Requirements:** PHP 8.1+ (`pdo_mysql`, `curl`, `fileinfo`, `zip`), MySQL/MariaDB (same DB as SimpleAdmin), Apache/Nginx. Optional [Steam Web API key](https://steamcommunity.com/dev/apikey) for names + avatars.
+**Requirements:** PHP 8.1 or newer with the `pdo_mysql`, `curl`, `fileinfo`, `zip`, and `openssl` extensions; MySQL or MariaDB (the same database used by SimpleAdmin); Apache or Nginx. A [Steam Web API key](https://steamcommunity.com/dev/apikey) is optional and enables player names and avatars.
+
+## Integrations
+
+- **CS2-SimpleAdmin** — moderation data.
+- **VIPCore** — VIP management.
+- **K4-Zenith / K4-System** — statistics backend (one is selected during setup).
+- **WeaponPaints** — the Skins loadout editor.
+
+Each integration is optional and configured from the panel; when a plugin's tables are absent, its section is simply hidden.
+## Security
+
+Database access uses prepared statements, all state-changing requests are CSRF-protected, authentication is handled through Steam OpenID, and destructive actions require owner confirmation and take an automatic database backup first. `config.php` is excluded from version control and is never overwritten by the updater.
 
 ---
 
-## ⏱ Maintenance cron
+## License
 
-Periodic work (finish contests, expire admin perks, auto-cancel unpaid orders) runs via one endpoint. Add the line from **Settings → General → Maintenance** to your host cron:
+Copyright (c) panda.4179 . All rights reserved.
 
-```cron
-* * * * * curl -s "https://YOUR-SITE/cron?token=SECRET" >/dev/null 2>&1
-```
+This software is proprietary and distributed under a per-installation license key.
+Redistribution, resale, or sharing of the source or license key is not permitted without the
+author's written consent.
 
-Any interval works (5-min minimum on some hosts is fine). No cron? A throttled fallback runs it on page loads. Payments grant instantly via the PayPal webhook — they don't wait for cron.
-
----
-
-## 🔄 Auto-update
-
-Root can one-click update from the **Updates** page: backs up the DB + `app/`, overlays new files (never `config/`, uploads, or backups), runs pending migrations, and bumps `VERSION`. Cached check, so page loads stay fast.
-
-**Migrations** — `database/migrations/NNN_name.sql` (numeric index, sorted), tracked in `panel_migrations`, run once. Always use `IF NOT EXISTS` / `IF EXISTS`.
-
----
-
-## 🧩 Integrations
-
-- **CS2-SimpleAdmin** — reads/writes `sa_*` tables (prefix configurable).
-- **VIPCore** — `vip_users`, auto SteamID64 conversion.
-- **K4-Zenith** — configurable table/column names; missing tables → section simply empty, no errors.
-
----
-
-## 📁 Structure
-
-```
-public/            DocumentRoot (index.php, assets/)
-  assets/css/themes/*.css   drop-in animated themes
-  assets/img/maps/*.png     optional map previews
-app/
-  Core/            Router, DB, Auth, Rcon, A2S, Discord, Store, PayPal,
-                   Maintenance, Migrator, Updater, Settings, Backup, ...
-  Controllers/     route logic
-  Models/          SimpleAdmin · VIPCore · Zenith · panel data
-  Views/           templates + layouts + partials
-  Lang/            en · ro · ru · de
-config/            config.php (generated, git-ignored)
-database/          panel_schema.sql + migrations/*.sql
-VERSION            current version + codename
-```
-
----
-
-## 🛡 Security
-
-PDO prepared statements · CSRF on all writes · Steam OpenID (HTTP-only, SameSite=Lax, Secure on HTTPS) · destructive actions need Owner + confirmation + DB backup · errors logged, never leaked · `config.php` git-ignored and never overwritten by the updater.
-
-<div align="center">
-<sub>Built with care for the CS2 community.</sub>
-</div>
+For licensing and support, contact panda.4179 on Discord.
