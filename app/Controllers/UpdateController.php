@@ -93,15 +93,56 @@ final class UpdateController extends Controller
     {
         Auth::requireRoot();
         $this->verifyCsrf();
+        // A long step must not hold the session lock, or the UI's status polls
+        // (same session) would block behind it.
+        if (session_status() === PHP_SESSION_ACTIVE) {
+            session_write_close();
+        }
 
         $id = (string) $this->input('step', 'prepare');
         try {
-            $result = Updater::step($id);
+            if (!Updater::isBackgroundStep($id)) {
+                $this->json(Updater::step($id));
+            }
+            $status = Updater::jobStatus($id);
+            if ($status !== null) {
+                $this->json($status);
+            }
+            Updater::startJob($id);
+            if (function_exists('fastcgi_finish_request') || function_exists('litespeed_finish_request')) {
+                $this->respondAndDetach(Updater::pendingResult($id));
+                Updater::runJob($id);
+                exit;
+            }
+            // No way to end the response early: run inline. If a proxy times
+            // out meanwhile, PHP keeps going and the UI picks up the stored result.
+            $result = Updater::runJob($id);
         } catch (\Throwable $e) {
             $msg = $e->getMessage() . ' (' . basename($e->getFile()) . ':' . $e->getLine() . ')';
             Updater::logError('Step "' . $id . '" fatal: ' . $msg);
             $this->json(['ok' => false, 'done' => false, 'step' => $id, 'next' => null, 'percent' => 0, 'label' => '', 'message' => $msg]);
         }
         $this->json($result);
+    }
+
+    /** Send a JSON response and close the connection, keeping PHP running. */
+    private function respondAndDetach(array $payload): void
+    {
+        @ignore_user_abort(true);
+        $body = (string) json_encode($payload);
+        while (ob_get_level() > 0) {
+            @ob_end_clean();
+        }
+        http_response_code(200);
+        header('Content-Type: application/json');
+        header('Content-Length: ' . strlen($body));
+        header('Connection: close');
+        echo $body;
+        flush();
+        if (function_exists('fastcgi_finish_request')) {
+            fastcgi_finish_request();
+        } elseif (function_exists('litespeed_finish_request')) {
+            litespeed_finish_request();
+        }
     }
 }

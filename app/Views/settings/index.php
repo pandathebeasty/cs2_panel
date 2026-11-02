@@ -2095,6 +2095,10 @@ document.addEventListener('DOMContentLoaded', function () {
             if (updRunBtn) updRunBtn.disabled = false;
         }
 
+        // A step may outlive a reverse proxy's timeout; the proxy then answers
+        // with its own HTML error page while PHP keeps working. Treat 5xx/network
+        // errors as "still running" and poll the same step for a while.
+        var retryUntil = 0;
         function runStep(id) {
             var body = new URLSearchParams();
             body.set('step', id);
@@ -2104,10 +2108,25 @@ document.addEventListener('DOMContentLoaded', function () {
                 headers: { 'Content-Type': 'application/x-www-form-urlencoded', 'X-Requested-With': 'fetch' },
                 body: body.toString(),
                 credentials: 'same-origin'
-            }).then(function (r) { return r.json(); }).then(function (d) {
+            }).then(function (r) {
+                return r.text().then(function (t) {
+                    try { return JSON.parse(t); } catch (e) {
+                        var title = (t.match(/<title>([^<]*)<\/title>/i) || [])[1] || '';
+                        var err = new Error('HTTP ' + r.status + (title ? ' - ' + title.trim() : ''));
+                        err.retry = r.status >= 500;
+                        throw err;
+                    }
+                });
+            }).then(function (d) {
+                retryUntil = 0;
                 if (!d || !d.ok) { fail(d && d.message ? d.message : ''); addLog(d && d.log ? d.log : []); return; }
                 setProgress(d.percent, d.label);
                 addLog(d.log || []);
+                if (d.pending) {
+                    if (stepEl && d.detail) stepEl.textContent = (I18N.steps[d.label] || '') + ' (' + d.detail + ')';
+                    setTimeout(function () { runStep(d.next || id); }, 2500);
+                    return;
+                }
                 if (d.done || !d.next) {
                     setProgress(100, null);
                     if (stepEl) stepEl.textContent = I18N.hud_done;
@@ -2116,6 +2135,11 @@ document.addEventListener('DOMContentLoaded', function () {
                 }
                 runStep(d.next);
             }).catch(function (err) {
+                var retry = !err || err.retry !== false;
+                if (retry) {
+                    if (!retryUntil) retryUntil = Date.now() + 10 * 60 * 1000;
+                    if (Date.now() < retryUntil) { setTimeout(function () { runStep(id); }, 4000); return; }
+                }
                 fail(String(err && err.message ? err.message : err));
             });
         }

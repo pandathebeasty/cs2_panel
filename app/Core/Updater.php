@@ -390,7 +390,150 @@ final class Updater
 
     private static function writeState(array $s): void
     {
-        @file_put_contents(self::stateFile(), json_encode($s));
+        self::writeJsonAtomic(self::stateFile(), $s);
+    }
+
+    /** Write JSON via temp file + rename so a concurrent poll never reads half a file. */
+    private static function writeJsonAtomic(string $file, array $data): void
+    {
+        $tmp = $file . '.' . getmypid() . '.tmp';
+        if (@file_put_contents($tmp, json_encode($data)) === false) {
+            return;
+        }
+        if (!@rename($tmp, $file)) {
+            @unlink($file);
+            @rename($tmp, $file);
+        }
+    }
+
+    // Background steps. The release archive is large, so download/extract/backup/
+    // copy can outlast a reverse proxy's timeout (which then answers with its own
+    // HTML 504/524 page). These steps run as a job: the request that starts one
+    // may return early, and the UI polls the same step until the job's stored
+    // result is available.
+
+    private const BACKGROUND_STEPS = ['download', 'extract', 'backup_db', 'backup_code', 'apply', 'migrate'];
+
+    /** Seconds after which a job with no stored result is considered dead. */
+    private const JOB_STALE_AFTER = 1800;
+
+    private static ?string $runningJob = null;
+
+    public static function isBackgroundStep(string $id): bool
+    {
+        return in_array($id, self::BACKGROUND_STEPS, true);
+    }
+
+    private static function jobFile(string $id): string
+    {
+        return self::workDir() . '/job_' . $id . '.json';
+    }
+
+    private static function readJob(string $id): ?array
+    {
+        $f = self::jobFile($id);
+        if (!is_file($f)) {
+            return null;
+        }
+        $d = json_decode((string) @file_get_contents($f), true);
+        return is_array($d) ? $d : null;
+    }
+
+    private static function writeJob(string $id, array $job): void
+    {
+        if (is_dir(self::workDir())) {
+            self::writeJsonAtomic(self::jobFile($id), $job);
+        }
+    }
+
+    /**
+     * Result for a step that was already started: the stored result when the
+     * job finished, a "pending" answer while it runs, or a failure when it died
+     * silently. Null when the step has not been started yet.
+     */
+    public static function jobStatus(string $id): ?array
+    {
+        $meta = self::stepMeta($id);
+        $job = self::readJob($id);
+        if ($meta === null || $job === null) {
+            return null;
+        }
+        if (($job['status'] ?? '') === 'done' && is_array($job['result'] ?? null)) {
+            return $job['result'];
+        }
+        if (time() - (int) ($job['started'] ?? 0) > self::JOB_STALE_AFTER) {
+            $msg = 'The "' . $id . '" step stopped without reporting a result (host time or memory limit?).';
+            self::logError($msg);
+            return self::stepFail($id, $meta, $msg);
+        }
+        return self::pendingResult($id, (string) ($job['detail'] ?? ''));
+    }
+
+    /** "Still working" answer: keeps the previous step's percent, polls the same step. */
+    public static function pendingResult(string $id, string $detail = ''): array
+    {
+        $meta = self::stepMeta($id) ?? ['label' => '', 'percent' => 0];
+        $percent = 0;
+        foreach (self::STEPS as $s) {
+            if ($s['id'] === $id) {
+                break;
+            }
+            $percent = $s['percent'];
+        }
+        return [
+            'ok'      => true,
+            'pending' => true,
+            'done'    => false,
+            'step'    => $id,
+            'next'    => $id,
+            'percent' => $percent,
+            'label'   => $meta['label'],
+            'detail'  => $detail,
+            'log'     => [],
+        ];
+    }
+
+    public static function startJob(string $id): void
+    {
+        self::writeJob($id, ['status' => 'running', 'started' => time(), 'detail' => '']);
+    }
+
+    /** Run a started job to completion and store its result for later polls. */
+    public static function runJob(string $id): array
+    {
+        @set_time_limit(0);
+        @ignore_user_abort(true);
+        $started = (int) (self::readJob($id)['started'] ?? time());
+        self::$runningJob = $id;
+        register_shutdown_function(static function () use ($id, $started): void {
+            if (self::$runningJob !== $id) {
+                return;
+            }
+            $err = error_get_last();
+            $reason = $err !== null
+                ? $err['message'] . ' in ' . basename((string) ($err['file'] ?? '')) . ':' . ($err['line'] ?? '?')
+                : 'The step stopped unexpectedly (possible time or memory limit on the host).';
+            self::logError('Step "' . $id . '" aborted: ' . $reason);
+            $meta = self::stepMeta($id) ?? [];
+            self::writeJob($id, ['status' => 'done', 'started' => $started, 'result' => self::stepFail($id, $meta, $reason)]);
+        });
+
+        $result = self::step($id);
+
+        self::writeJob($id, ['status' => 'done', 'started' => $started, 'result' => $result]);
+        self::$runningJob = null;
+        return $result;
+    }
+
+    /** Update the "detail" text shown by polls while a job runs (e.g. MB downloaded). */
+    private static function jobDetail(string $id, string $detail): void
+    {
+        $job = self::readJob($id);
+        if ($job === null || ($job['status'] ?? '') !== 'running') {
+            return;
+        }
+        $job['detail'] = $detail;
+        self::writeJob($id, $job);
     }
 
     /**
@@ -452,7 +595,15 @@ final class Updater
                     if (empty($st['zipball'])) {
                         return self::stepFail($id, $meta, 'Update state missing; restart the update.');
                     }
-                    if (!self::download($st['zipball'], self::workDir() . '/release.zip')) {
+                    $lastReport = 0.0;
+                    $onProgress = static function (int $bytes) use (&$lastReport): void {
+                        $now = microtime(true);
+                        if ($now - $lastReport >= 1.0) {
+                            $lastReport = $now;
+                            self::jobDetail('download', round($bytes / 1048576, 1) . ' MB');
+                        }
+                    };
+                    if (!self::download($st['zipball'], self::workDir() . '/release.zip', $onProgress)) {
                         return self::stepFail($id, $meta, 'Failed to download the release archive.');
                     }
                     $log[] = 'Downloaded ' . ($st['tag'] ?? '') . '.';
@@ -663,8 +814,12 @@ final class Updater
         return (string) $body;
     }
 
-    /** Download a URL to a file. Returns true on success. */
-    private static function download(string $url, string $dest): bool
+    /**
+     * Download a URL to a file. Returns true on success. No overall time cap
+     * (the archive is large); a stalled transfer is aborted instead.
+     * @param (callable(int):void)|null $onProgress receives bytes downloaded so far
+     */
+    private static function download(string $url, string $dest, ?callable $onProgress = null): bool
     {
         $ch = curl_init($url);
         $fh = @fopen($dest, 'w');
@@ -672,11 +827,23 @@ final class Updater
             return false;
         }
         curl_setopt_array($ch, [
-            CURLOPT_FILE           => $fh,
-            CURLOPT_FOLLOWLOCATION => true,
-            CURLOPT_TIMEOUT        => 120,
-            CURLOPT_HTTPHEADER     => ['User-Agent: CS2Panel-Updater'],
+            CURLOPT_FILE            => $fh,
+            CURLOPT_FOLLOWLOCATION  => true,
+            CURLOPT_CONNECTTIMEOUT  => 20,
+            CURLOPT_TIMEOUT         => 0,
+            CURLOPT_LOW_SPEED_LIMIT => 1024,
+            CURLOPT_LOW_SPEED_TIME  => 60,
+            CURLOPT_HTTPHEADER      => ['User-Agent: CS2Panel-Updater'],
         ]);
+        if ($onProgress !== null) {
+            curl_setopt_array($ch, [
+                CURLOPT_NOPROGRESS       => false,
+                CURLOPT_XFERINFOFUNCTION => static function ($ch, $dlTotal, $dlNow) use ($onProgress): int {
+                    $onProgress((int) $dlNow);
+                    return 0;
+                },
+            ]);
+        }
         $ca = ini_get('curl.cainfo') ?: ini_get('openssl.cafile');
         if ($ca && is_file($ca)) {
             curl_setopt($ch, CURLOPT_CAINFO, $ca);
