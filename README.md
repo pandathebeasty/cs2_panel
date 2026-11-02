@@ -4,6 +4,8 @@ A PHP admin and community panel for Counter-Strike 2 servers. It sits on top of 
 
 Version: see [VERSION](VERSION).
 
+Live demo: [gobans.ro/GO](https://gobans.ro/GO)
+
 ## Supported plugins
 
 The panel reads and writes the plugins' own tables.
