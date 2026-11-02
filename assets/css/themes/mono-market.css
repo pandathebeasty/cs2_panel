@@ -1,0 +1,53 @@
+/* @theme id:mono-market | name:Mono Market | accent:#c7f43d | tag:Minimal */
+
+[data-theme="mono-market"] {
+    --accent: #c7f43d;
+    --accent-2: #47d7ac;
+    --enter: animRise;
+    --enter-dur: .4s;
+}
+
+[data-theme="mono-market"][data-mode="dark"] {
+    --bg: #0b0c0b; --bg-2: #111310; --bg-3: #1c1f19; --card: #151713;
+    --border: #34382e; --text: #f4f7ed; --text-dim: #b1b7a7; --text-mut: #73796a;
+    --shadow: 0 12px 30px rgba(0,0,0,.4);
+}
+[data-theme="mono-market"][data-mode="light"] {
+    --bg: #f4f6ef; --bg-2: #ffffff; --bg-3: #e8ebe1; --card: #ffffff;
+    --border: #d1d6c8; --text: #151713; --text-dim: #575d50; --text-mut: #8d9485;
+    --shadow: 0 8px 24px rgba(42,50,35,.1);
+}
+
+[data-theme="mono-market"] body { font-family:"IBM Plex Mono",Consolas,monospace; font-size:14px; }
+[data-theme="mono-market"] .theme-fx::before {
+    content:""; position:absolute; inset:-64px; pointer-events:none;
+    background:
+        linear-gradient(90deg,color-mix(in srgb,var(--text) 3%,transparent) 1px,transparent 1px),
+        linear-gradient(color-mix(in srgb,var(--text) 3%,transparent) 1px,transparent 1px);
+    background-size:32px 32px; animation:marketGrid 20s linear infinite;
+}
+[data-theme="mono-market"] .theme-fx::after {
+    content:"+ + +"; position:absolute; right:4vw; top:8vh; pointer-events:none;
+    color:color-mix(in srgb,var(--accent) 28%,transparent); font:700 clamp(24px,4vw,62px)/1 "IBM Plex Mono",monospace;
+    letter-spacing:.5em; animation:marketMarks 5s steps(2,end) infinite;
+}
+@keyframes marketGrid { to { transform:translate3d(64px,32px,0); } }
+@keyframes marketMarks { 50% { opacity:.35; transform:translateY(8px); } }
+
+[data-theme="mono-market"] .brand .name,
+[data-theme="mono-market"] .topbar h1,
+[data-theme="mono-market"] .card-title,
+[data-theme="mono-market"] table th { font-family:"IBM Plex Mono",Consolas,monospace; font-weight:700; letter-spacing:.02em; }
+[data-theme="mono-market"] .sidebar { border-right:1px dashed color-mix(in srgb,var(--accent) 45%,var(--border)); }
+[data-theme="mono-market"] .nav-item.active { color:var(--text); background:var(--accent); box-shadow:none; }
+[data-theme="mono-market"][data-mode="dark"] .nav-item.active { color:#11150a; }
+[data-theme="mono-market"] .card,
+[data-theme="mono-market"] .store-card,
+[data-theme="mono-market"] .modal { border-radius:0; border-style:dashed; }
+[data-theme="mono-market"] .btn { border-radius:0; text-transform:uppercase; }
+[data-theme="mono-market"] .btn-primary {
+    color:#11150a; background:var(--accent); border-color:var(--accent); position:relative;
+    animation:marketButton 3.8s steps(2,end) infinite;
+}
+@keyframes marketButton { 50% { box-shadow:4px 4px 0 color-mix(in srgb,var(--accent-2) 55%,transparent); } }
+[data-theme="mono-market"] .badge { border-radius:0; border:1px solid currentColor; }

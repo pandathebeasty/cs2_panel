@@ -1,0 +1,254 @@
+{
+    "ctm_diver/ctm_diver_varianta": {
+        "color": "#eb4b4b",
+        "rarity": "Master"
+    },
+    "ctm_diver/ctm_diver_variantb": {
+        "color": "#eb4b4b",
+        "rarity": "Master"
+    },
+    "ctm_diver/ctm_diver_variantc": {
+        "color": "#d32ce6",
+        "rarity": "Superior"
+    },
+    "ctm_fbi/ctm_fbi_variantb": {
+        "color": "#eb4b4b",
+        "rarity": "Master"
+    },
+    "ctm_fbi/ctm_fbi_variantf": {
+        "color": "#4b69ff",
+        "rarity": "Distinguished"
+    },
+    "ctm_fbi/ctm_fbi_variantg": {
+        "color": "#8847ff",
+        "rarity": "Exceptional"
+    },
+    "ctm_fbi/ctm_fbi_varianth": {
+        "color": "#d32ce6",
+        "rarity": "Superior"
+    },
+    "ctm_gendarmerie/ctm_gendarmerie_varianta": {
+        "color": "#8847ff",
+        "rarity": "Exceptional"
+    },
+    "ctm_gendarmerie/ctm_gendarmerie_variantb": {
+        "color": "#d32ce6",
+        "rarity": "Superior"
+    },
+    "ctm_gendarmerie/ctm_gendarmerie_variantc": {
+        "color": "#eb4b4b",
+        "rarity": "Master"
+    },
+    "ctm_gendarmerie/ctm_gendarmerie_variantd": {
+        "color": "#4b69ff",
+        "rarity": "Distinguished"
+    },
+    "ctm_gendarmerie/ctm_gendarmerie_variante": {
+        "color": "#8847ff",
+        "rarity": "Exceptional"
+    },
+    "ctm_sas/ctm_sas_variantf": {
+        "color": "#4b69ff",
+        "rarity": "Distinguished"
+    },
+    "ctm_sas/ctm_sas_variantg": {
+        "color": "#4b69ff",
+        "rarity": "Distinguished"
+    },
+    "ctm_st6/ctm_st6_variante": {
+        "color": "#4b69ff",
+        "rarity": "Distinguished"
+    },
+    "ctm_st6/ctm_st6_variantg": {
+        "color": "#8847ff",
+        "rarity": "Exceptional"
+    },
+    "ctm_st6/ctm_st6_varianti": {
+        "color": "#eb4b4b",
+        "rarity": "Master"
+    },
+    "ctm_st6/ctm_st6_variantj": {
+        "color": "#8847ff",
+        "rarity": "Exceptional"
+    },
+    "ctm_st6/ctm_st6_variantk": {
+        "color": "#4b69ff",
+        "rarity": "Distinguished"
+    },
+    "ctm_st6/ctm_st6_variantl": {
+        "color": "#d32ce6",
+        "rarity": "Superior"
+    },
+    "ctm_st6/ctm_st6_variantm": {
+        "color": "#d32ce6",
+        "rarity": "Superior"
+    },
+    "ctm_st6/ctm_st6_variantn": {
+        "color": "#4b69ff",
+        "rarity": "Distinguished"
+    },
+    "ctm_swat/ctm_swat_variante": {
+        "color": "#eb4b4b",
+        "rarity": "Master"
+    },
+    "ctm_swat/ctm_swat_variantf": {
+        "color": "#d32ce6",
+        "rarity": "Superior"
+    },
+    "ctm_swat/ctm_swat_variantg": {
+        "color": "#8847ff",
+        "rarity": "Exceptional"
+    },
+    "ctm_swat/ctm_swat_varianth": {
+        "color": "#4b69ff",
+        "rarity": "Distinguished"
+    },
+    "ctm_swat/ctm_swat_varianti": {
+        "color": "#8847ff",
+        "rarity": "Exceptional"
+    },
+    "ctm_swat/ctm_swat_variantj": {
+        "color": "#4b69ff",
+        "rarity": "Distinguished"
+    },
+    "ctm_swat/ctm_swat_variantk": {
+        "color": "#8847ff",
+        "rarity": "Exceptional"
+    },
+    "tm_balkan/tm_balkan_variantf": {
+        "color": "#8847ff",
+        "rarity": "Exceptional"
+    },
+    "tm_balkan/tm_balkan_variantg": {
+        "color": "#d32ce6",
+        "rarity": "Superior"
+    },
+    "tm_balkan/tm_balkan_varianth": {
+        "color": "#eb4b4b",
+        "rarity": "Master"
+    },
+    "tm_balkan/tm_balkan_varianti": {
+        "color": "#8847ff",
+        "rarity": "Exceptional"
+    },
+    "tm_balkan/tm_balkan_variantj": {
+        "color": "#d32ce6",
+        "rarity": "Superior"
+    },
+    "tm_balkan/tm_balkan_variantk": {
+        "color": "#d32ce6",
+        "rarity": "Superior"
+    },
+    "tm_balkan/tm_balkan_variantl": {
+        "color": "#4b69ff",
+        "rarity": "Distinguished"
+    },
+    "tm_jungle_raider/tm_jungle_raider_varianta": {
+        "color": "#d32ce6",
+        "rarity": "Superior"
+    },
+    "tm_jungle_raider/tm_jungle_raider_variantb": {
+        "color": "#eb4b4b",
+        "rarity": "Master"
+    },
+    "tm_jungle_raider/tm_jungle_raider_variantb2": {
+        "color": "#eb4b4b",
+        "rarity": "Master"
+    },
+    "tm_jungle_raider/tm_jungle_raider_variantc": {
+        "color": "#d32ce6",
+        "rarity": "Superior"
+    },
+    "tm_jungle_raider/tm_jungle_raider_variantd": {
+        "color": "#8847ff",
+        "rarity": "Exceptional"
+    },
+    "tm_jungle_raider/tm_jungle_raider_variante": {
+        "color": "#eb4b4b",
+        "rarity": "Master"
+    },
+    "tm_jungle_raider/tm_jungle_raider_variantf": {
+        "color": "#4b69ff",
+        "rarity": "Distinguished"
+    },
+    "tm_jungle_raider/tm_jungle_raider_variantf2": {
+        "color": "#8847ff",
+        "rarity": "Exceptional"
+    },
+    "tm_leet/tm_leet_variantf": {
+        "color": "#eb4b4b",
+        "rarity": "Master"
+    },
+    "tm_leet/tm_leet_variantg": {
+        "color": "#4b69ff",
+        "rarity": "Distinguished"
+    },
+    "tm_leet/tm_leet_varianth": {
+        "color": "#8847ff",
+        "rarity": "Exceptional"
+    },
+    "tm_leet/tm_leet_varianti": {
+        "color": "#d32ce6",
+        "rarity": "Superior"
+    },
+    "tm_leet/tm_leet_variantj": {
+        "color": "#4b69ff",
+        "rarity": "Distinguished"
+    },
+    "tm_phoenix/tm_phoenix_variantf": {
+        "color": "#4b69ff",
+        "rarity": "Distinguished"
+    },
+    "tm_phoenix/tm_phoenix_variantg": {
+        "color": "#8847ff",
+        "rarity": "Exceptional"
+    },
+    "tm_phoenix/tm_phoenix_varianth": {
+        "color": "#4b69ff",
+        "rarity": "Distinguished"
+    },
+    "tm_phoenix/tm_phoenix_varianti": {
+        "color": "#4b69ff",
+        "rarity": "Distinguished"
+    },
+    "tm_professional/tm_professional_varf": {
+        "color": "#eb4b4b",
+        "rarity": "Master"
+    },
+    "tm_professional/tm_professional_varf1": {
+        "color": "#eb4b4b",
+        "rarity": "Master"
+    },
+    "tm_professional/tm_professional_varf2": {
+        "color": "#eb4b4b",
+        "rarity": "Master"
+    },
+    "tm_professional/tm_professional_varf3": {
+        "color": "#eb4b4b",
+        "rarity": "Master"
+    },
+    "tm_professional/tm_professional_varf4": {
+        "color": "#eb4b4b",
+        "rarity": "Master"
+    },
+    "tm_professional/tm_professional_varf5": {
+        "color": "#d32ce6",
+        "rarity": "Superior"
+    },
+    "tm_professional/tm_professional_varg": {
+        "color": "#d32ce6",
+        "rarity": "Superior"
+    },
+    "tm_professional/tm_professional_varh": {
+        "color": "#8847ff",
+        "rarity": "Exceptional"
+    },
+    "tm_professional/tm_professional_vari": {
+        "color": "#d32ce6",
+        "rarity": "Superior"
+    },
+    "tm_professional/tm_professional_varj": {
+        "color": "#8847ff",
+        "rarity": "Exceptional"
+    }
+}

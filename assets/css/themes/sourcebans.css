@@ -1,0 +1,57 @@
+/* @theme id:sourcebans | name:SourceBans | accent:#ea580c | tag:Classic */
+
+/* A faithful port of the SourceBans++ 2026 look: a clean, flat admin theme on
+   the Zinc neutral scale with the signature SourceBans orange accent. No moving
+   background — SB++ is deliberately calm and content-first — just the orange CTA
+   glow and crisp zinc surfaces. Palette lifted 1:1 from the upstream
+   web/themes/default/css/theme.css tokens (brand = orange, neutrals = zinc). */
+
+[data-theme="sourcebans"] {
+    --accent: #ea580c;   /* brand-600 */
+    --accent-2: #f97316; /* brand-500 */
+    --enter: animFade;
+    --enter-dur: .4s;
+}
+
+/* Dark = SB++ html.dark: zinc-950 page, zinc-900 surfaces, zinc-800 muted. */
+[data-theme="sourcebans"][data-mode="dark"] {
+    --bg: #09090b;      /* zinc-950 (page) */
+    --bg-2: #18181b;    /* zinc-900 (surface) */
+    --bg-3: #27272a;    /* zinc-800 (muted) */
+    --card: #18181b;    /* zinc-900 */
+    --border: #27272a;  /* zinc-800 */
+    --text: #f4f4f5;    /* zinc-100 */
+    --text-dim: #a1a1aa;/* zinc-400 */
+    --text-mut: #52525b;/* zinc-600 */
+}
+
+/* Light = SB++ :root default: zinc-50 page, white surfaces, zinc-200 border. */
+[data-theme="sourcebans"][data-mode="light"] {
+    --bg: #fafafa;      /* zinc-50 (page) */
+    --bg-2: #ffffff;    /* surface */
+    --bg-3: #f4f4f5;    /* zinc-100 (muted) */
+    --card: #ffffff;
+    --border: #e4e4e7;  /* zinc-200 */
+    --text: #18181b;    /* zinc-900 */
+    --text-dim: #71717a;/* zinc-500 */
+    --text-mut: #a1a1aa;/* zinc-400 */
+}
+
+/* SB++ is flat and calm — no animated background layer. Keep the FX stage empty
+   so the theme reads as the clean admin console it is. */
+[data-theme="sourcebans"] .theme-fx::before,
+[data-theme="sourcebans"] .theme-fx::after { content: none; }
+
+/* Signature orange primary button + active nav, matching SB++'s .btn--primary
+   (brand-600, hover brand-700) and the orange active-row treatment. */
+[data-theme="sourcebans"] .btn-primary {
+    background: var(--accent);
+    border-color: var(--accent);
+}
+[data-theme="sourcebans"] .btn-primary:hover {
+    background: #c2410c; /* brand-700 */
+    border-color: #c2410c;
+}
+[data-theme="sourcebans"] .nav-item.active {
+    box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--accent) 45%, transparent);
+}

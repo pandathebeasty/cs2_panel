@@ -1,0 +1,228 @@
+/* @theme id:liquid-mesh | name:Liquid Mesh | accent:#ff6b6b | tag:Fluid */
+
+/* Warm animated mesh gradient background, pill-shaped gooey buttons, floating
+   cards. Colorful and premium. */
+
+[data-theme="liquid-mesh"] {
+    --accent: #ff6b6b;
+    --accent-2: #ff9a8f;
+    --lm-coral-rose: #ff596e;
+    --lm-coral-deep: #d94a5f;
+    --mx: 50%;
+    --my: 40%;
+    --enter: animRise;
+    --enter-dur: .5s;
+    --radius: 18px;
+}
+[data-theme="liquid-mesh"][data-mode="dark"] {
+    --bg: #0d0c10; --bg-2: #151116; --bg-3: #21191f; --card: #1b151a;
+    --border: #3d2932; --text: #fff6f7; --text-dim: #c9b2ba; --text-mut: #806570;
+}
+[data-theme="liquid-mesh"][data-mode="light"] {
+    --bg: #fff5f6; --bg-2: #ffffff; --bg-3: #f9e7eb; --card: #fffafa;
+    --border: #edcfd6; --text: #35242a; --text-dim: #765762; --text-mut: #af8d98;
+}
+
+/* Soft gradient stops provide diffusion without full-screen blur filters. */
+[data-theme="liquid-mesh"] .theme-fx::before {
+    content: ""; position: absolute; inset: -12%; z-index: 0; pointer-events: none;
+    background:
+        radial-gradient(ellipse at 20% 35%, color-mix(in srgb, var(--accent) 75%, transparent), transparent 65%),
+        radial-gradient(ellipse at 75% 62%, color-mix(in srgb, var(--lm-coral-rose) 68%, transparent), transparent 70%),
+        radial-gradient(ellipse at 45% 90%, color-mix(in srgb, var(--accent-2) 58%, transparent), transparent 68%);
+    opacity: .42;
+    animation: lmFlow 58s linear infinite;
+}
+[data-theme="liquid-mesh"] .theme-fx::after {
+    content: ""; position: absolute; inset: -10%; z-index: 0; pointer-events: none;
+    background:
+        radial-gradient(38% 46% at 22% 28%, color-mix(in srgb, #ff6b6b 68%, transparent) 0, transparent 72%),
+        radial-gradient(42% 40% at 80% 72%, color-mix(in srgb, var(--lm-coral-deep) 58%, transparent) 0, transparent 74%),
+        radial-gradient(30% 34% at 68% 18%, color-mix(in srgb, var(--accent-2) 56%, transparent) 0, transparent 72%);
+    opacity: .47;
+    animation: lmDrift 38s ease-in-out infinite alternate;
+}
+[data-theme="liquid-mesh"][data-mode="light"] .theme-fx::before { opacity: .28; }
+[data-theme="liquid-mesh"][data-mode="light"] .theme-fx::after  { opacity: .32; }
+[data-theme="liquid-mesh"][data-mode="dark"] .theme-fx::before { opacity: .34; }
+[data-theme="liquid-mesh"][data-mode="dark"] .theme-fx::after  { opacity: .38; }
+@keyframes lmFlow {
+    0%, 100% { transform: translate3d(-2%, 2%, 0) rotate(-6deg); opacity: .88; }
+    50% { transform: translate3d(2%, -2%, 0) rotate(6deg); opacity: 1; }
+}
+@keyframes lmDrift {
+    0%   { transform: translate(0, 0) scale(1); }
+    50%  { transform: translate(2.5%, -2%) scale(1.05); }
+    100% { transform: translate(-2.5%, 2%) scale(1); }
+}
+
+/* Nearly invisible pointer feedback: a 3px coral point and a very soft halo.
+   app.js updates --mx/--my at most once per animation frame. */
+[data-theme="liquid-mesh"] .theme-fx {
+    background:
+        radial-gradient(circle 3px at var(--mx) var(--my),color-mix(in srgb,var(--accent) 24%,transparent),transparent 100%),
+        radial-gradient(circle 68px at var(--mx) var(--my),color-mix(in srgb,var(--accent) 6%,transparent),transparent 72%);
+}
+[data-theme="liquid-mesh"][data-mode="light"] .theme-fx {
+    background:
+        radial-gradient(circle 3px at var(--mx) var(--my),color-mix(in srgb,var(--accent) 18%,transparent),transparent 100%),
+        radial-gradient(circle 68px at var(--mx) var(--my),color-mix(in srgb,var(--accent) 4%,transparent),transparent 72%);
+}
+
+/* Pill buttons with a gooey squish. */
+[data-theme="liquid-mesh"] .btn-primary {
+    background: linear-gradient(120deg, #ff817a, var(--accent) 52%, var(--lm-coral-rose));
+    border-radius: 40px; color: #fff; font-weight: 800;
+    transition: transform .2s cubic-bezier(.34,1.8,.5,1), box-shadow .25s, filter .2s;
+}
+[data-theme="liquid-mesh"] .btn { border-radius: 40px; transition: transform .18s cubic-bezier(.34,1.8,.5,1), background .2s, border-color .2s; }
+[data-theme="liquid-mesh"] .btn-primary:hover { transform: translateY(-2px) scale(1.015); box-shadow: 0 10px 26px -10px color-mix(in srgb, var(--accent) 48%, transparent); filter: saturate(1.05); }
+[data-theme="liquid-mesh"] .btn:hover { transform: translateY(-1px); }
+[data-theme="liquid-mesh"] .btn-primary:active,
+[data-theme="liquid-mesh"] .btn:active { transform: scale(.97); }
+
+/* Floating cards with a subtle tilt on hover. */
+[data-theme="liquid-mesh"] .store-card { transition: transform .25s cubic-bezier(.34,1.56,.64,1), box-shadow .25s; }
+[data-theme="liquid-mesh"] .store-card:hover { transform: translateY(-3px); box-shadow: 0 16px 38px -18px color-mix(in srgb, var(--accent) 48%, transparent); }
+
+/* Rounder cards + gradient brand text. */
+[data-theme="liquid-mesh"] .card, [data-theme="liquid-mesh"] .store-card, [data-theme="liquid-mesh"] .modal {
+    border-radius: 18px;
+    background:
+        linear-gradient(145deg,color-mix(in srgb,var(--accent) 10%,transparent),transparent 46%),
+        color-mix(in srgb, var(--card) 88%, transparent);
+    border-color: color-mix(in srgb, var(--accent) 24%, var(--border));
+    backdrop-filter: blur(5px) saturate(125%);
+}
+[data-theme="liquid-mesh"] .brand .name {
+    background: linear-gradient(90deg,var(--accent-2),var(--accent),var(--lm-coral-rose),var(--accent),var(--accent-2));
+    background-size: 260% 100%;
+    -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; color: transparent;
+    animation: lmBrand 6s linear infinite,lmBrandGlow 3.8s ease-in-out infinite;
+}
+@keyframes lmBrand { to { background-position: -260% 0; } }
+@keyframes lmBrandGlow {
+    0%,100% { filter: drop-shadow(0 0 0 transparent); }
+    50% { filter: drop-shadow(0 0 7px color-mix(in srgb,var(--accent) 48%,transparent)); }
+}
+
+/* New: a restrained liquid tide flows along the topbar edge. */
+[data-theme="liquid-mesh"] .topbar {
+    overflow: visible;
+    background: linear-gradient(90deg,color-mix(in srgb,var(--accent) 13%,var(--bg-2)),color-mix(in srgb,var(--bg-2) 95%,transparent));
+    border-bottom-color: color-mix(in srgb,var(--accent) 32%,var(--border));
+}
+[data-theme="liquid-mesh"] .topbar::after {
+    content: ""; position: absolute; left: 0; bottom: 0; width: 20%; height: 2px;
+    z-index: 0; pointer-events: none;
+    background: linear-gradient(90deg, transparent 8%, var(--accent), var(--accent-2), var(--lm-coral-deep), transparent 92%);
+    opacity: .58; animation: lmTide 9s ease-in-out infinite;
+}
+[data-theme="liquid-mesh"] .topbar > * {
+    position: relative;
+    z-index: 1;
+}
+@keyframes lmTide {
+    0%,100% { transform: translateX(0) scaleX(.9); }
+    50% { transform: translateX(400%) scaleX(1); }
+}
+
+/* Modals bounce+blur in. */
+[data-theme="liquid-mesh"] .modal-overlay.open .modal { animation: lmPop .4s cubic-bezier(.34,1.7,.5,1) both; }
+@keyframes lmPop { 0% { opacity: 0; transform: scale(.9) translateY(14px); filter: blur(5px); } 60% { transform: scale(1.02); } 100% { opacity: 1; transform: none; filter: blur(0); } }
+
+                                                                              
+/* Glassy translucent panel so the flowing background bleeds through, with a
+   soft gradient accent edge instead of the flat 1px border.
+   NOTE: the blur lives on ::before, NOT on .sidebar itself. Putting
+   backdrop-filter directly on .sidebar creates a new compositing context that
+   breaks its `position: sticky` (the panel would scroll away with the page).
+   The pseudo-element sits behind the content and blurs the background while the
+   real .sidebar stays sticky. */
+[data-theme="liquid-mesh"] .sidebar {
+    background:
+        linear-gradient(180deg,
+            color-mix(in srgb, var(--accent) 18%, transparent),
+            transparent 30%),
+        color-mix(in srgb, var(--bg-2) 90%, transparent);
+    border-right: 0;
+    box-shadow: inset -1px 0 0 color-mix(in srgb, var(--accent) 22%, var(--border));
+    /* position/height/overflow stay as defined in app.css (sticky). */
+}
+[data-theme="liquid-mesh"] .sidebar::before {
+    content: ""; position: absolute; inset: 0; z-index: -1; pointer-events: none;
+    backdrop-filter: blur(14px) saturate(130%);
+    -webkit-backdrop-filter: blur(14px) saturate(130%);
+}
+/* A thin animated gradient ribbon running down the sidebar's inner edge. */
+[data-theme="liquid-mesh"] .sidebar::after {
+    content: ""; position: absolute; top: 0; right: 0; bottom: 0; width: 2px;
+    background: linear-gradient(180deg, var(--accent), var(--accent-2), var(--lm-coral-rose), var(--lm-coral-deep), var(--accent));
+    background-size: 100% 300%;
+    opacity: .62; pointer-events: none;
+    animation: lmEdge 16s ease-in-out infinite;
+}
+@keyframes lmEdge {
+    0%,100% { background-position: 0 0; }
+    50%     { background-position: 0 100%; }
+}
+[data-theme="liquid-mesh"][data-mode="light"] .sidebar {
+    background:
+        linear-gradient(180deg, color-mix(in srgb, var(--accent) 9%, transparent), transparent 22%),
+        color-mix(in srgb, #ffffff 72%, transparent);
+}
+
+/* The brand divider picks up the theme gradient. */
+[data-theme="liquid-mesh"] .brand {
+    border-bottom-color: color-mix(in srgb, var(--accent) 38%, var(--border));
+}
+
+/* Active nav item = pill matching the theme's gooey buttons. */
+[data-theme="liquid-mesh"] .nav-item { border-radius: 999px; }
+[data-theme="liquid-mesh"] .nav-item.active {
+    background: linear-gradient(120deg,
+        color-mix(in srgb, var(--accent) 56%, transparent),
+        color-mix(in srgb, var(--lm-coral-deep) 38%, transparent));
+    box-shadow:
+        inset 0 0 0 1px color-mix(in srgb, var(--accent) 45%, transparent),
+        0 6px 18px -8px color-mix(in srgb, var(--accent) 65%, transparent);
+    color: #fff;
+}
+[data-theme="liquid-mesh"] .nav-item:hover {
+    background: color-mix(in srgb, var(--accent) 20%, transparent);
+}
+/* Section labels get a subtle accent tint so the sidebar feels themed top to bottom. */
+[data-theme="liquid-mesh"] .nav-label {
+    color: color-mix(in srgb,var(--accent) 58%,var(--text-mut));
+    letter-spacing: .6px;
+}
+
+/* Top navigation controls share the same coral family instead of generic navy. */
+[data-theme="liquid-mesh"] .topbar-link,
+[data-theme="liquid-mesh"] .user-chip,
+[data-theme="liquid-mesh"] .theme-toggle,
+[data-theme="liquid-mesh"] .topbar-clock {
+    background: color-mix(in srgb,var(--accent) 9%,var(--bg-3));
+    border-color: color-mix(in srgb,var(--accent) 24%,var(--border));
+}
+[data-theme="liquid-mesh"] .topbar-link:hover,
+[data-theme="liquid-mesh"] .user-chip:hover,
+[data-theme="liquid-mesh"] .theme-toggle:hover {
+    background: color-mix(in srgb,var(--accent) 16%,var(--bg-3));
+    border-color: color-mix(in srgb,var(--accent) 42%,var(--border));
+}
+
+/* Coral is part of the working UI, not only the animated wallpaper. */
+[data-theme="liquid-mesh"] .table-wrap {
+    background: color-mix(in srgb,var(--card) 84%,transparent);
+    border-color: color-mix(in srgb,var(--accent) 22%,var(--border));
+}
+[data-theme="liquid-mesh"] table { background: transparent; }
+[data-theme="liquid-mesh"] thead th { color: color-mix(in srgb,var(--accent) 72%,var(--text-dim)); }
+[data-theme="liquid-mesh"] tbody tr:hover { background: color-mix(in srgb,var(--accent) 9%,var(--bg-3)); }
+[data-theme="liquid-mesh"] .store-type-vip,
+[data-theme="liquid-mesh"] .badge-mute {
+    color: #ff9a95;
+    background: color-mix(in srgb,var(--accent) 14%,transparent);
+    border-color: color-mix(in srgb,var(--accent) 35%,transparent);
+}

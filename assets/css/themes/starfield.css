@@ -1,0 +1,74 @@
+/* @theme id:starfield | name:Starfield | accent:#a78bfa | tag:Animated */
+
+[data-theme="starfield"] {
+    --accent: #8b5cf6;
+    --accent-2: #a78bfa;
+    --enter: animZoom;
+    --enter-dur: .55s;
+    --star: #d8e2ff;
+    --theme-fx-opacity: .95;
+    --theme-fx-light-opacity: .8;
+}
+[data-theme="starfield"][data-mode="dark"] {
+    --bg: #060512; --bg-2: #0c0a1e; --bg-3: #14112e; --card: #0e0b22;
+    --border: #251d47; --text: #ece9ff; --text-dim: #a99fd6; --text-mut: #675d93;
+    --star: #d8e2ff;
+}
+[data-theme="starfield"][data-mode="light"] {
+    --bg: #cfd1df; --bg-2: #dfe1e9; --bg-3: #c2c7d7; --card: #d7dae5;
+    --border: #949ab2; --text: #252a40; --text-dim: #414b68; --text-mut: #4e5973;
+    --star: #4e547b;
+}
+
+[data-theme="starfield"] .theme-fx::before {
+    content: "";
+    position: absolute; inset: -160px; z-index: 1; pointer-events: none;
+    background:
+        radial-gradient(1.5px 1.5px at 20% 30%, var(--star) 60%, transparent 85%),
+        radial-gradient(1px 1px at 70% 60%, var(--star) 60%, transparent 85%),
+        radial-gradient(2px 2px at 40% 80%, var(--star) 55%, transparent 85%),
+        radial-gradient(1.5px 1.5px at 85% 25%, var(--star) 60%, transparent 85%),
+        radial-gradient(1px 1px at 55% 15%, var(--star) 60%, transparent 85%),
+        radial-gradient(2px 2px at 15% 70%, var(--star) 55%, transparent 85%),
+        radial-gradient(1.5px 1.5px at 90% 85%, var(--star) 60%, transparent 85%);
+    background-repeat: repeat;
+    background-size: 320px 320px;
+    opacity: .9;
+    animation: starDrift 80s linear infinite alternate, twinkle 7s ease-in-out infinite;
+}
+
+/* Violet nebula glow on a second fixed layer. */
+[data-theme="starfield"] .theme-fx::after {
+    content: "";
+    position: absolute; inset: 0; z-index: 0; pointer-events: none;
+    background:
+        radial-gradient(40% 40% at 25% 20%, color-mix(in srgb, var(--accent) 40%, transparent), transparent 70%),
+        radial-gradient(44% 46% at 78% 75%, color-mix(in srgb, #6d5bff 38%, transparent), transparent 72%);
+    opacity: .3;
+    animation: nebula 22s ease-in-out infinite alternate;
+}
+[data-theme="starfield"][data-mode="light"] .theme-fx::after {
+    opacity: .12;
+}
+
+@keyframes starDrift {
+    from { transform: translate3d(-40px, -40px, 0); }
+    to { transform: translate3d(80px, 40px, 0); }
+}
+@keyframes twinkle {
+    0%, 100% { opacity: .95; }
+    50%      { opacity: .65; }
+}
+@keyframes nebula {
+    0%   { transform: translate3d(0,0,0) scale(1); }
+    100% { transform: translate3d(2%, -2%, 0) scale(1.1); }
+}
+
+[data-theme="starfield"] .btn-primary,
+[data-theme="starfield"] .nav-item.active {
+    animation: starGlow 5s ease-in-out infinite;
+}
+@keyframes starGlow {
+    0%, 100% { box-shadow: 0 0 10px -4px color-mix(in srgb, var(--accent) 40%, transparent); }
+    50%      { box-shadow: 0 0 24px -2px color-mix(in srgb, var(--accent) 65%, transparent); }
+}

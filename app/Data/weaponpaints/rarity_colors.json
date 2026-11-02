@@ -1,0 +1,5918 @@
+{
+    "2": {
+        "color": "#5e98d9",
+        "rarity": "Industrial Grade"
+    },
+    "3": {
+        "color": "#5e98d9",
+        "rarity": "Industrial Grade"
+    },
+    "5": {
+        "color": "#eb4b4b",
+        "rarity": "Covert"
+    },
+    "6": {
+        "color": "#5e98d9",
+        "rarity": "Industrial Grade"
+    },
+    "8": {
+        "color": "#b0c3d9",
+        "rarity": "Consumer Grade"
+    },
+    "9": {
+        "color": "#d32ce6",
+        "rarity": "Classified"
+    },
+    "10": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "11": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "12": {
+        "color": "#eb4b4b",
+        "rarity": "Covert"
+    },
+    "13": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "14": {
+        "color": "#d32ce6",
+        "rarity": "Classified"
+    },
+    "15": {
+        "color": "#5e98d9",
+        "rarity": "Industrial Grade"
+    },
+    "16": {
+        "color": "#5e98d9",
+        "rarity": "Industrial Grade"
+    },
+    "17": {
+        "color": "#5e98d9",
+        "rarity": "Industrial Grade"
+    },
+    "20": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "21": {
+        "color": "#5e98d9",
+        "rarity": "Industrial Grade"
+    },
+    "22": {
+        "color": "#b0c3d9",
+        "rarity": "Consumer Grade"
+    },
+    "25": {
+        "color": "#b0c3d9",
+        "rarity": "Consumer Grade"
+    },
+    "26": {
+        "color": "#b0c3d9",
+        "rarity": "Consumer Grade"
+    },
+    "27": {
+        "color": "#b0c3d9",
+        "rarity": "Consumer Grade"
+    },
+    "28": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "30": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "32": {
+        "color": "#5e98d9",
+        "rarity": "Industrial Grade"
+    },
+    "33": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "34": {
+        "color": "#5e98d9",
+        "rarity": "Industrial Grade"
+    },
+    "36": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "37": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "38": {
+        "color": "#eb4b4b",
+        "rarity": "Covert"
+    },
+    "39": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "40": {
+        "color": "#eb4b4b",
+        "rarity": "Covert"
+    },
+    "41": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "42": {
+        "color": "#eb4b4b",
+        "rarity": "Covert"
+    },
+    "43": {
+        "color": "#eb4b4b",
+        "rarity": "Covert"
+    },
+    "44": {
+        "color": "#d32ce6",
+        "rarity": "Classified"
+    },
+    "46": {
+        "color": "#b0c3d9",
+        "rarity": "Consumer Grade"
+    },
+    "47": {
+        "color": "#b0c3d9",
+        "rarity": "Consumer Grade"
+    },
+    "48": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "51": {
+        "color": "#eb4b4b",
+        "rarity": "Covert"
+    },
+    "59": {
+        "color": "#eb4b4b",
+        "rarity": "Covert"
+    },
+    "60": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "61": {
+        "color": "#d32ce6",
+        "rarity": "Classified"
+    },
+    "62": {
+        "color": "#d32ce6",
+        "rarity": "Classified"
+    },
+    "67": {
+        "color": "#d32ce6",
+        "rarity": "Classified"
+    },
+    "70": {
+        "color": "#5e98d9",
+        "rarity": "Industrial Grade"
+    },
+    "71": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "72": {
+        "color": "#5e98d9",
+        "rarity": "Industrial Grade"
+    },
+    "73": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "74": {
+        "color": "#b0c3d9",
+        "rarity": "Consumer Grade"
+    },
+    "75": {
+        "color": "#5e98d9",
+        "rarity": "Industrial Grade"
+    },
+    "76": {
+        "color": "#5e98d9",
+        "rarity": "Industrial Grade"
+    },
+    "77": {
+        "color": "#eb4b4b",
+        "rarity": "Covert"
+    },
+    "78": {
+        "color": "#b0c3d9",
+        "rarity": "Consumer Grade"
+    },
+    "83": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "84": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "90": {
+        "color": "#5e98d9",
+        "rarity": "Industrial Grade"
+    },
+    "92": {
+        "color": "#5e98d9",
+        "rarity": "Industrial Grade"
+    },
+    "93": {
+        "color": "#b0c3d9",
+        "rarity": "Consumer Grade"
+    },
+    "95": {
+        "color": "#5e98d9",
+        "rarity": "Industrial Grade"
+    },
+    "96": {
+        "color": "#b0c3d9",
+        "rarity": "Consumer Grade"
+    },
+    "98": {
+        "color": "#eb4b4b",
+        "rarity": "Covert"
+    },
+    "99": {
+        "color": "#b0c3d9",
+        "rarity": "Consumer Grade"
+    },
+    "100": {
+        "color": "#b0c3d9",
+        "rarity": "Consumer Grade"
+    },
+    "101": {
+        "color": "#b0c3d9",
+        "rarity": "Consumer Grade"
+    },
+    "102": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "104": {
+        "color": "#5e98d9",
+        "rarity": "Industrial Grade"
+    },
+    "106": {
+        "color": "#eb4b4b",
+        "rarity": "Covert"
+    },
+    "107": {
+        "color": "#b0c3d9",
+        "rarity": "Consumer Grade"
+    },
+    "110": {
+        "color": "#5e98d9",
+        "rarity": "Industrial Grade"
+    },
+    "111": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "112": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "113": {
+        "color": "#d32ce6",
+        "rarity": "Classified"
+    },
+    "114": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "115": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "116": {
+        "color": "#b0c3d9",
+        "rarity": "Consumer Grade"
+    },
+    "117": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "118": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "119": {
+        "color": "#b0c3d9",
+        "rarity": "Consumer Grade"
+    },
+    "120": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "121": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "122": {
+        "color": "#5e98d9",
+        "rarity": "Industrial Grade"
+    },
+    "123": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "124": {
+        "color": "#b0c3d9",
+        "rarity": "Consumer Grade"
+    },
+    "125": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "126": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "127": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "128": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "129": {
+        "color": "#eb4b4b",
+        "rarity": "Covert"
+    },
+    "130": {
+        "color": "#d32ce6",
+        "rarity": "Classified"
+    },
+    "131": {
+        "color": "#d32ce6",
+        "rarity": "Classified"
+    },
+    "133": {
+        "color": "#5e98d9",
+        "rarity": "Industrial Grade"
+    },
+    "134": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "135": {
+        "color": "#b0c3d9",
+        "rarity": "Consumer Grade"
+    },
+    "136": {
+        "color": "#b0c3d9",
+        "rarity": "Consumer Grade"
+    },
+    "137": {
+        "color": "#d32ce6",
+        "rarity": "Classified"
+    },
+    "138": {
+        "color": "#5e98d9",
+        "rarity": "Industrial Grade"
+    },
+    "139": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "140": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "141": {
+        "color": "#5e98d9",
+        "rarity": "Industrial Grade"
+    },
+    "142": {
+        "color": "#eb4b4b",
+        "rarity": "Covert"
+    },
+    "143": {
+        "color": "#eb4b4b",
+        "rarity": "Covert"
+    },
+    "144": {
+        "color": "#5e98d9",
+        "rarity": "Industrial Grade"
+    },
+    "145": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "146": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "147": {
+        "color": "#b0c3d9",
+        "rarity": "Consumer Grade"
+    },
+    "148": {
+        "color": "#b0c3d9",
+        "rarity": "Consumer Grade"
+    },
+    "149": {
+        "color": "#b0c3d9",
+        "rarity": "Consumer Grade"
+    },
+    "151": {
+        "color": "#b0c3d9",
+        "rarity": "Consumer Grade"
+    },
+    "152": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "153": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "154": {
+        "color": "#d32ce6",
+        "rarity": "Classified"
+    },
+    "155": {
+        "color": "#eb4b4b",
+        "rarity": "Covert"
+    },
+    "156": {
+        "color": "#eb4b4b",
+        "rarity": "Covert"
+    },
+    "157": {
+        "color": "#5e98d9",
+        "rarity": "Industrial Grade"
+    },
+    "158": {
+        "color": "#b0c3d9",
+        "rarity": "Consumer Grade"
+    },
+    "159": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "160": {
+        "color": "#5e98d9",
+        "rarity": "Industrial Grade"
+    },
+    "161": {
+        "color": "#5e98d9",
+        "rarity": "Industrial Grade"
+    },
+    "162": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "163": {
+        "color": "#eb4b4b",
+        "rarity": "Covert"
+    },
+    "164": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "165": {
+        "color": "#d32ce6",
+        "rarity": "Classified"
+    },
+    "166": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "167": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "168": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "169": {
+        "color": "#5e98d9",
+        "rarity": "Industrial Grade"
+    },
+    "170": {
+        "color": "#5e98d9",
+        "rarity": "Industrial Grade"
+    },
+    "171": {
+        "color": "#b0c3d9",
+        "rarity": "Consumer Grade"
+    },
+    "172": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "173": {
+        "color": "#d32ce6",
+        "rarity": "Classified"
+    },
+    "174": {
+        "color": "#d32ce6",
+        "rarity": "Classified"
+    },
+    "175": {
+        "color": "#eb4b4b",
+        "rarity": "Covert"
+    },
+    "176": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "177": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "178": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "179": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "180": {
+        "color": "#eb4b4b",
+        "rarity": "Covert"
+    },
+    "181": {
+        "color": "#d32ce6",
+        "rarity": "Classified"
+    },
+    "182": {
+        "color": "#d32ce6",
+        "rarity": "Classified"
+    },
+    "183": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "184": {
+        "color": "#d32ce6",
+        "rarity": "Classified"
+    },
+    "185": {
+        "color": "#eb4b4b",
+        "rarity": "Covert"
+    },
+    "186": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "187": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "188": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "189": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "190": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "191": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "192": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "193": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "194": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "195": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "196": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "197": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "198": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "199": {
+        "color": "#b0c3d9",
+        "rarity": "Consumer Grade"
+    },
+    "200": {
+        "color": "#5e98d9",
+        "rarity": "Industrial Grade"
+    },
+    "201": {
+        "color": "#5e98d9",
+        "rarity": "Industrial Grade"
+    },
+    "202": {
+        "color": "#b0c3d9",
+        "rarity": "Consumer Grade"
+    },
+    "203": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "204": {
+        "color": "#5e98d9",
+        "rarity": "Industrial Grade"
+    },
+    "205": {
+        "color": "#b0c3d9",
+        "rarity": "Consumer Grade"
+    },
+    "206": {
+        "color": "#b0c3d9",
+        "rarity": "Consumer Grade"
+    },
+    "207": {
+        "color": "#5e98d9",
+        "rarity": "Industrial Grade"
+    },
+    "208": {
+        "color": "#5e98d9",
+        "rarity": "Industrial Grade"
+    },
+    "209": {
+        "color": "#b0c3d9",
+        "rarity": "Consumer Grade"
+    },
+    "210": {
+        "color": "#b0c3d9",
+        "rarity": "Consumer Grade"
+    },
+    "211": {
+        "color": "#d32ce6",
+        "rarity": "Classified"
+    },
+    "212": {
+        "color": "#d32ce6",
+        "rarity": "Classified"
+    },
+    "213": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "214": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "215": {
+        "color": "#eb4b4b",
+        "rarity": "Covert"
+    },
+    "216": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "217": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "218": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "219": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "220": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "221": {
+        "color": "#d32ce6",
+        "rarity": "Classified"
+    },
+    "222": {
+        "color": "#eb4b4b",
+        "rarity": "Covert"
+    },
+    "223": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "224": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "225": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "226": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "227": {
+        "color": "#d32ce6",
+        "rarity": "Classified"
+    },
+    "228": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "229": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "230": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "231": {
+        "color": "#d32ce6",
+        "rarity": "Classified"
+    },
+    "232": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "233": {
+        "color": "#5e98d9",
+        "rarity": "Industrial Grade"
+    },
+    "234": {
+        "color": "#5e98d9",
+        "rarity": "Industrial Grade"
+    },
+    "235": {
+        "color": "#5e98d9",
+        "rarity": "Industrial Grade"
+    },
+    "236": {
+        "color": "#5e98d9",
+        "rarity": "Industrial Grade"
+    },
+    "237": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "238": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "239": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "240": {
+        "color": "#5e98d9",
+        "rarity": "Industrial Grade"
+    },
+    "241": {
+        "color": "#b0c3d9",
+        "rarity": "Consumer Grade"
+    },
+    "242": {
+        "color": "#b0c3d9",
+        "rarity": "Consumer Grade"
+    },
+    "243": {
+        "color": "#5e98d9",
+        "rarity": "Industrial Grade"
+    },
+    "244": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "245": {
+        "color": "#b0c3d9",
+        "rarity": "Consumer Grade"
+    },
+    "246": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "247": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "248": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "249": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "250": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "251": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "252": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "253": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "254": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "255": {
+        "color": "#eb4b4b",
+        "rarity": "Covert"
+    },
+    "256": {
+        "color": "#eb4b4b",
+        "rarity": "Covert"
+    },
+    "257": {
+        "color": "#d32ce6",
+        "rarity": "Classified"
+    },
+    "258": {
+        "color": "#d32ce6",
+        "rarity": "Classified"
+    },
+    "259": {
+        "color": "#d32ce6",
+        "rarity": "Classified"
+    },
+    "260": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "261": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "262": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "263": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "264": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "265": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "266": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "267": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "268": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "269": {
+        "color": "#d32ce6",
+        "rarity": "Classified"
+    },
+    "270": {
+        "color": "#eb4b4b",
+        "rarity": "Covert"
+    },
+    "271": {
+        "color": "#d32ce6",
+        "rarity": "Classified"
+    },
+    "272": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "273": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "274": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "275": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "276": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "277": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "278": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "279": {
+        "color": "#eb4b4b",
+        "rarity": "Covert"
+    },
+    "280": {
+        "color": "#eb4b4b",
+        "rarity": "Covert"
+    },
+    "281": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "282": {
+        "color": "#d32ce6",
+        "rarity": "Classified"
+    },
+    "283": {
+        "color": "#d32ce6",
+        "rarity": "Classified"
+    },
+    "284": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "285": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "286": {
+        "color": "#d32ce6",
+        "rarity": "Classified"
+    },
+    "287": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "288": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "289": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "290": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "291": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "292": {
+        "color": "#d32ce6",
+        "rarity": "Classified"
+    },
+    "293": {
+        "color": "#b0c3d9",
+        "rarity": "Consumer Grade"
+    },
+    "294": {
+        "color": "#5e98d9",
+        "rarity": "Industrial Grade"
+    },
+    "295": {
+        "color": "#d32ce6",
+        "rarity": "Classified"
+    },
+    "296": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "297": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "298": {
+        "color": "#b0c3d9",
+        "rarity": "Consumer Grade"
+    },
+    "299": {
+        "color": "#5e98d9",
+        "rarity": "Industrial Grade"
+    },
+    "300": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "301": {
+        "color": "#d32ce6",
+        "rarity": "Classified"
+    },
+    "302": {
+        "color": "#eb4b4b",
+        "rarity": "Covert"
+    },
+    "303": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "304": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "305": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "306": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "307": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "308": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "309": {
+        "color": "#e4ae39",
+        "rarity": "Contraband"
+    },
+    "310": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "311": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "312": {
+        "color": "#d32ce6",
+        "rarity": "Classified"
+    },
+    "313": {
+        "color": "#d32ce6",
+        "rarity": "Classified"
+    },
+    "314": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "315": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "316": {
+        "color": "#eb4b4b",
+        "rarity": "Covert"
+    },
+    "317": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "318": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "319": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "320": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "321": {
+        "color": "#d32ce6",
+        "rarity": "Classified"
+    },
+    "322": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "323": {
+        "color": "#5e98d9",
+        "rarity": "Industrial Grade"
+    },
+    "324": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "325": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "326": {
+        "color": "#d32ce6",
+        "rarity": "Classified"
+    },
+    "327": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "328": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "329": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "330": {
+        "color": "#b0c3d9",
+        "rarity": "Consumer Grade"
+    },
+    "331": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "332": {
+        "color": "#5e98d9",
+        "rarity": "Industrial Grade"
+    },
+    "333": {
+        "color": "#b0c3d9",
+        "rarity": "Consumer Grade"
+    },
+    "334": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "335": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "336": {
+        "color": "#eb4b4b",
+        "rarity": "Covert"
+    },
+    "337": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "338": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "339": {
+        "color": "#d32ce6",
+        "rarity": "Classified"
+    },
+    "340": {
+        "color": "#d32ce6",
+        "rarity": "Classified"
+    },
+    "341": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "342": {
+        "color": "#5e98d9",
+        "rarity": "Industrial Grade"
+    },
+    "343": {
+        "color": "#5e98d9",
+        "rarity": "Industrial Grade"
+    },
+    "344": {
+        "color": "#eb4b4b",
+        "rarity": "Covert"
+    },
+    "345": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "346": {
+        "color": "#5e98d9",
+        "rarity": "Industrial Grade"
+    },
+    "347": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "348": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "349": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "350": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "351": {
+        "color": "#d32ce6",
+        "rarity": "Classified"
+    },
+    "352": {
+        "color": "#d32ce6",
+        "rarity": "Classified"
+    },
+    "353": {
+        "color": "#d32ce6",
+        "rarity": "Classified"
+    },
+    "354": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "355": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "356": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "357": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "358": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "359": {
+        "color": "#eb4b4b",
+        "rarity": "Covert"
+    },
+    "360": {
+        "color": "#eb4b4b",
+        "rarity": "Covert"
+    },
+    "361": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "362": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "363": {
+        "color": "#5e98d9",
+        "rarity": "Industrial Grade"
+    },
+    "364": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "365": {
+        "color": "#b0c3d9",
+        "rarity": "Consumer Grade"
+    },
+    "366": {
+        "color": "#b0c3d9",
+        "rarity": "Consumer Grade"
+    },
+    "367": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "368": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "369": {
+        "color": "#5e98d9",
+        "rarity": "Industrial Grade"
+    },
+    "370": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "371": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "372": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "373": {
+        "color": "#5e98d9",
+        "rarity": "Industrial Grade"
+    },
+    "374": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "375": {
+        "color": "#5e98d9",
+        "rarity": "Industrial Grade"
+    },
+    "376": {
+        "color": "#5e98d9",
+        "rarity": "Industrial Grade"
+    },
+    "377": {
+        "color": "#5e98d9",
+        "rarity": "Industrial Grade"
+    },
+    "378": {
+        "color": "#5e98d9",
+        "rarity": "Industrial Grade"
+    },
+    "379": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "380": {
+        "color": "#eb4b4b",
+        "rarity": "Covert"
+    },
+    "381": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "382": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "383": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "384": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "385": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "386": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "387": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "388": {
+        "color": "#d32ce6",
+        "rarity": "Classified"
+    },
+    "389": {
+        "color": "#eb4b4b",
+        "rarity": "Covert"
+    },
+    "390": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "391": {
+        "color": "#d32ce6",
+        "rarity": "Classified"
+    },
+    "392": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "393": {
+        "color": "#d32ce6",
+        "rarity": "Classified"
+    },
+    "394": {
+        "color": "#d32ce6",
+        "rarity": "Classified"
+    },
+    "395": {
+        "color": "#eb4b4b",
+        "rarity": "Covert"
+    },
+    "396": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "397": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "398": {
+        "color": "#eb4b4b",
+        "rarity": "Covert"
+    },
+    "399": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "400": {
+        "color": "#d32ce6",
+        "rarity": "Classified"
+    },
+    "401": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "402": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "403": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "404": {
+        "color": "#d32ce6",
+        "rarity": "Classified"
+    },
+    "405": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "406": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "407": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "409": {
+        "color": "#eb4b4b",
+        "rarity": "Covert"
+    },
+    "410": {
+        "color": "#eb4b4b",
+        "rarity": "Covert"
+    },
+    "411": {
+        "color": "#eb4b4b",
+        "rarity": "Covert"
+    },
+    "412": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "413": {
+        "color": "#eb4b4b",
+        "rarity": "Covert"
+    },
+    "414": {
+        "color": "#eb4b4b",
+        "rarity": "Covert"
+    },
+    "415": {
+        "color": "#eb4b4b",
+        "rarity": "Covert"
+    },
+    "416": {
+        "color": "#eb4b4b",
+        "rarity": "Covert"
+    },
+    "417": {
+        "color": "#eb4b4b",
+        "rarity": "Covert"
+    },
+    "418": {
+        "color": "#eb4b4b",
+        "rarity": "Covert"
+    },
+    "419": {
+        "color": "#eb4b4b",
+        "rarity": "Covert"
+    },
+    "420": {
+        "color": "#eb4b4b",
+        "rarity": "Covert"
+    },
+    "421": {
+        "color": "#eb4b4b",
+        "rarity": "Covert"
+    },
+    "422": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "423": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "424": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "425": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "426": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "427": {
+        "color": "#d32ce6",
+        "rarity": "Classified"
+    },
+    "428": {
+        "color": "#d32ce6",
+        "rarity": "Classified"
+    },
+    "429": {
+        "color": "#d32ce6",
+        "rarity": "Classified"
+    },
+    "430": {
+        "color": "#eb4b4b",
+        "rarity": "Covert"
+    },
+    "431": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "432": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "433": {
+        "color": "#eb4b4b",
+        "rarity": "Covert"
+    },
+    "434": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "435": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "436": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "437": {
+        "color": "#d32ce6",
+        "rarity": "Classified"
+    },
+    "438": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "439": {
+        "color": "#5e98d9",
+        "rarity": "Industrial Grade"
+    },
+    "440": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "441": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "442": {
+        "color": "#b0c3d9",
+        "rarity": "Consumer Grade"
+    },
+    "443": {
+        "color": "#5e98d9",
+        "rarity": "Industrial Grade"
+    },
+    "444": {
+        "color": "#b0c3d9",
+        "rarity": "Consumer Grade"
+    },
+    "445": {
+        "color": "#d32ce6",
+        "rarity": "Classified"
+    },
+    "446": {
+        "color": "#eb4b4b",
+        "rarity": "Covert"
+    },
+    "447": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "448": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "449": {
+        "color": "#d32ce6",
+        "rarity": "Classified"
+    },
+    "450": {
+        "color": "#b0c3d9",
+        "rarity": "Consumer Grade"
+    },
+    "451": {
+        "color": "#5e98d9",
+        "rarity": "Industrial Grade"
+    },
+    "452": {
+        "color": "#5e98d9",
+        "rarity": "Industrial Grade"
+    },
+    "453": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "454": {
+        "color": "#5e98d9",
+        "rarity": "Industrial Grade"
+    },
+    "455": {
+        "color": "#eb4b4b",
+        "rarity": "Covert"
+    },
+    "456": {
+        "color": "#d32ce6",
+        "rarity": "Classified"
+    },
+    "457": {
+        "color": "#b0c3d9",
+        "rarity": "Consumer Grade"
+    },
+    "458": {
+        "color": "#b0c3d9",
+        "rarity": "Consumer Grade"
+    },
+    "459": {
+        "color": "#b0c3d9",
+        "rarity": "Consumer Grade"
+    },
+    "460": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "461": {
+        "color": "#5e98d9",
+        "rarity": "Industrial Grade"
+    },
+    "462": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "463": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "464": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "465": {
+        "color": "#b0c3d9",
+        "rarity": "Consumer Grade"
+    },
+    "466": {
+        "color": "#5e98d9",
+        "rarity": "Industrial Grade"
+    },
+    "467": {
+        "color": "#b0c3d9",
+        "rarity": "Consumer Grade"
+    },
+    "468": {
+        "color": "#5e98d9",
+        "rarity": "Industrial Grade"
+    },
+    "469": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "470": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "471": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "472": {
+        "color": "#b0c3d9",
+        "rarity": "Consumer Grade"
+    },
+    "473": {
+        "color": "#b0c3d9",
+        "rarity": "Consumer Grade"
+    },
+    "474": {
+        "color": "#eb4b4b",
+        "rarity": "Covert"
+    },
+    "475": {
+        "color": "#eb4b4b",
+        "rarity": "Covert"
+    },
+    "476": {
+        "color": "#d32ce6",
+        "rarity": "Classified"
+    },
+    "477": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "478": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "479": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "480": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "481": {
+        "color": "#d32ce6",
+        "rarity": "Classified"
+    },
+    "482": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "483": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "484": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "485": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "486": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "487": {
+        "color": "#d32ce6",
+        "rarity": "Classified"
+    },
+    "488": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "489": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "490": {
+        "color": "#d32ce6",
+        "rarity": "Classified"
+    },
+    "491": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "492": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "493": {
+        "color": "#d32ce6",
+        "rarity": "Classified"
+    },
+    "494": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "495": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "496": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "497": {
+        "color": "#eb4b4b",
+        "rarity": "Covert"
+    },
+    "498": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "499": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "500": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "501": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "502": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "503": {
+        "color": "#d32ce6",
+        "rarity": "Classified"
+    },
+    "504": {
+        "color": "#eb4b4b",
+        "rarity": "Covert"
+    },
+    "505": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "506": {
+        "color": "#d32ce6",
+        "rarity": "Classified"
+    },
+    "507": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "508": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "509": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "510": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "511": {
+        "color": "#d32ce6",
+        "rarity": "Classified"
+    },
+    "512": {
+        "color": "#eb4b4b",
+        "rarity": "Covert"
+    },
+    "513": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "514": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "515": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "516": {
+        "color": "#d32ce6",
+        "rarity": "Classified"
+    },
+    "517": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "518": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "519": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "520": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "521": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "522": {
+        "color": "#eb4b4b",
+        "rarity": "Covert"
+    },
+    "523": {
+        "color": "#d32ce6",
+        "rarity": "Classified"
+    },
+    "524": {
+        "color": "#eb4b4b",
+        "rarity": "Covert"
+    },
+    "525": {
+        "color": "#d32ce6",
+        "rarity": "Classified"
+    },
+    "526": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "527": {
+        "color": "#d32ce6",
+        "rarity": "Classified"
+    },
+    "528": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "529": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "530": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "532": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "533": {
+        "color": "#eb4b4b",
+        "rarity": "Covert"
+    },
+    "534": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "535": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "536": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "537": {
+        "color": "#d32ce6",
+        "rarity": "Classified"
+    },
+    "538": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "539": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "540": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "541": {
+        "color": "#d32ce6",
+        "rarity": "Classified"
+    },
+    "542": {
+        "color": "#eb4b4b",
+        "rarity": "Covert"
+    },
+    "543": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "544": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "545": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "546": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "547": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "548": {
+        "color": "#eb4b4b",
+        "rarity": "Covert"
+    },
+    "549": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "550": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "551": {
+        "color": "#d32ce6",
+        "rarity": "Classified"
+    },
+    "552": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "553": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "554": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "555": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "556": {
+        "color": "#d32ce6",
+        "rarity": "Classified"
+    },
+    "557": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "558": {
+        "color": "#eb4b4b",
+        "rarity": "Covert"
+    },
+    "559": {
+        "color": "#eb4b4b",
+        "rarity": "Covert"
+    },
+    "560": {
+        "color": "#eb4b4b",
+        "rarity": "Covert"
+    },
+    "561": {
+        "color": "#eb4b4b",
+        "rarity": "Covert"
+    },
+    "562": {
+        "color": "#eb4b4b",
+        "rarity": "Covert"
+    },
+    "563": {
+        "color": "#eb4b4b",
+        "rarity": "Covert"
+    },
+    "564": {
+        "color": "#eb4b4b",
+        "rarity": "Covert"
+    },
+    "565": {
+        "color": "#eb4b4b",
+        "rarity": "Covert"
+    },
+    "566": {
+        "color": "#eb4b4b",
+        "rarity": "Covert"
+    },
+    "567": {
+        "color": "#eb4b4b",
+        "rarity": "Covert"
+    },
+    "568": {
+        "color": "#eb4b4b",
+        "rarity": "Covert"
+    },
+    "569": {
+        "color": "#eb4b4b",
+        "rarity": "Covert"
+    },
+    "570": {
+        "color": "#eb4b4b",
+        "rarity": "Covert"
+    },
+    "571": {
+        "color": "#eb4b4b",
+        "rarity": "Covert"
+    },
+    "572": {
+        "color": "#eb4b4b",
+        "rarity": "Covert"
+    },
+    "573": {
+        "color": "#eb4b4b",
+        "rarity": "Covert"
+    },
+    "574": {
+        "color": "#eb4b4b",
+        "rarity": "Covert"
+    },
+    "575": {
+        "color": "#eb4b4b",
+        "rarity": "Covert"
+    },
+    "576": {
+        "color": "#eb4b4b",
+        "rarity": "Covert"
+    },
+    "577": {
+        "color": "#eb4b4b",
+        "rarity": "Covert"
+    },
+    "578": {
+        "color": "#eb4b4b",
+        "rarity": "Covert"
+    },
+    "579": {
+        "color": "#eb4b4b",
+        "rarity": "Covert"
+    },
+    "580": {
+        "color": "#eb4b4b",
+        "rarity": "Covert"
+    },
+    "581": {
+        "color": "#eb4b4b",
+        "rarity": "Covert"
+    },
+    "582": {
+        "color": "#eb4b4b",
+        "rarity": "Covert"
+    },
+    "583": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "584": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "585": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "586": {
+        "color": "#eb4b4b",
+        "rarity": "Covert"
+    },
+    "587": {
+        "color": "#eb4b4b",
+        "rarity": "Covert"
+    },
+    "588": {
+        "color": "#d32ce6",
+        "rarity": "Classified"
+    },
+    "589": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "590": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "591": {
+        "color": "#d32ce6",
+        "rarity": "Classified"
+    },
+    "592": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "593": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "594": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "595": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "596": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "597": {
+        "color": "#d32ce6",
+        "rarity": "Classified"
+    },
+    "598": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "599": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "600": {
+        "color": "#eb4b4b",
+        "rarity": "Covert"
+    },
+    "601": {
+        "color": "#d32ce6",
+        "rarity": "Classified"
+    },
+    "602": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "603": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "604": {
+        "color": "#eb4b4b",
+        "rarity": "Covert"
+    },
+    "605": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "606": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "607": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "608": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "609": {
+        "color": "#d32ce6",
+        "rarity": "Classified"
+    },
+    "610": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "611": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "612": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "613": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "614": {
+        "color": "#d32ce6",
+        "rarity": "Classified"
+    },
+    "615": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "616": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "617": {
+        "color": "#eb4b4b",
+        "rarity": "Covert"
+    },
+    "618": {
+        "color": "#eb4b4b",
+        "rarity": "Covert"
+    },
+    "619": {
+        "color": "#eb4b4b",
+        "rarity": "Covert"
+    },
+    "620": {
+        "color": "#eb4b4b",
+        "rarity": "Covert"
+    },
+    "621": {
+        "color": "#eb4b4b",
+        "rarity": "Covert"
+    },
+    "622": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "623": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "624": {
+        "color": "#eb4b4b",
+        "rarity": "Covert"
+    },
+    "625": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "626": {
+        "color": "#d32ce6",
+        "rarity": "Classified"
+    },
+    "627": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "628": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "629": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "630": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "631": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "632": {
+        "color": "#eb4b4b",
+        "rarity": "Covert"
+    },
+    "633": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "634": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "635": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "636": {
+        "color": "#d32ce6",
+        "rarity": "Classified"
+    },
+    "637": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "638": {
+        "color": "#d32ce6",
+        "rarity": "Classified"
+    },
+    "639": {
+        "color": "#eb4b4b",
+        "rarity": "Covert"
+    },
+    "640": {
+        "color": "#d32ce6",
+        "rarity": "Classified"
+    },
+    "641": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "642": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "643": {
+        "color": "#d32ce6",
+        "rarity": "Classified"
+    },
+    "644": {
+        "color": "#d32ce6",
+        "rarity": "Classified"
+    },
+    "645": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "646": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "647": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "648": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "649": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "650": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "651": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "652": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "653": {
+        "color": "#eb4b4b",
+        "rarity": "Covert"
+    },
+    "654": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "655": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "656": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "657": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "658": {
+        "color": "#d32ce6",
+        "rarity": "Classified"
+    },
+    "659": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "660": {
+        "color": "#eb4b4b",
+        "rarity": "Covert"
+    },
+    "661": {
+        "color": "#d32ce6",
+        "rarity": "Classified"
+    },
+    "662": {
+        "color": "#eb4b4b",
+        "rarity": "Covert"
+    },
+    "663": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "664": {
+        "color": "#d32ce6",
+        "rarity": "Classified"
+    },
+    "665": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "666": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "667": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "668": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "669": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "670": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "671": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "672": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "673": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "674": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "675": {
+        "color": "#eb4b4b",
+        "rarity": "Covert"
+    },
+    "676": {
+        "color": "#d32ce6",
+        "rarity": "Classified"
+    },
+    "677": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "678": {
+        "color": "#eb4b4b",
+        "rarity": "Covert"
+    },
+    "679": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "680": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "681": {
+        "color": "#d32ce6",
+        "rarity": "Classified"
+    },
+    "682": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "683": {
+        "color": "#d32ce6",
+        "rarity": "Classified"
+    },
+    "684": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "685": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "686": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "687": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "688": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "689": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "690": {
+        "color": "#d32ce6",
+        "rarity": "Classified"
+    },
+    "691": {
+        "color": "#d32ce6",
+        "rarity": "Classified"
+    },
+    "692": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "693": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "694": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "695": {
+        "color": "#eb4b4b",
+        "rarity": "Covert"
+    },
+    "696": {
+        "color": "#eb4b4b",
+        "rarity": "Covert"
+    },
+    "697": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "698": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "699": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "700": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "701": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "702": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "703": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "704": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "705": {
+        "color": "#d32ce6",
+        "rarity": "Classified"
+    },
+    "706": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "707": {
+        "color": "#eb4b4b",
+        "rarity": "Covert"
+    },
+    "708": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "709": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "710": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "711": {
+        "color": "#eb4b4b",
+        "rarity": "Covert"
+    },
+    "712": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "713": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "714": {
+        "color": "#d32ce6",
+        "rarity": "Classified"
+    },
+    "715": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "716": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "717": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "718": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "719": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "720": {
+        "color": "#d32ce6",
+        "rarity": "Classified"
+    },
+    "721": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "722": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "723": {
+        "color": "#d32ce6",
+        "rarity": "Classified"
+    },
+    "724": {
+        "color": "#eb4b4b",
+        "rarity": "Covert"
+    },
+    "725": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "726": {
+        "color": "#5e98d9",
+        "rarity": "Industrial Grade"
+    },
+    "727": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "728": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "729": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "730": {
+        "color": "#5e98d9",
+        "rarity": "Industrial Grade"
+    },
+    "731": {
+        "color": "#5e98d9",
+        "rarity": "Industrial Grade"
+    },
+    "732": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "733": {
+        "color": "#5e98d9",
+        "rarity": "Industrial Grade"
+    },
+    "734": {
+        "color": "#d32ce6",
+        "rarity": "Classified"
+    },
+    "735": {
+        "color": "#eb4b4b",
+        "rarity": "Covert"
+    },
+    "736": {
+        "color": "#eb4b4b",
+        "rarity": "Covert"
+    },
+    "737": {
+        "color": "#d32ce6",
+        "rarity": "Classified"
+    },
+    "738": {
+        "color": "#5e98d9",
+        "rarity": "Industrial Grade"
+    },
+    "739": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "740": {
+        "color": "#b0c3d9",
+        "rarity": "Consumer Grade"
+    },
+    "741": {
+        "color": "#5e98d9",
+        "rarity": "Industrial Grade"
+    },
+    "742": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "743": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "744": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "745": {
+        "color": "#5e98d9",
+        "rarity": "Industrial Grade"
+    },
+    "746": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "747": {
+        "color": "#d32ce6",
+        "rarity": "Classified"
+    },
+    "748": {
+        "color": "#5e98d9",
+        "rarity": "Industrial Grade"
+    },
+    "749": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "750": {
+        "color": "#d32ce6",
+        "rarity": "Classified"
+    },
+    "751": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "752": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "753": {
+        "color": "#b0c3d9",
+        "rarity": "Consumer Grade"
+    },
+    "754": {
+        "color": "#b0c3d9",
+        "rarity": "Consumer Grade"
+    },
+    "755": {
+        "color": "#b0c3d9",
+        "rarity": "Consumer Grade"
+    },
+    "756": {
+        "color": "#eb4b4b",
+        "rarity": "Covert"
+    },
+    "757": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "758": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "759": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "760": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "761": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "762": {
+        "color": "#b0c3d9",
+        "rarity": "Consumer Grade"
+    },
+    "763": {
+        "color": "#d32ce6",
+        "rarity": "Classified"
+    },
+    "764": {
+        "color": "#d32ce6",
+        "rarity": "Classified"
+    },
+    "765": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "766": {
+        "color": "#5e98d9",
+        "rarity": "Industrial Grade"
+    },
+    "768": {
+        "color": "#5e98d9",
+        "rarity": "Industrial Grade"
+    },
+    "770": {
+        "color": "#5e98d9",
+        "rarity": "Industrial Grade"
+    },
+    "773": {
+        "color": "#5e98d9",
+        "rarity": "Industrial Grade"
+    },
+    "774": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "775": {
+        "color": "#b0c3d9",
+        "rarity": "Consumer Grade"
+    },
+    "776": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "777": {
+        "color": "#b0c3d9",
+        "rarity": "Consumer Grade"
+    },
+    "778": {
+        "color": "#b0c3d9",
+        "rarity": "Consumer Grade"
+    },
+    "779": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "780": {
+        "color": "#5e98d9",
+        "rarity": "Industrial Grade"
+    },
+    "781": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "782": {
+        "color": "#5e98d9",
+        "rarity": "Industrial Grade"
+    },
+    "783": {
+        "color": "#5e98d9",
+        "rarity": "Industrial Grade"
+    },
+    "784": {
+        "color": "#b0c3d9",
+        "rarity": "Consumer Grade"
+    },
+    "785": {
+        "color": "#b0c3d9",
+        "rarity": "Consumer Grade"
+    },
+    "786": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "787": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "788": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "789": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "790": {
+        "color": "#5e98d9",
+        "rarity": "Industrial Grade"
+    },
+    "791": {
+        "color": "#d32ce6",
+        "rarity": "Classified"
+    },
+    "792": {
+        "color": "#d32ce6",
+        "rarity": "Classified"
+    },
+    "793": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "794": {
+        "color": "#b0c3d9",
+        "rarity": "Consumer Grade"
+    },
+    "795": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "796": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "797": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "798": {
+        "color": "#5e98d9",
+        "rarity": "Industrial Grade"
+    },
+    "799": {
+        "color": "#5e98d9",
+        "rarity": "Industrial Grade"
+    },
+    "800": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "801": {
+        "color": "#eb4b4b",
+        "rarity": "Covert"
+    },
+    "802": {
+        "color": "#d32ce6",
+        "rarity": "Classified"
+    },
+    "803": {
+        "color": "#eb4b4b",
+        "rarity": "Covert"
+    },
+    "804": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "805": {
+        "color": "#d32ce6",
+        "rarity": "Classified"
+    },
+    "806": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "807": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "808": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "809": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "810": {
+        "color": "#d32ce6",
+        "rarity": "Classified"
+    },
+    "811": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "812": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "813": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "814": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "815": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "816": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "817": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "818": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "819": {
+        "color": "#eb4b4b",
+        "rarity": "Covert"
+    },
+    "820": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "821": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "822": {
+        "color": "#b0c3d9",
+        "rarity": "Consumer Grade"
+    },
+    "823": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "824": {
+        "color": "#5e98d9",
+        "rarity": "Industrial Grade"
+    },
+    "825": {
+        "color": "#b0c3d9",
+        "rarity": "Consumer Grade"
+    },
+    "826": {
+        "color": "#b0c3d9",
+        "rarity": "Consumer Grade"
+    },
+    "827": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "828": {
+        "color": "#5e98d9",
+        "rarity": "Industrial Grade"
+    },
+    "829": {
+        "color": "#b0c3d9",
+        "rarity": "Consumer Grade"
+    },
+    "830": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "831": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "832": {
+        "color": "#d32ce6",
+        "rarity": "Classified"
+    },
+    "834": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "835": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "836": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "837": {
+        "color": "#eb4b4b",
+        "rarity": "Covert"
+    },
+    "838": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "839": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "840": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "841": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "842": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "843": {
+        "color": "#d32ce6",
+        "rarity": "Classified"
+    },
+    "844": {
+        "color": "#eb4b4b",
+        "rarity": "Covert"
+    },
+    "845": {
+        "color": "#d32ce6",
+        "rarity": "Classified"
+    },
+    "846": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "847": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "848": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "849": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "850": {
+        "color": "#d32ce6",
+        "rarity": "Classified"
+    },
+    "851": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "852": {
+        "color": "#eb4b4b",
+        "rarity": "Covert"
+    },
+    "853": {
+        "color": "#eb4b4b",
+        "rarity": "Covert"
+    },
+    "854": {
+        "color": "#eb4b4b",
+        "rarity": "Covert"
+    },
+    "855": {
+        "color": "#eb4b4b",
+        "rarity": "Covert"
+    },
+    "856": {
+        "color": "#eb4b4b",
+        "rarity": "Covert"
+    },
+    "857": {
+        "color": "#eb4b4b",
+        "rarity": "Covert"
+    },
+    "858": {
+        "color": "#eb4b4b",
+        "rarity": "Covert"
+    },
+    "859": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "860": {
+        "color": "#5e98d9",
+        "rarity": "Industrial Grade"
+    },
+    "861": {
+        "color": "#b0c3d9",
+        "rarity": "Consumer Grade"
+    },
+    "862": {
+        "color": "#5e98d9",
+        "rarity": "Industrial Grade"
+    },
+    "863": {
+        "color": "#b0c3d9",
+        "rarity": "Consumer Grade"
+    },
+    "864": {
+        "color": "#5e98d9",
+        "rarity": "Industrial Grade"
+    },
+    "865": {
+        "color": "#b0c3d9",
+        "rarity": "Consumer Grade"
+    },
+    "866": {
+        "color": "#b0c3d9",
+        "rarity": "Consumer Grade"
+    },
+    "867": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "868": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "869": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "870": {
+        "color": "#b0c3d9",
+        "rarity": "Consumer Grade"
+    },
+    "871": {
+        "color": "#b0c3d9",
+        "rarity": "Consumer Grade"
+    },
+    "872": {
+        "color": "#b0c3d9",
+        "rarity": "Consumer Grade"
+    },
+    "873": {
+        "color": "#b0c3d9",
+        "rarity": "Consumer Grade"
+    },
+    "874": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "875": {
+        "color": "#5e98d9",
+        "rarity": "Industrial Grade"
+    },
+    "877": {
+        "color": "#5e98d9",
+        "rarity": "Industrial Grade"
+    },
+    "878": {
+        "color": "#5e98d9",
+        "rarity": "Industrial Grade"
+    },
+    "879": {
+        "color": "#d32ce6",
+        "rarity": "Classified"
+    },
+    "880": {
+        "color": "#b0c3d9",
+        "rarity": "Consumer Grade"
+    },
+    "882": {
+        "color": "#5e98d9",
+        "rarity": "Industrial Grade"
+    },
+    "883": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "884": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "885": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "886": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "887": {
+        "color": "#eb4b4b",
+        "rarity": "Covert"
+    },
+    "888": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "889": {
+        "color": "#d32ce6",
+        "rarity": "Classified"
+    },
+    "890": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "891": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "892": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "893": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "894": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "895": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "896": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "897": {
+        "color": "#d32ce6",
+        "rarity": "Classified"
+    },
+    "898": {
+        "color": "#eb4b4b",
+        "rarity": "Covert"
+    },
+    "899": {
+        "color": "#d32ce6",
+        "rarity": "Classified"
+    },
+    "900": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "901": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "902": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "903": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "904": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "905": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "906": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "907": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "908": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "909": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "910": {
+        "color": "#d32ce6",
+        "rarity": "Classified"
+    },
+    "911": {
+        "color": "#d32ce6",
+        "rarity": "Classified"
+    },
+    "912": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "913": {
+        "color": "#d32ce6",
+        "rarity": "Classified"
+    },
+    "914": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "915": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "916": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "917": {
+        "color": "#eb4b4b",
+        "rarity": "Covert"
+    },
+    "918": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "919": {
+        "color": "#eb4b4b",
+        "rarity": "Covert"
+    },
+    "920": {
+        "color": "#b0c3d9",
+        "rarity": "Consumer Grade"
+    },
+    "921": {
+        "color": "#eb4b4b",
+        "rarity": "Covert"
+    },
+    "922": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "923": {
+        "color": "#d32ce6",
+        "rarity": "Classified"
+    },
+    "924": {
+        "color": "#b0c3d9",
+        "rarity": "Consumer Grade"
+    },
+    "925": {
+        "color": "#b0c3d9",
+        "rarity": "Consumer Grade"
+    },
+    "926": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "927": {
+        "color": "#5e98d9",
+        "rarity": "Industrial Grade"
+    },
+    "928": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "929": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "930": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "931": {
+        "color": "#5e98d9",
+        "rarity": "Industrial Grade"
+    },
+    "932": {
+        "color": "#5e98d9",
+        "rarity": "Industrial Grade"
+    },
+    "933": {
+        "color": "#5e98d9",
+        "rarity": "Industrial Grade"
+    },
+    "934": {
+        "color": "#b0c3d9",
+        "rarity": "Consumer Grade"
+    },
+    "935": {
+        "color": "#b0c3d9",
+        "rarity": "Consumer Grade"
+    },
+    "936": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "937": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "938": {
+        "color": "#d32ce6",
+        "rarity": "Classified"
+    },
+    "939": {
+        "color": "#5e98d9",
+        "rarity": "Industrial Grade"
+    },
+    "940": {
+        "color": "#5e98d9",
+        "rarity": "Industrial Grade"
+    },
+    "941": {
+        "color": "#d32ce6",
+        "rarity": "Classified"
+    },
+    "942": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "943": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "944": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "945": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "946": {
+        "color": "#eb4b4b",
+        "rarity": "Covert"
+    },
+    "947": {
+        "color": "#d32ce6",
+        "rarity": "Classified"
+    },
+    "948": {
+        "color": "#d32ce6",
+        "rarity": "Classified"
+    },
+    "949": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "950": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "951": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "952": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "953": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "954": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "955": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "956": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "957": {
+        "color": "#eb4b4b",
+        "rarity": "Covert"
+    },
+    "958": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "959": {
+        "color": "#eb4b4b",
+        "rarity": "Covert"
+    },
+    "960": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "961": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "962": {
+        "color": "#eb4b4b",
+        "rarity": "Covert"
+    },
+    "963": {
+        "color": "#d32ce6",
+        "rarity": "Classified"
+    },
+    "964": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "965": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "966": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "967": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "968": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "969": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "970": {
+        "color": "#d32ce6",
+        "rarity": "Classified"
+    },
+    "971": {
+        "color": "#d32ce6",
+        "rarity": "Classified"
+    },
+    "972": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "973": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "974": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "975": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "976": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "977": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "978": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "979": {
+        "color": "#d32ce6",
+        "rarity": "Classified"
+    },
+    "980": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "981": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "982": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "983": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "984": {
+        "color": "#eb4b4b",
+        "rarity": "Covert"
+    },
+    "985": {
+        "color": "#d32ce6",
+        "rarity": "Classified"
+    },
+    "986": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "987": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "988": {
+        "color": "#eb4b4b",
+        "rarity": "Covert"
+    },
+    "989": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "990": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "991": {
+        "color": "#d32ce6",
+        "rarity": "Classified"
+    },
+    "992": {
+        "color": "#5e98d9",
+        "rarity": "Industrial Grade"
+    },
+    "993": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "994": {
+        "color": "#b0c3d9",
+        "rarity": "Consumer Grade"
+    },
+    "995": {
+        "color": "#b0c3d9",
+        "rarity": "Consumer Grade"
+    },
+    "996": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "997": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "998": {
+        "color": "#5e98d9",
+        "rarity": "Industrial Grade"
+    },
+    "999": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "1000": {
+        "color": "#d32ce6",
+        "rarity": "Classified"
+    },
+    "1001": {
+        "color": "#eb4b4b",
+        "rarity": "Covert"
+    },
+    "1002": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "1003": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "1004": {
+        "color": "#eb4b4b",
+        "rarity": "Covert"
+    },
+    "1005": {
+        "color": "#b0c3d9",
+        "rarity": "Consumer Grade"
+    },
+    "1006": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "1007": {
+        "color": "#5e98d9",
+        "rarity": "Industrial Grade"
+    },
+    "1008": {
+        "color": "#5e98d9",
+        "rarity": "Industrial Grade"
+    },
+    "1009": {
+        "color": "#d32ce6",
+        "rarity": "Classified"
+    },
+    "1010": {
+        "color": "#b0c3d9",
+        "rarity": "Consumer Grade"
+    },
+    "1011": {
+        "color": "#5e98d9",
+        "rarity": "Industrial Grade"
+    },
+    "1012": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "1013": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "1014": {
+        "color": "#b0c3d9",
+        "rarity": "Consumer Grade"
+    },
+    "1015": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "1016": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "1017": {
+        "color": "#d32ce6",
+        "rarity": "Classified"
+    },
+    "1018": {
+        "color": "#d32ce6",
+        "rarity": "Classified"
+    },
+    "1019": {
+        "color": "#5e98d9",
+        "rarity": "Industrial Grade"
+    },
+    "1020": {
+        "color": "#b0c3d9",
+        "rarity": "Consumer Grade"
+    },
+    "1021": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "1022": {
+        "color": "#b0c3d9",
+        "rarity": "Consumer Grade"
+    },
+    "1023": {
+        "color": "#5e98d9",
+        "rarity": "Industrial Grade"
+    },
+    "1024": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "1025": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "1026": {
+        "color": "#eb4b4b",
+        "rarity": "Covert"
+    },
+    "1027": {
+        "color": "#d32ce6",
+        "rarity": "Classified"
+    },
+    "1028": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "1029": {
+        "color": "#d32ce6",
+        "rarity": "Classified"
+    },
+    "1030": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "1031": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "1032": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "1033": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "1034": {
+        "color": "#5e98d9",
+        "rarity": "Industrial Grade"
+    },
+    "1035": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "1036": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "1037": {
+        "color": "#d32ce6",
+        "rarity": "Classified"
+    },
+    "1038": {
+        "color": "#d32ce6",
+        "rarity": "Classified"
+    },
+    "1039": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "1040": {
+        "color": "#eb4b4b",
+        "rarity": "Covert"
+    },
+    "1041": {
+        "color": "#eb4b4b",
+        "rarity": "Covert"
+    },
+    "1042": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "1043": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "1044": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "1045": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "1046": {
+        "color": "#d32ce6",
+        "rarity": "Classified"
+    },
+    "1047": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "1048": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "1049": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "1050": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "1051": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "1052": {
+        "color": "#d32ce6",
+        "rarity": "Classified"
+    },
+    "1053": {
+        "color": "#d32ce6",
+        "rarity": "Classified"
+    },
+    "1054": {
+        "color": "#d32ce6",
+        "rarity": "Classified"
+    },
+    "1055": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "1056": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "1058": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "1059": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "1060": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "1061": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "1062": {
+        "color": "#5e98d9",
+        "rarity": "Industrial Grade"
+    },
+    "1063": {
+        "color": "#eb4b4b",
+        "rarity": "Covert"
+    },
+    "1064": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "1065": {
+        "color": "#d32ce6",
+        "rarity": "Classified"
+    },
+    "1066": {
+        "color": "#b0c3d9",
+        "rarity": "Consumer Grade"
+    },
+    "1067": {
+        "color": "#d32ce6",
+        "rarity": "Classified"
+    },
+    "1070": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "1071": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "1072": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "1073": {
+        "color": "#eb4b4b",
+        "rarity": "Covert"
+    },
+    "1074": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "1075": {
+        "color": "#b0c3d9",
+        "rarity": "Consumer Grade"
+    },
+    "1076": {
+        "color": "#b0c3d9",
+        "rarity": "Consumer Grade"
+    },
+    "1077": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "1078": {
+        "color": "#b0c3d9",
+        "rarity": "Consumer Grade"
+    },
+    "1079": {
+        "color": "#5e98d9",
+        "rarity": "Industrial Grade"
+    },
+    "1080": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "1081": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "1082": {
+        "color": "#d32ce6",
+        "rarity": "Classified"
+    },
+    "1083": {
+        "color": "#5e98d9",
+        "rarity": "Industrial Grade"
+    },
+    "1084": {
+        "color": "#d32ce6",
+        "rarity": "Classified"
+    },
+    "1085": {
+        "color": "#5e98d9",
+        "rarity": "Industrial Grade"
+    },
+    "1086": {
+        "color": "#b0c3d9",
+        "rarity": "Consumer Grade"
+    },
+    "1087": {
+        "color": "#eb4b4b",
+        "rarity": "Covert"
+    },
+    "1088": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "1089": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "1090": {
+        "color": "#eb4b4b",
+        "rarity": "Covert"
+    },
+    "1091": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "1092": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "1093": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "1094": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "1095": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "1096": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "1097": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "1098": {
+        "color": "#d32ce6",
+        "rarity": "Classified"
+    },
+    "1099": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "1100": {
+        "color": "#d32ce6",
+        "rarity": "Classified"
+    },
+    "1101": {
+        "color": "#d32ce6",
+        "rarity": "Classified"
+    },
+    "1102": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "1103": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "1104": {
+        "color": "#eb4b4b",
+        "rarity": "Covert"
+    },
+    "1105": {
+        "color": "#eb4b4b",
+        "rarity": "Covert"
+    },
+    "1106": {
+        "color": "#eb4b4b",
+        "rarity": "Covert"
+    },
+    "1107": {
+        "color": "#eb4b4b",
+        "rarity": "Covert"
+    },
+    "1108": {
+        "color": "#eb4b4b",
+        "rarity": "Covert"
+    },
+    "1109": {
+        "color": "#eb4b4b",
+        "rarity": "Covert"
+    },
+    "1110": {
+        "color": "#eb4b4b",
+        "rarity": "Covert"
+    },
+    "1111": {
+        "color": "#eb4b4b",
+        "rarity": "Covert"
+    },
+    "1112": {
+        "color": "#eb4b4b",
+        "rarity": "Covert"
+    },
+    "1113": {
+        "color": "#eb4b4b",
+        "rarity": "Covert"
+    },
+    "1114": {
+        "color": "#eb4b4b",
+        "rarity": "Covert"
+    },
+    "1115": {
+        "color": "#eb4b4b",
+        "rarity": "Covert"
+    },
+    "1116": {
+        "color": "#eb4b4b",
+        "rarity": "Covert"
+    },
+    "1117": {
+        "color": "#eb4b4b",
+        "rarity": "Covert"
+    },
+    "1118": {
+        "color": "#eb4b4b",
+        "rarity": "Covert"
+    },
+    "1119": {
+        "color": "#eb4b4b",
+        "rarity": "Covert"
+    },
+    "1120": {
+        "color": "#eb4b4b",
+        "rarity": "Covert"
+    },
+    "1121": {
+        "color": "#eb4b4b",
+        "rarity": "Covert"
+    },
+    "1122": {
+        "color": "#eb4b4b",
+        "rarity": "Covert"
+    },
+    "1123": {
+        "color": "#eb4b4b",
+        "rarity": "Covert"
+    },
+    "1125": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "1126": {
+        "color": "#d32ce6",
+        "rarity": "Classified"
+    },
+    "1127": {
+        "color": "#d32ce6",
+        "rarity": "Classified"
+    },
+    "1128": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "1129": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "1130": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "1131": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "1132": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "1133": {
+        "color": "#d32ce6",
+        "rarity": "Classified"
+    },
+    "1134": {
+        "color": "#eb4b4b",
+        "rarity": "Covert"
+    },
+    "1135": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "1136": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "1137": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "1138": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "1139": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "1140": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "1141": {
+        "color": "#eb4b4b",
+        "rarity": "Covert"
+    },
+    "1142": {
+        "color": "#eb4b4b",
+        "rarity": "Covert"
+    },
+    "1143": {
+        "color": "#d32ce6",
+        "rarity": "Classified"
+    },
+    "1144": {
+        "color": "#eb4b4b",
+        "rarity": "Covert"
+    },
+    "1145": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "1146": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "1147": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "1148": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "1149": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "1150": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "1151": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "1152": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "1153": {
+        "color": "#d32ce6",
+        "rarity": "Classified"
+    },
+    "1154": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "1155": {
+        "color": "#d32ce6",
+        "rarity": "Classified"
+    },
+    "1156": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "1157": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "1158": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "1159": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "1160": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "1161": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "1162": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "1163": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "1164": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "1165": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "1166": {
+        "color": "#d32ce6",
+        "rarity": "Classified"
+    },
+    "1167": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "1168": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "1169": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "1170": {
+        "color": "#eb4b4b",
+        "rarity": "Covert"
+    },
+    "1171": {
+        "color": "#eb4b4b",
+        "rarity": "Covert"
+    },
+    "1172": {
+        "color": "#d32ce6",
+        "rarity": "Classified"
+    },
+    "1173": {
+        "color": "#d32ce6",
+        "rarity": "Classified"
+    },
+    "1174": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "1175": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "1177": {
+        "color": "#eb4b4b",
+        "rarity": "Covert"
+    },
+    "1178": {
+        "color": "#d32ce6",
+        "rarity": "Classified"
+    },
+    "1179": {
+        "color": "#5e98d9",
+        "rarity": "Industrial Grade"
+    },
+    "1180": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "1181": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "1182": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "1183": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "1184": {
+        "color": "#eb4b4b",
+        "rarity": "Covert"
+    },
+    "1185": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "1186": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "1187": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "1188": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "1189": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "1190": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "1192": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "1193": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "1194": {
+        "color": "#d32ce6",
+        "rarity": "Classified"
+    },
+    "1195": {
+        "color": "#5e98d9",
+        "rarity": "Industrial Grade"
+    },
+    "1198": {
+        "color": "#5e98d9",
+        "rarity": "Industrial Grade"
+    },
+    "1199": {
+        "color": "#5e98d9",
+        "rarity": "Industrial Grade"
+    },
+    "1200": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "1201": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "1202": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "1203": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "1204": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "1205": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "1206": {
+        "color": "#eb4b4b",
+        "rarity": "Covert"
+    },
+    "1207": {
+        "color": "#d32ce6",
+        "rarity": "Classified"
+    },
+    "1208": {
+        "color": "#d32ce6",
+        "rarity": "Classified"
+    },
+    "1209": {
+        "color": "#d32ce6",
+        "rarity": "Classified"
+    },
+    "1210": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "1211": {
+        "color": "#d32ce6",
+        "rarity": "Classified"
+    },
+    "1212": {
+        "color": "#5e98d9",
+        "rarity": "Industrial Grade"
+    },
+    "1213": {
+        "color": "#eb4b4b",
+        "rarity": "Covert"
+    },
+    "1214": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "1215": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "1216": {
+        "color": "#d32ce6",
+        "rarity": "Classified"
+    },
+    "1217": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "1218": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "1219": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "1220": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "1221": {
+        "color": "#eb4b4b",
+        "rarity": "Covert"
+    },
+    "1222": {
+        "color": "#d32ce6",
+        "rarity": "Classified"
+    },
+    "1223": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "1224": {
+        "color": "#d32ce6",
+        "rarity": "Classified"
+    },
+    "1225": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "1226": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "1227": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "1228": {
+        "color": "#eb4b4b",
+        "rarity": "Covert"
+    },
+    "1229": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "1230": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "1231": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "1232": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "1233": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "1234": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "1235": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "1236": {
+        "color": "#d32ce6",
+        "rarity": "Classified"
+    },
+    "1237": {
+        "color": "#b0c3d9",
+        "rarity": "Consumer Grade"
+    },
+    "1238": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "1239": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "1240": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "1241": {
+        "color": "#d32ce6",
+        "rarity": "Classified"
+    },
+    "1242": {
+        "color": "#b0c3d9",
+        "rarity": "Consumer Grade"
+    },
+    "1243": {
+        "color": "#5e98d9",
+        "rarity": "Industrial Grade"
+    },
+    "1244": {
+        "color": "#5e98d9",
+        "rarity": "Industrial Grade"
+    },
+    "1245": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "1246": {
+        "color": "#b0c3d9",
+        "rarity": "Consumer Grade"
+    },
+    "1247": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "1248": {
+        "color": "#d32ce6",
+        "rarity": "Classified"
+    },
+    "1249": {
+        "color": "#b0c3d9",
+        "rarity": "Consumer Grade"
+    },
+    "1250": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "1251": {
+        "color": "#5e98d9",
+        "rarity": "Industrial Grade"
+    },
+    "1252": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "1253": {
+        "color": "#5e98d9",
+        "rarity": "Industrial Grade"
+    },
+    "1254": {
+        "color": "#b0c3d9",
+        "rarity": "Consumer Grade"
+    },
+    "1255": {
+        "color": "#eb4b4b",
+        "rarity": "Covert"
+    },
+    "1256": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "1257": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "1258": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "1259": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "1260": {
+        "color": "#5e98d9",
+        "rarity": "Industrial Grade"
+    },
+    "1261": {
+        "color": "#5e98d9",
+        "rarity": "Industrial Grade"
+    },
+    "1262": {
+        "color": "#5e98d9",
+        "rarity": "Industrial Grade"
+    },
+    "1263": {
+        "color": "#5e98d9",
+        "rarity": "Industrial Grade"
+    },
+    "1264": {
+        "color": "#5e98d9",
+        "rarity": "Industrial Grade"
+    },
+    "1265": {
+        "color": "#5e98d9",
+        "rarity": "Industrial Grade"
+    },
+    "1266": {
+        "color": "#5e98d9",
+        "rarity": "Industrial Grade"
+    },
+    "1267": {
+        "color": "#5e98d9",
+        "rarity": "Industrial Grade"
+    },
+    "1268": {
+        "color": "#5e98d9",
+        "rarity": "Industrial Grade"
+    },
+    "1269": {
+        "color": "#b0c3d9",
+        "rarity": "Consumer Grade"
+    },
+    "1270": {
+        "color": "#b0c3d9",
+        "rarity": "Consumer Grade"
+    },
+    "1271": {
+        "color": "#b0c3d9",
+        "rarity": "Consumer Grade"
+    },
+    "1272": {
+        "color": "#b0c3d9",
+        "rarity": "Consumer Grade"
+    },
+    "1273": {
+        "color": "#b0c3d9",
+        "rarity": "Consumer Grade"
+    },
+    "1274": {
+        "color": "#b0c3d9",
+        "rarity": "Consumer Grade"
+    },
+    "1275": {
+        "color": "#b0c3d9",
+        "rarity": "Consumer Grade"
+    },
+    "1276": {
+        "color": "#b0c3d9",
+        "rarity": "Consumer Grade"
+    },
+    "1277": {
+        "color": "#b0c3d9",
+        "rarity": "Consumer Grade"
+    },
+    "1278": {
+        "color": "#b0c3d9",
+        "rarity": "Consumer Grade"
+    },
+    "1279": {
+        "color": "#b0c3d9",
+        "rarity": "Consumer Grade"
+    },
+    "1280": {
+        "color": "#d32ce6",
+        "rarity": "Classified"
+    },
+    "1281": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "1282": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "1283": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "1284": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "1285": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "1286": {
+        "color": "#5e98d9",
+        "rarity": "Industrial Grade"
+    },
+    "1287": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "1288": {
+        "color": "#5e98d9",
+        "rarity": "Industrial Grade"
+    },
+    "1289": {
+        "color": "#5e98d9",
+        "rarity": "Industrial Grade"
+    },
+    "1290": {
+        "color": "#5e98d9",
+        "rarity": "Industrial Grade"
+    },
+    "1291": {
+        "color": "#5e98d9",
+        "rarity": "Industrial Grade"
+    },
+    "1292": {
+        "color": "#5e98d9",
+        "rarity": "Industrial Grade"
+    },
+    "1293": {
+        "color": "#5e98d9",
+        "rarity": "Industrial Grade"
+    },
+    "1294": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "1295": {
+        "color": "#5e98d9",
+        "rarity": "Industrial Grade"
+    },
+    "1296": {
+        "color": "#5e98d9",
+        "rarity": "Industrial Grade"
+    },
+    "1297": {
+        "color": "#b0c3d9",
+        "rarity": "Consumer Grade"
+    },
+    "1298": {
+        "color": "#b0c3d9",
+        "rarity": "Consumer Grade"
+    },
+    "1299": {
+        "color": "#b0c3d9",
+        "rarity": "Consumer Grade"
+    },
+    "1300": {
+        "color": "#b0c3d9",
+        "rarity": "Consumer Grade"
+    },
+    "1301": {
+        "color": "#b0c3d9",
+        "rarity": "Consumer Grade"
+    },
+    "1302": {
+        "color": "#b0c3d9",
+        "rarity": "Consumer Grade"
+    },
+    "1303": {
+        "color": "#b0c3d9",
+        "rarity": "Consumer Grade"
+    },
+    "1304": {
+        "color": "#b0c3d9",
+        "rarity": "Consumer Grade"
+    },
+    "1305": {
+        "color": "#b0c3d9",
+        "rarity": "Consumer Grade"
+    },
+    "1306": {
+        "color": "#b0c3d9",
+        "rarity": "Consumer Grade"
+    },
+    "1307": {
+        "color": "#b0c3d9",
+        "rarity": "Consumer Grade"
+    },
+    "1308": {
+        "color": "#b0c3d9",
+        "rarity": "Consumer Grade"
+    },
+    "1309": {
+        "color": "#d32ce6",
+        "rarity": "Classified"
+    },
+    "1310": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "1311": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "1312": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "1313": {
+        "color": "#5e98d9",
+        "rarity": "Industrial Grade"
+    },
+    "1314": {
+        "color": "#5e98d9",
+        "rarity": "Industrial Grade"
+    },
+    "1315": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "1316": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "1317": {
+        "color": "#5e98d9",
+        "rarity": "Industrial Grade"
+    },
+    "1318": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "1319": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "1320": {
+        "color": "#5e98d9",
+        "rarity": "Industrial Grade"
+    },
+    "1321": {
+        "color": "#5e98d9",
+        "rarity": "Industrial Grade"
+    },
+    "1322": {
+        "color": "#5e98d9",
+        "rarity": "Industrial Grade"
+    },
+    "1323": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "1324": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "1325": {
+        "color": "#b0c3d9",
+        "rarity": "Consumer Grade"
+    },
+    "1326": {
+        "color": "#b0c3d9",
+        "rarity": "Consumer Grade"
+    },
+    "1327": {
+        "color": "#b0c3d9",
+        "rarity": "Consumer Grade"
+    },
+    "1328": {
+        "color": "#b0c3d9",
+        "rarity": "Consumer Grade"
+    },
+    "1329": {
+        "color": "#b0c3d9",
+        "rarity": "Consumer Grade"
+    },
+    "1330": {
+        "color": "#b0c3d9",
+        "rarity": "Consumer Grade"
+    },
+    "1331": {
+        "color": "#b0c3d9",
+        "rarity": "Consumer Grade"
+    },
+    "1332": {
+        "color": "#b0c3d9",
+        "rarity": "Consumer Grade"
+    },
+    "1333": {
+        "color": "#b0c3d9",
+        "rarity": "Consumer Grade"
+    },
+    "1334": {
+        "color": "#b0c3d9",
+        "rarity": "Consumer Grade"
+    },
+    "1335": {
+        "color": "#b0c3d9",
+        "rarity": "Consumer Grade"
+    },
+    "1336": {
+        "color": "#b0c3d9",
+        "rarity": "Consumer Grade"
+    },
+    "1337": {
+        "color": "#5e98d9",
+        "rarity": "Industrial Grade"
+    },
+    "1338": {
+        "color": "#d32ce6",
+        "rarity": "Classified"
+    },
+    "1339": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "1340": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "1341": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "1342": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "1343": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "1344": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "1345": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "1346": {
+        "color": "#d32ce6",
+        "rarity": "Classified"
+    },
+    "1347": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "1348": {
+        "color": "#d32ce6",
+        "rarity": "Classified"
+    },
+    "1349": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "1350": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "1351": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "1352": {
+        "color": "#eb4b4b",
+        "rarity": "Covert"
+    },
+    "1353": {
+        "color": "#eb4b4b",
+        "rarity": "Covert"
+    },
+    "1354": {
+        "color": "#d32ce6",
+        "rarity": "Classified"
+    },
+    "1355": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "1356": {
+        "color": "#d32ce6",
+        "rarity": "Classified"
+    },
+    "1357": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "1358": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "1359": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "1360": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "1361": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "1362": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "1363": {
+        "color": "#5e98d9",
+        "rarity": "Industrial Grade"
+    },
+    "1364": {
+        "color": "#5e98d9",
+        "rarity": "Industrial Grade"
+    },
+    "1365": {
+        "color": "#5e98d9",
+        "rarity": "Industrial Grade"
+    },
+    "1366": {
+        "color": "#5e98d9",
+        "rarity": "Industrial Grade"
+    },
+    "1367": {
+        "color": "#5e98d9",
+        "rarity": "Industrial Grade"
+    },
+    "1368": {
+        "color": "#b0c3d9",
+        "rarity": "Consumer Grade"
+    },
+    "1369": {
+        "color": "#b0c3d9",
+        "rarity": "Consumer Grade"
+    },
+    "1370": {
+        "color": "#b0c3d9",
+        "rarity": "Consumer Grade"
+    },
+    "1371": {
+        "color": "#b0c3d9",
+        "rarity": "Consumer Grade"
+    },
+    "1372": {
+        "color": "#b0c3d9",
+        "rarity": "Consumer Grade"
+    },
+    "1373": {
+        "color": "#b0c3d9",
+        "rarity": "Consumer Grade"
+    },
+    "1374": {
+        "color": "#b0c3d9",
+        "rarity": "Consumer Grade"
+    },
+    "1375": {
+        "color": "#b0c3d9",
+        "rarity": "Consumer Grade"
+    },
+    "1376": {
+        "color": "#d32ce6",
+        "rarity": "Classified"
+    },
+    "1377": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "1378": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "1379": {
+        "color": "#5e98d9",
+        "rarity": "Industrial Grade"
+    },
+    "1380": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "1381": {
+        "color": "#5e98d9",
+        "rarity": "Industrial Grade"
+    },
+    "1382": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "1383": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "1384": {
+        "color": "#5e98d9",
+        "rarity": "Industrial Grade"
+    },
+    "1385": {
+        "color": "#5e98d9",
+        "rarity": "Industrial Grade"
+    },
+    "1386": {
+        "color": "#5e98d9",
+        "rarity": "Industrial Grade"
+    },
+    "1387": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "1388": {
+        "color": "#b0c3d9",
+        "rarity": "Consumer Grade"
+    },
+    "1389": {
+        "color": "#b0c3d9",
+        "rarity": "Consumer Grade"
+    },
+    "1390": {
+        "color": "#b0c3d9",
+        "rarity": "Consumer Grade"
+    },
+    "1391": {
+        "color": "#b0c3d9",
+        "rarity": "Consumer Grade"
+    },
+    "1392": {
+        "color": "#b0c3d9",
+        "rarity": "Consumer Grade"
+    },
+    "1393": {
+        "color": "#b0c3d9",
+        "rarity": "Consumer Grade"
+    },
+    "1394": {
+        "color": "#b0c3d9",
+        "rarity": "Consumer Grade"
+    },
+    "1397": {
+        "color": "#eb4b4b",
+        "rarity": "Covert"
+    },
+    "1398": {
+        "color": "#eb4b4b",
+        "rarity": "Extraordinary"
+    },
+    "1399": {
+        "color": "#eb4b4b",
+        "rarity": "Extraordinary"
+    },
+    "1400": {
+        "color": "#eb4b4b",
+        "rarity": "Extraordinary"
+    },
+    "1401": {
+        "color": "#eb4b4b",
+        "rarity": "Extraordinary"
+    },
+    "1402": {
+        "color": "#eb4b4b",
+        "rarity": "Extraordinary"
+    },
+    "1404": {
+        "color": "#eb4b4b",
+        "rarity": "Extraordinary"
+    },
+    "1405": {
+        "color": "#eb4b4b",
+        "rarity": "Extraordinary"
+    },
+    "1406": {
+        "color": "#eb4b4b",
+        "rarity": "Extraordinary"
+    },
+    "1407": {
+        "color": "#eb4b4b",
+        "rarity": "Extraordinary"
+    },
+    "1408": {
+        "color": "#eb4b4b",
+        "rarity": "Extraordinary"
+    },
+    "1409": {
+        "color": "#eb4b4b",
+        "rarity": "Extraordinary"
+    },
+    "1410": {
+        "color": "#eb4b4b",
+        "rarity": "Extraordinary"
+    },
+    "1412": {
+        "color": "#eb4b4b",
+        "rarity": "Extraordinary"
+    },
+    "1413": {
+        "color": "#eb4b4b",
+        "rarity": "Extraordinary"
+    },
+    "1414": {
+        "color": "#eb4b4b",
+        "rarity": "Extraordinary"
+    },
+    "1415": {
+        "color": "#eb4b4b",
+        "rarity": "Extraordinary"
+    },
+    "1416": {
+        "color": "#eb4b4b",
+        "rarity": "Extraordinary"
+    },
+    "1417": {
+        "color": "#eb4b4b",
+        "rarity": "Extraordinary"
+    },
+    "1418": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "1419": {
+        "color": "#d32ce6",
+        "rarity": "Classified"
+    },
+    "1420": {
+        "color": "#d32ce6",
+        "rarity": "Classified"
+    },
+    "1421": {
+        "color": "#eb4b4b",
+        "rarity": "Covert"
+    },
+    "1422": {
+        "color": "#eb4b4b",
+        "rarity": "Covert"
+    },
+    "1423": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "1425": {
+        "color": "#d32ce6",
+        "rarity": "Classified"
+    },
+    "1426": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "1427": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "1429": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "1430": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "1431": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "1432": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "1433": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "1434": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "1435": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "1436": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "1437": {
+        "color": "#eb4b4b",
+        "rarity": "Extraordinary"
+    },
+    "1438": {
+        "color": "#eb4b4b",
+        "rarity": "Extraordinary"
+    },
+    "1439": {
+        "color": "#eb4b4b",
+        "rarity": "Extraordinary"
+    },
+    "1440": {
+        "color": "#eb4b4b",
+        "rarity": "Extraordinary"
+    },
+    "1442": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "1443": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "1445": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "1446": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "1447": {
+        "color": "#5e98d9",
+        "rarity": "Industrial Grade"
+    },
+    "1448": {
+        "color": "#5e98d9",
+        "rarity": "Industrial Grade"
+    },
+    "1449": {
+        "color": "#eb4b4b",
+        "rarity": "Covert"
+    },
+    "1450": {
+        "color": "#eb4b4b",
+        "rarity": "Covert"
+    },
+    "1451": {
+        "color": "#d32ce6",
+        "rarity": "Classified"
+    },
+    "1452": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "1453": {
+        "color": "#5e98d9",
+        "rarity": "Industrial Grade"
+    },
+    "1454": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "1455": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "1457": {
+        "color": "#5e98d9",
+        "rarity": "Industrial Grade"
+    },
+    "1458": {
+        "color": "#d32ce6",
+        "rarity": "Classified"
+    },
+    "1459": {
+        "color": "#5e98d9",
+        "rarity": "Industrial Grade"
+    },
+    "1460": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "1461": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "1462": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "1463": {
+        "color": "#d32ce6",
+        "rarity": "Classified"
+    },
+    "1464": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "1465": {
+        "color": "#eb4b4b",
+        "rarity": "Covert"
+    },
+    "1466": {
+        "color": "#eb4b4b",
+        "rarity": "Covert"
+    },
+    "1467": {
+        "color": "#8847ff",
+        "rarity": "Restricted"
+    },
+    "1468": {
+        "color": "#5e98d9",
+        "rarity": "Industrial Grade"
+    },
+    "1469": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "1470": {
+        "color": "#5e98d9",
+        "rarity": "Industrial Grade"
+    },
+    "1471": {
+        "color": "#5e98d9",
+        "rarity": "Industrial Grade"
+    },
+    "1472": {
+        "color": "#5e98d9",
+        "rarity": "Industrial Grade"
+    },
+    "1473": {
+        "color": "#5e98d9",
+        "rarity": "Industrial Grade"
+    },
+    "1474": {
+        "color": "#5e98d9",
+        "rarity": "Industrial Grade"
+    },
+    "1475": {
+        "color": "#4b69ff",
+        "rarity": "Mil-Spec Grade"
+    },
+    "1476": {
+        "color": "#d32ce6",
+        "rarity": "Classified"
+    },
+    "1477": {
+        "color": "#5e98d9",
+        "rarity": "Industrial Grade"
+    },
+    "10006": {
+        "color": "#eb4b4b",
+        "rarity": "Extraordinary"
+    },
+    "10007": {
+        "color": "#eb4b4b",
+        "rarity": "Extraordinary"
+    },
+    "10008": {
+        "color": "#eb4b4b",
+        "rarity": "Extraordinary"
+    },
+    "10009": {
+        "color": "#eb4b4b",
+        "rarity": "Extraordinary"
+    },
+    "10010": {
+        "color": "#eb4b4b",
+        "rarity": "Extraordinary"
+    },
+    "10013": {
+        "color": "#eb4b4b",
+        "rarity": "Extraordinary"
+    },
+    "10015": {
+        "color": "#eb4b4b",
+        "rarity": "Extraordinary"
+    },
+    "10016": {
+        "color": "#eb4b4b",
+        "rarity": "Extraordinary"
+    },
+    "10018": {
+        "color": "#eb4b4b",
+        "rarity": "Extraordinary"
+    },
+    "10019": {
+        "color": "#eb4b4b",
+        "rarity": "Extraordinary"
+    },
+    "10021": {
+        "color": "#eb4b4b",
+        "rarity": "Extraordinary"
+    },
+    "10024": {
+        "color": "#eb4b4b",
+        "rarity": "Extraordinary"
+    },
+    "10026": {
+        "color": "#eb4b4b",
+        "rarity": "Extraordinary"
+    },
+    "10027": {
+        "color": "#eb4b4b",
+        "rarity": "Extraordinary"
+    },
+    "10028": {
+        "color": "#eb4b4b",
+        "rarity": "Extraordinary"
+    },
+    "10030": {
+        "color": "#eb4b4b",
+        "rarity": "Extraordinary"
+    },
+    "10033": {
+        "color": "#eb4b4b",
+        "rarity": "Extraordinary"
+    },
+    "10034": {
+        "color": "#eb4b4b",
+        "rarity": "Extraordinary"
+    },
+    "10035": {
+        "color": "#eb4b4b",
+        "rarity": "Extraordinary"
+    },
+    "10036": {
+        "color": "#eb4b4b",
+        "rarity": "Extraordinary"
+    },
+    "10037": {
+        "color": "#eb4b4b",
+        "rarity": "Extraordinary"
+    },
+    "10038": {
+        "color": "#eb4b4b",
+        "rarity": "Extraordinary"
+    },
+    "10039": {
+        "color": "#eb4b4b",
+        "rarity": "Extraordinary"
+    },
+    "10040": {
+        "color": "#eb4b4b",
+        "rarity": "Extraordinary"
+    },
+    "10041": {
+        "color": "#eb4b4b",
+        "rarity": "Extraordinary"
+    },
+    "10042": {
+        "color": "#eb4b4b",
+        "rarity": "Extraordinary"
+    },
+    "10043": {
+        "color": "#eb4b4b",
+        "rarity": "Extraordinary"
+    },
+    "10044": {
+        "color": "#eb4b4b",
+        "rarity": "Extraordinary"
+    },
+    "10045": {
+        "color": "#eb4b4b",
+        "rarity": "Extraordinary"
+    },
+    "10046": {
+        "color": "#eb4b4b",
+        "rarity": "Extraordinary"
+    },
+    "10047": {
+        "color": "#eb4b4b",
+        "rarity": "Extraordinary"
+    },
+    "10048": {
+        "color": "#eb4b4b",
+        "rarity": "Extraordinary"
+    },
+    "10049": {
+        "color": "#eb4b4b",
+        "rarity": "Extraordinary"
+    },
+    "10050": {
+        "color": "#eb4b4b",
+        "rarity": "Extraordinary"
+    },
+    "10051": {
+        "color": "#eb4b4b",
+        "rarity": "Extraordinary"
+    },
+    "10052": {
+        "color": "#eb4b4b",
+        "rarity": "Extraordinary"
+    },
+    "10053": {
+        "color": "#eb4b4b",
+        "rarity": "Extraordinary"
+    },
+    "10054": {
+        "color": "#eb4b4b",
+        "rarity": "Extraordinary"
+    },
+    "10055": {
+        "color": "#eb4b4b",
+        "rarity": "Extraordinary"
+    },
+    "10056": {
+        "color": "#eb4b4b",
+        "rarity": "Extraordinary"
+    },
+    "10057": {
+        "color": "#eb4b4b",
+        "rarity": "Extraordinary"
+    },
+    "10058": {
+        "color": "#eb4b4b",
+        "rarity": "Extraordinary"
+    },
+    "10059": {
+        "color": "#eb4b4b",
+        "rarity": "Extraordinary"
+    },
+    "10060": {
+        "color": "#eb4b4b",
+        "rarity": "Extraordinary"
+    },
+    "10061": {
+        "color": "#eb4b4b",
+        "rarity": "Extraordinary"
+    },
+    "10062": {
+        "color": "#eb4b4b",
+        "rarity": "Extraordinary"
+    },
+    "10063": {
+        "color": "#eb4b4b",
+        "rarity": "Extraordinary"
+    },
+    "10064": {
+        "color": "#eb4b4b",
+        "rarity": "Extraordinary"
+    },
+    "10065": {
+        "color": "#eb4b4b",
+        "rarity": "Extraordinary"
+    },
+    "10066": {
+        "color": "#eb4b4b",
+        "rarity": "Extraordinary"
+    },
+    "10067": {
+        "color": "#eb4b4b",
+        "rarity": "Extraordinary"
+    },
+    "10068": {
+        "color": "#eb4b4b",
+        "rarity": "Extraordinary"
+    },
+    "10069": {
+        "color": "#eb4b4b",
+        "rarity": "Extraordinary"
+    },
+    "10070": {
+        "color": "#eb4b4b",
+        "rarity": "Extraordinary"
+    },
+    "10071": {
+        "color": "#eb4b4b",
+        "rarity": "Extraordinary"
+    },
+    "10072": {
+        "color": "#eb4b4b",
+        "rarity": "Extraordinary"
+    },
+    "10073": {
+        "color": "#eb4b4b",
+        "rarity": "Extraordinary"
+    },
+    "10074": {
+        "color": "#eb4b4b",
+        "rarity": "Extraordinary"
+    },
+    "10075": {
+        "color": "#eb4b4b",
+        "rarity": "Extraordinary"
+    },
+    "10076": {
+        "color": "#eb4b4b",
+        "rarity": "Extraordinary"
+    },
+    "10077": {
+        "color": "#eb4b4b",
+        "rarity": "Extraordinary"
+    },
+    "10078": {
+        "color": "#eb4b4b",
+        "rarity": "Extraordinary"
+    },
+    "10079": {
+        "color": "#eb4b4b",
+        "rarity": "Extraordinary"
+    },
+    "10080": {
+        "color": "#eb4b4b",
+        "rarity": "Extraordinary"
+    },
+    "10081": {
+        "color": "#eb4b4b",
+        "rarity": "Extraordinary"
+    },
+    "10082": {
+        "color": "#eb4b4b",
+        "rarity": "Extraordinary"
+    },
+    "10083": {
+        "color": "#eb4b4b",
+        "rarity": "Extraordinary"
+    },
+    "10084": {
+        "color": "#eb4b4b",
+        "rarity": "Extraordinary"
+    },
+    "10085": {
+        "color": "#eb4b4b",
+        "rarity": "Extraordinary"
+    },
+    "10086": {
+        "color": "#eb4b4b",
+        "rarity": "Extraordinary"
+    },
+    "10087": {
+        "color": "#eb4b4b",
+        "rarity": "Extraordinary"
+    },
+    "10088": {
+        "color": "#eb4b4b",
+        "rarity": "Extraordinary"
+    }
+}

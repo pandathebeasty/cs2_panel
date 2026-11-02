@@ -1,0 +1,69 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 760" fill="none">
+  <defs>
+    <linearGradient id="base" x1="700" y1="0" x2="1300" y2="760" gradientUnits="userSpaceOnUse"><stop stop-color="#182b3c"/><stop offset=".55" stop-color="#223344"/><stop offset="1" stop-color="#091522"/></linearGradient>
+    <linearGradient id="glass" x1="800" y1="160" x2="1300" y2="620" gradientUnits="userSpaceOnUse"><stop stop-color="#647f95" stop-opacity=".4"/><stop offset=".5" stop-color="#253f55" stop-opacity=".72"/><stop offset="1" stop-color="#132539" stop-opacity=".94"/></linearGradient>
+    <linearGradient id="metal" x1="740" y1="260" x2="1240" y2="450" gradientUnits="userSpaceOnUse"><stop stop-color="#d0dce7"/><stop offset=".45" stop-color="#8ba7bb"/><stop offset="1" stop-color="#425d75"/></linearGradient>
+    <linearGradient id="warm" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#edbb85"/><stop offset="1" stop-color="#98624e"/></linearGradient>
+    <radialGradient id="glow"><stop stop-color="#6cbbdc" stop-opacity=".25"/><stop offset="1" stop-color="#6cbbdc" stop-opacity="0"/></radialGradient>
+    <pattern id="grid" width="52" height="52" patternUnits="userSpaceOnUse"><path d="M52 0H0v52" stroke="#b7cede" stroke-opacity=".06"/></pattern>
+    <filter id="shadow" x="-30%" y="-40%" width="170%" height="190%"><feDropShadow dx="0" dy="25" stdDeviation="20" flood-color="#040c16" flood-opacity=".55"/></filter>
+  </defs>
+  <path fill="url(#base)" d="M0 0h1440v760H0z"/>
+  <path fill="url(#grid)" d="M0 0h1440v760H0z"/>
+  <ellipse cx="1050" cy="330" rx="490" ry="410" fill="url(#glow)"/>
+  <g stroke="#7ca3bd" stroke-opacity=".2">
+    <circle cx="1050" cy="350" r="260"/><circle cx="1050" cy="350" r="315" stroke-dasharray="3 19"/>
+    <path d="M590 350h850M1050 0v760M450 760l750-760M840 760l480-760"/>
+  </g>
+  <g transform="translate(740 104) rotate(-9 290 180)" filter="url(#shadow)">
+    <rect width="565" height="317" rx="24" fill="url(#glass)" stroke="#a4c5da" stroke-opacity=".32"/>
+    <path d="M24 62h517" stroke="#a4c5da" stroke-opacity=".2"/>
+    <rect x="25" y="23" width="8" height="8" rx="2" fill="#a8d5ea"/>
+    <text x="46" y="33" fill="#c6dce9" font-family="Arial,sans-serif" font-size="12" letter-spacing="3">COUNTER-STRIKE 2</text>
+    <text x="491" y="33" fill="#91b1c7" font-family="Arial,sans-serif" font-size="11">01</text>
+    <ellipse cx="288" cy="224" rx="218" ry="18" fill="#071321" fill-opacity=".38"/>
+    <g transform="translate(34 109)">
+      <path d="m36 96 46-28 48 8 36-19h102l37-14 74 3 6 11 63 6v14l-92 4-32 13-123-3-50 19-82-7-23-7Z" fill="url(#metal)" stroke="#c0d2df" stroke-opacity=".55"/>
+      <path d="m24 91 42-30 15 8-34 39-23-17Z" fill="#7594ab"/>
+      <path d="m159 93 32 4-7 50-29-5 4-49Z" fill="#48687f"/>
+      <path d="m228 87 26 3 18 56-31 11-13-70Z" fill="#385670" stroke="#a3c0d4" stroke-opacity=".35"/>
+      <path d="m270 57 117 2 19 11-114 8-22-21Z" fill="#28485e"/>
+      <path d="M307 52h35v-9h-35zM349 57h31v-9h-31z" fill="#a4bdce"/>
+      <path d="M436 65h66v8h-66z" fill="#adbfcc"/>
+      <path d="M175 66h81M199 76h56M281 68h96" stroke="#dbe6ec" stroke-opacity=".5" stroke-width="2"/>
+      <path d="m365 56 18-22 14 1-9 24-23-3Z" fill="#4b718b"/>
+      <path d="m105 83 33 2-9 18-40-3 16-17Z" fill="#273f53"/>
+    </g>
+    <text x="26" y="283" fill="#d3e3ed" font-family="Arial,sans-serif" font-size="22" font-weight="700" letter-spacing="1">PRECISION</text>
+    <text x="413" y="282" fill="#8fafc5" font-family="Arial,sans-serif" font-size="10" letter-spacing="3">LOADOUT / CT</text>
+    <rect x="26" y="298" width="65" height="2" rx="1" fill="#9fc6dd"/>
+  </g>
+  <g transform="translate(678 448) rotate(7 230 110)" filter="url(#shadow)">
+    <rect width="470" height="225" rx="21" fill="url(#glass)" stroke="#cdb6a1" stroke-opacity=".3"/>
+    <path d="M24 51h422" stroke="#cdb6a1" stroke-opacity=".16"/>
+    <text x="25" y="31" fill="#c8b8a8" font-family="Arial,sans-serif" font-size="10" letter-spacing="3">TACTICAL INVENTORY</text>
+    <text x="414" y="31" fill="#91a5b7" font-family="Arial,sans-serif" font-size="10">02</text>
+    <g transform="translate(20 76)">
+      <path d="m13 66 37-24 74 3 38-22 119 3 48 18 80 1v10l-103 1-40 15-128-3-28 22-69-6-28-18Z" fill="url(#metal)" stroke="#bccedb" stroke-opacity=".4"/>
+      <path d="m14 57 38-27 45 8-10 19-51 17-22-17Z" fill="url(#warm)"/>
+      <path d="m244 30 78 13-7 22-63-13-8-22Z" fill="url(#warm)"/>
+      <path d="m181 62 27 2 23 42-28 18-22-62Z" fill="#57778e"/>
+      <path d="m128 64 25 4-9 37-25-7 9-34Z" fill="#314c64"/>
+      <path d="M320 44h111v8H320z" fill="#a3b9c9"/>
+      <path d="M174 26h45v-9h-45z" fill="#b3c8d7"/>
+      <path d="m249 47 19 4 46-4" stroke="#e7e2d7" stroke-opacity=".45" stroke-width="2"/>
+    </g>
+    <text x="25" y="200" fill="#d3e3ed" font-family="Arial,sans-serif" font-size="15" font-weight="700" letter-spacing="2">COUNTER-STRIKE</text>
+    <text x="362" y="199" fill="#9fbdce" font-family="Arial,sans-serif" font-size="9" letter-spacing="2">LOADOUT / T</text>
+  </g>
+  <g transform="translate(1174 487) rotate(-5 75 83)" filter="url(#shadow)">
+    <rect width="159" height="169" rx="19" fill="url(#glass)" stroke="#a7c5d9" stroke-opacity=".25"/>
+    <path d="M21 33h31M21 45h48" stroke="#abc5d6" stroke-opacity=".55" stroke-width="3"/>
+    <path d="M58 69h43l9 45-10 19H60l-12-19 10-45Z" fill="#7c94a4" stroke="#bcced9" stroke-opacity=".4"/>
+    <path d="M67 62h29v12H67zM89 54h25v8H89zM114 55v37" fill="#536f84" stroke="#acc2d0" stroke-opacity=".55" stroke-width="3"/>
+    <path d="M58 83h45M55 97h51M54 111h52" stroke="#375267" stroke-width="3"/>
+    <text x="24" y="151" fill="#a5c0d3" font-family="Arial,sans-serif" font-size="9" letter-spacing="3">UTILITY</text>
+  </g>
+  <g fill="#b6d2e3" fill-opacity=".45"><circle cx="660" cy="197" r="4"/><circle cx="1285" cy="420" r="5"/><circle cx="599" cy="567" r="3"/></g>
+  <g stroke="#9ec5db" stroke-opacity=".35"><path d="M628 197h66M660 165v65M1251 420h69M1285 386v68M580 567h38M599 548v38"/></g>
+</svg>

@@ -1,0 +1,120 @@
+/* @theme id:carbon-hud | name:Carbon HUD | accent:#75f0bd | tag:Tactical */
+
+[data-theme="carbon-hud"] {
+    --accent: #75f0bd;
+    --accent-2: #d4fff0;
+    --enter: animGlide;
+    --enter-dur: .42s;
+    --theme-fx-opacity: .9;
+    --theme-fx-light-opacity: .65;
+}
+
+[data-theme="carbon-hud"] body {
+    font-family: "Rajdhani", "Arial Narrow", sans-serif;
+    font-size: 15.5px;
+    font-weight: 500;
+}
+
+[data-theme="carbon-hud"][data-mode="dark"] {
+    --bg: #0b0d0e; --bg-2: #101314; --bg-3: #191d1e; --card: #141718;
+    --border: #303637; --text: #f0f5f3; --text-dim: #a4afac; --text-mut: #6f7a77;
+    --shadow: 0 12px 32px rgba(0, 0, 0, .45);
+}
+
+[data-theme="carbon-hud"][data-mode="light"] {
+    --bg: #cdd5d1; --bg-2: #dee4e0; --bg-3: #bfcfc6; --card: #d5dfd9;
+    --border: #91a398; --text: #20372b; --text-dim: #3c5748; --text-mut: #4a6356;
+    --shadow: 0 9px 25px rgba(21, 44, 35, .1);
+}
+
+[data-theme="carbon-hud"] .theme-fx::before {
+    content: "";
+    position: absolute;
+    inset: -96px;
+    pointer-events: none;
+    background-image:
+        linear-gradient(45deg, color-mix(in srgb, var(--text) 12%, transparent) 25%, transparent 25% 75%, color-mix(in srgb, var(--text) 12%, transparent) 75%),
+        linear-gradient(45deg, color-mix(in srgb, var(--text) 12%, transparent) 25%, transparent 25% 75%, color-mix(in srgb, var(--text) 12%, transparent) 75%),
+        linear-gradient(color-mix(in srgb, var(--accent) 18%, transparent) 1px, transparent 1px),
+        linear-gradient(90deg, color-mix(in srgb, var(--accent) 18%, transparent) 1px, transparent 1px);
+    background-size: 24px 24px, 24px 24px, 96px 96px, 96px 96px;
+    background-position: 0 0, 12px 12px, 0 0, 0 0;
+    opacity: .85;
+    animation: carbonWeave 18s linear infinite;
+}
+
+[data-theme="carbon-hud"] .theme-fx::after {
+    content: "";
+    position: absolute;
+    width: clamp(420px, 65vw, 760px);
+    aspect-ratio: 1;
+    right: -120px;
+    top: 12%;
+    border: 1px solid color-mix(in srgb, var(--accent) 38%, transparent);
+    border-radius: 50%;
+    background:
+        conic-gradient(from 0deg, transparent 0 78%, color-mix(in srgb, var(--accent) 34%, transparent) 94%, transparent 100%),
+        repeating-radial-gradient(circle, transparent 0 62px, color-mix(in srgb, var(--accent) 24%, transparent) 63px 64px);
+    box-shadow: inset 0 0 30px color-mix(in srgb, var(--accent) 8%, transparent);
+    animation: carbonRadar 16s linear infinite;
+}
+
+@keyframes carbonWeave {
+    to { transform: translate3d(96px, 96px, 0); }
+}
+
+@keyframes carbonRadar {
+    to { transform: rotate(360deg); }
+}
+
+[data-theme="carbon-hud"] .sidebar {
+    border-right-color: color-mix(in srgb, var(--accent) 20%, var(--border));
+}
+
+[data-theme="carbon-hud"] .brand .name,
+[data-theme="carbon-hud"] .mono,
+[data-theme="carbon-hud"] table th,
+[data-theme="carbon-hud"] .badge {
+    font-family: "Rajdhani", "Arial Narrow", sans-serif;
+    font-weight: 700;
+    letter-spacing: .045em;
+}
+
+[data-theme="carbon-hud"] .nav-item.active {
+    background: color-mix(in srgb, var(--accent) 10%, transparent);
+    box-shadow: inset 3px 0 0 var(--accent);
+    animation: carbonLock 3s ease-in-out infinite;
+}
+
+@keyframes carbonLock {
+    0%, 100% { border-color: color-mix(in srgb, var(--accent) 25%, transparent); }
+    50% { border-color: var(--accent); }
+}
+
+[data-theme="carbon-hud"] .card,
+[data-theme="carbon-hud"] .store-card,
+[data-theme="carbon-hud"] .modal {
+    border-color: color-mix(in srgb, var(--accent) 16%, var(--border));
+    border-radius: 6px;
+}
+
+[data-theme="carbon-hud"] .btn { border-radius: 5px; }
+[data-theme="carbon-hud"] .btn-primary {
+    color: #07120d;
+    background: linear-gradient(180deg, var(--accent-2), var(--accent));
+    border-color: var(--accent);
+    font-weight: 800;
+    animation: carbonPower 3.4s ease-in-out infinite;
+}
+[data-theme="carbon-hud"] .btn-primary:hover { box-shadow: 0 0 18px -6px var(--accent); }
+
+@keyframes carbonPower {
+    0%, 100% { filter: brightness(1); }
+    50% { filter: brightness(1.08); }
+}
+
+[data-theme="carbon-hud"] .card-title::before {
+    content: "// ";
+    color: var(--accent);
+    font-family: "Rajdhani", "Arial Narrow", sans-serif;
+}

@@ -1,0 +1,5 @@
+GSAP 3.15.0
+Standard 'no charge' license: https://gsap.com/standard-license.
+Official source: https://github.com/greensock/GSAP
+The unmodified distribution retains its original copyright and license header.
+Used for website animation, not a visual animation authoring tool.

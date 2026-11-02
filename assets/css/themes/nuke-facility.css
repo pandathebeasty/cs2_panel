@@ -1,0 +1,132 @@
+/* @theme id:nuke-facility | name:Nuke Facility | accent:#d7ef3f | tag:Industrial */
+
+[data-theme="nuke-facility"] {
+    --accent: #d7ef3f;
+    --accent-2: #f3ff9a;
+    --enter: animSlideR;
+    --enter-dur: .42s;
+}
+
+[data-theme="nuke-facility"] body {
+    font-family: "Oxanium", sans-serif;
+    font-size: 14px;
+}
+
+[data-theme="nuke-facility"][data-mode="dark"] {
+    --bg: #11140d; --bg-2: #15190f; --bg-3: #202618; --card: #191d12;
+    --border: #3b4324; --text: #f4f6df; --text-dim: #b8bc8d; --text-mut: #777c56;
+    --shadow: 0 12px 32px rgba(0, 0, 0, .42);
+}
+
+[data-theme="nuke-facility"][data-mode="light"] {
+    --bg: #f1f3e4; --bg-2: #fafbef; --bg-3: #e6e9d3; --card: #fffef4;
+    --border: #cfd49f; --text: #272b18; --text-dim: #61673f; --text-mut: #979d70;
+    --shadow: 0 9px 25px rgba(59, 67, 36, .12);
+}
+
+[data-theme="nuke-facility"] .theme-fx::before {
+    content: "";
+    position: absolute;
+    inset: -96px;
+    pointer-events: none;
+    background:
+        repeating-linear-gradient(135deg, color-mix(in srgb, var(--accent) 4%, transparent) 0 2px, transparent 2px 30px),
+        radial-gradient(circle at 72% 38%, color-mix(in srgb, var(--accent) 10%, transparent), transparent 48%);
+    background-position: 0 0, 0 0;
+    animation: nukeGrid 20s linear infinite alternate;
+}
+
+[data-theme="nuke-facility"] .theme-fx::after {
+    content: "CAUTION  //  CONTROLLED AREA  //  CAUTION  //  CONTROLLED AREA";
+    position: absolute;
+    left: -52px;
+    right: -52px;
+    bottom: 0;
+    height: 22px;
+    overflow: hidden;
+    color: #171b09;
+    background: repeating-linear-gradient(135deg, #d7ef3f 0 18px, #202510 18px 36px);
+    opacity: .28;
+    font: 800 10px/22px "Cascadia Mono", Consolas, monospace;
+    letter-spacing: 3px;
+    white-space: nowrap;
+    text-align: center;
+    background-size: 51px 51px;
+    animation: nukeTape 2.2s linear infinite, nukeWarning 3s ease-in-out infinite;
+}
+
+@keyframes nukeGrid {
+    to { transform: translate3d(36px, 36px, 0); }
+}
+
+@keyframes nukeTape {
+    to { transform: translate3d(51px, 0, 0); }
+}
+
+@keyframes nukeWarning {
+    0%, 100% { opacity: .24; }
+    50% { opacity: .4; }
+}
+
+[data-theme="nuke-facility"] .brand .name,
+[data-theme="nuke-facility"] .card-title,
+[data-theme="nuke-facility"] table th {
+    font-family: "Oxanium", sans-serif;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+}
+
+[data-theme="nuke-facility"] .brand .name {
+    animation: nukeBrand 3.2s ease-in-out infinite;
+}
+
+@keyframes nukeBrand {
+    0%, 100% { text-shadow: 0 0 0 transparent; }
+    50% { text-shadow: 0 0 14px color-mix(in srgb, var(--accent) 45%, transparent); }
+}
+
+[data-theme="nuke-facility"] .sidebar {
+    border-right: 2px solid color-mix(in srgb, var(--accent) 32%, var(--border));
+}
+
+[data-theme="nuke-facility"] .nav-item.active {
+    color: var(--accent-2);
+    background: color-mix(in srgb, var(--accent) 11%, transparent);
+    box-shadow: inset 4px 0 0 var(--accent);
+    animation: nukeNav 2.4s steps(2, end) infinite;
+}
+
+@keyframes nukeNav {
+    50% { background: color-mix(in srgb, var(--accent) 17%, transparent); }
+}
+
+[data-theme="nuke-facility"] .card,
+[data-theme="nuke-facility"] .store-card,
+[data-theme="nuke-facility"] .modal {
+    border-color: color-mix(in srgb, var(--accent) 20%, var(--border));
+    border-radius: 3px;
+}
+
+[data-theme="nuke-facility"] .btn { border-radius: 3px; text-transform: uppercase; letter-spacing: .05em; }
+[data-theme="nuke-facility"] .btn-primary {
+    color: #171b09;
+    background: var(--accent);
+    border-color: var(--accent);
+    font-weight: 900;
+    animation: nukeButton 4s ease-in-out infinite;
+}
+[data-theme="nuke-facility"] .btn-primary:hover {
+    background: var(--accent-2);
+    box-shadow: 0 0 20px -7px var(--accent);
+}
+
+@keyframes nukeButton {
+    0%, 88%, 100% { filter: brightness(1); }
+    92% { filter: brightness(1.25); }
+}
+
+[data-theme="nuke-facility"] .badge-active,
+[data-theme="nuke-facility"] .badge-online {
+    color: #171b09;
+    background: var(--accent);
+}

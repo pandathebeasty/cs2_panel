@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" role="img" aria-label="VIP Diamond">
+  <defs>
+    <linearGradient id="d-g" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#8be9ff"/>
+      <stop offset="0.5" stop-color="#36c5f0"/>
+      <stop offset="1" stop-color="#0a85c7"/>
+    </linearGradient>
+    <linearGradient id="d-g2" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#e8fbff"/>
+      <stop offset="1" stop-color="#36c5f0"/>
+    </linearGradient>
+  </defs>
+  <path d="M16 10h32l12 16-28 30L4 26z" fill="url(#d-g)"/>
+  <path d="M16 10h32l12 16H4z" fill="url(#d-g2)" opacity="0.85"/>
+  <path d="M4 26h56L32 56z" fill="#1aa0d8" opacity="0.35"/>
+  <path d="M24 26 32 56 40 26M4 26l20 0 8-16 8 16 20 0" fill="none" stroke="#ffffff" stroke-opacity="0.6" stroke-width="1.5" stroke-linejoin="round"/>
+</svg>

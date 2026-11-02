@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" role="img" aria-label="VIP Silver">
+  <defs>
+    <linearGradient id="s-g" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#e8e8e8"/>
+      <stop offset="0.5" stop-color="#c0c0c0"/>
+      <stop offset="1" stop-color="#8a8a8a"/>
+    </linearGradient>
+  </defs>
+  <circle cx="32" cy="30" r="22" fill="url(#s-g)"/>
+  <circle cx="32" cy="30" r="18" fill="none" stroke="#fff" stroke-opacity="0.45" stroke-width="1.5"/>
+  <path d="M32 17l3.6 7.3 8 1.2-5.8 5.6 1.4 8L32 35l-7.2 4.1 1.4-8-5.8-5.6 8-1.2z" fill="#fff" fill-opacity="0.75"/>
+  <rect x="20" y="52" width="24" height="6" rx="3" fill="#c0c0c0"/>
+  <rect x="24" y="46" width="16" height="8" rx="2" fill="#8a8a8a"/>
+  <text x="32" y="51" text-anchor="middle" font-family="Arial,sans-serif" font-weight="800" font-size="5.5" fill="#fff">SILVER</text>
+</svg>

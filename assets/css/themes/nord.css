@@ -1,0 +1,42 @@
+/* @theme id:nord | name:Nord | accent:#5e81ac | tag:Animated */
+
+[data-theme="nord"] {
+    --accent: #5e81ac;
+    --accent-2: #81a1c1;
+    --enter: animFade;
+    --enter-dur: .5s;
+    --nord-glow: #88c0d0;
+    --theme-fx-opacity: .85;
+    --theme-fx-light-opacity: .55;
+}
+[data-theme="nord"][data-mode="light"] { --nord-glow: #426b7f; }
+
+[data-theme="nord"] .theme-fx::before {
+    content: "";
+    position: absolute;
+    inset: -12%;
+    background:
+        radial-gradient(ellipse 78% 22% at 20% 28%, color-mix(in srgb, var(--nord-glow) 48%, transparent), transparent 72%),
+        radial-gradient(ellipse 65% 24% at 78% 62%, color-mix(in srgb, var(--accent-2) 42%, transparent), transparent 74%),
+        radial-gradient(ellipse 48% 16% at 45% 78%, color-mix(in srgb, var(--accent) 32%, transparent), transparent 75%);
+    animation: nordRibbons 24s ease-in-out infinite alternate;
+}
+[data-theme="nord"] .theme-fx::after {
+    content: "";
+    position: absolute;
+    inset: -48px;
+    background:
+        radial-gradient(1.5px 1.5px at 24% 32%, var(--accent-2) 65%, transparent 85%),
+        radial-gradient(1px 1px at 72% 68%, var(--nord-glow) 65%, transparent 85%);
+    background-size: 240px 280px, 320px 240px;
+    opacity: .5;
+    animation: nordSky 40s ease-in-out infinite alternate;
+}
+@keyframes nordRibbons {
+    from { transform: translate3d(-3%, 2%, 0) rotate(-5deg); }
+    to { transform: translate3d(3%, -2%, 0) rotate(5deg); }
+}
+@keyframes nordSky {
+    from { transform: translate3d(0, -20px, 0); opacity: .3; }
+    to { transform: translate3d(24px, 20px, 0); opacity: .6; }
+}

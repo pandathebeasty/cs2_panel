@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128" role="img" aria-labelledby="gold-premium-title">
+  <title id="gold-premium-title">Gold VIP premium emblem</title>
+  <defs>
+    <linearGradient id="gold-premium-metal" x1="28" y1="12" x2="102" y2="112" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#fff0b5"/>
+      <stop offset=".28" stop-color="#f0c55e"/>
+      <stop offset=".53" stop-color="#b17b20"/>
+      <stop offset=".76" stop-color="#ffdc7a"/>
+      <stop offset="1" stop-color="#855315"/>
+    </linearGradient>
+    <linearGradient id="gold-premium-core" x1="64" y1="23" x2="64" y2="104" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#3b3730"/>
+      <stop offset="1" stop-color="#201e20"/>
+    </linearGradient>
+  </defs>
+  <path d="M33 94C12 84 9 61 19 43m76 51c21-10 24-33 14-51" fill="none" stroke="#563e1b" stroke-width="6" stroke-linecap="round"/>
+  <g fill="url(#gold-premium-metal)" stroke="#6b4b1c" stroke-width="1.5" stroke-linejoin="round">
+    <path d="M20 57C7 55 7 44 10 38c10 2 15 8 10 19Zm0 17C7 73 4 63 6 56c11 0 17 7 14 18Zm9 16C15 93 9 83 9 76c10-3 19 1 20 14Z"/>
+    <path d="M108 57c13-2 13-13 10-19-10 2-15 8-10 19Zm0 17c13-1 16-11 14-18-11 0-17 7-14 18Zm-9 16c14 3 20-7 20-14-10-3-19 1-20 14Z"/>
+  </g>
+  <path d="m64 8 34 20v36c0 22-14 39-34 54-20-15-34-32-34-54V28Z" fill="url(#gold-premium-metal)" stroke="#49351c" stroke-width="3" stroke-linejoin="round"/>
+  <path d="m64 19 25 15v30c0 17-11 31-25 43-14-12-25-26-25-43V34Z" fill="url(#gold-premium-core)" stroke="#ffe6a0" stroke-width="1.5"/>
+  <path d="m43 48 11 9 10-20 10 20 11-9-5 29H48Z" fill="url(#gold-premium-metal)" stroke="#ffe8aa" stroke-width="1.5" stroke-linejoin="round"/>
+  <path d="M48 70h32v8H48Z" fill="#efbf51"/>
+  <path d="m64 53 5 7-5 7-5-7Z" fill="#fff1bf" stroke="#8e601c" stroke-width="1.5"/>
+  <circle cx="43" cy="46" r="3" fill="#ffe8a1"/>
+  <circle cx="64" cy="35" r="3" fill="#fff2c2"/>
+  <circle cx="85" cy="46" r="3" fill="#ffe8a1"/>
+  <path d="M54 88h20m-17 7h14m-11 7h8" stroke="#edc76c" stroke-width="3" stroke-linecap="round"/>
+  <path d="m44 35 20-12 20 12" fill="none" stroke="#fff4cc" stroke-opacity=".7" stroke-width="2" stroke-linecap="round"/>
+</svg>

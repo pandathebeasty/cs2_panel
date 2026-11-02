@@ -1,0 +1,29 @@
+/* @theme id:obsidian-studio | name:Obsidian Studio | accent:#a78bfa | tag:Static */
+[data-theme="obsidian-studio"] {
+    --accent: #a78bfa;
+    --accent-2: #c4b5fd;
+    --enter: animFade;
+    --enter-dur: .35s;
+}
+
+[data-theme="obsidian-studio"][data-mode="dark"] {
+    --bg: #101015;
+    --bg-2: #16161e;
+    --bg-3: #23222e;
+    --card: #1a1923;
+    --border: #33303f;
+    --text: #f0edf8;
+    --text-dim: #b6afc9;
+    --text-mut: #8e849f;
+}
+
+[data-theme="obsidian-studio"][data-mode="light"] {
+    --bg: #f5f3fa;
+    --bg-2: #ffffff;
+    --bg-3: #eeebf5;
+    --card: #ffffff;
+    --border: #e0dbe9;
+    --text: #29213b;
+    --text-dim: #655b79;
+    --text-mut: #8a809f;
+}

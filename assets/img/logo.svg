@@ -1,0 +1,18 @@
+<svg width="120" height="120" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="CS2 Panel logo">
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#ff2d55"/>
+      <stop offset="1" stop-color="#e01e37"/>
+    </linearGradient>
+    <filter id="glow" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="3" result="b"/>
+      <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+  <rect x="6" y="6" width="108" height="108" rx="26" fill="#12131a"/>
+  <rect x="6" y="6" width="108" height="108" rx="26" fill="none" stroke="url(#g)" stroke-width="2" opacity="0.6"/>
+  <g filter="url(#glow)">
+    <path d="M78 40c-6-7-15-11-25-11-19 0-33 14-33 31s14 31 33 31c10 0 19-4 25-11l-13-9c-3 4-7 6-12 6-9 0-16-7-16-17s7-17 16-17c5 0 9 2 12 6z" fill="url(#g)"/>
+    <text x="86" y="74" font-family="Arial Black, Arial, sans-serif" font-size="34" font-weight="900" fill="url(#g)" text-anchor="middle">2</text>
+  </g>
+</svg>

@@ -1,0 +1,137 @@
+/* @theme id:fireworks | name:Fireworks | accent:#ffca3a | tag:Animated */
+
+/* A festive night sky with REAL fireworks — rockets launch, explode into a
+   shower of sparks that fly outward and fall with gravity. The particle system
+   runs on a <canvas> injected by app.js (only while this theme is active). This
+   file just sets the palette and the canvas placement. */
+
+[data-theme="fireworks"] {
+    --accent: #ffca3a;
+    --accent-2: #ff5da2;
+    --enter: animZoom;
+    --enter-dur: .5s;
+}
+[data-theme="fireworks"][data-mode="dark"] {
+    --bg: #050512; --bg-2: #0b0b1e; --bg-3: #12122e; --card: #0e0e24;
+    --border: #232347; --text: #eef0ff; --text-dim: #a3a6d0; --text-mut: #61648f;
+}
+[data-theme="fireworks"][data-mode="light"] {
+    --bg: #eef1f8; --bg-2: #ffffff; --bg-3: #f4f6fb; --card: #ffffff;
+    --border: #dce1ec; --text: #1b1e2b; --text-dim: #5a5f78; --text-mut: #9aa0b5;
+}
+
+/* The canvas fills the FX layer (behind the app). Dark night sky on dark mode,
+   a soft light sky on light mode so the cards/text stay readable. */
+[data-theme="fireworks"][data-mode="dark"] .theme-fx {
+    background:
+        linear-gradient(180deg, #09091f 0%, #05050f 66%, #0b0917 100%);
+}
+[data-theme="fireworks"][data-mode="light"] .theme-fx {
+    background: linear-gradient(180deg, #e9eef9 0%, #f5f7fc 62%, #dce4f2 100%);
+}
+
+[data-theme="fireworks"] .theme-fx::before,
+[data-theme="fireworks"] .theme-fx::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+}
+
+/* Three star scales break the repeated-dot look and produce real depth. */
+[data-theme="fireworks"] .theme-fx::before {
+    z-index: 0;
+    background-image:
+        radial-gradient(circle, rgba(255,255,255,.92) 0 1px, transparent 1.4px),
+        radial-gradient(circle, rgba(164,190,255,.68) 0 .7px, transparent 1.1px),
+        radial-gradient(circle, rgba(255,220,170,.48) 0 .55px, transparent .9px);
+    background-size: 173px 157px, 97px 113px, 61px 79px;
+    background-position: 19px 31px, 47px 13px, 7px 53px;
+    opacity: .62;
+    animation: fwStars 7s ease-in-out infinite alternate;
+}
+
+[data-theme="fireworks"] .theme-fx::after {
+    z-index: 1;
+    background: linear-gradient(180deg, transparent 62%, color-mix(in srgb, var(--accent-2) 5%, transparent));
+    opacity: .7;
+}
+
+[data-theme="fireworks"][data-mode="light"] .theme-fx::before { opacity: .12; filter: invert(1); }
+[data-theme="fireworks"][data-mode="light"] .theme-fx::after { opacity: .25; }
+
+@keyframes fwStars {
+    from { opacity: .42; transform: translateY(0); }
+    to { opacity: .72; transform: translateY(3px); }
+}
+[data-theme="fireworks"] .fw-canvas {
+    position: absolute; inset: 0; z-index: 2; width: 100%; height: 100%; display: block;
+}
+
+[data-theme="fireworks"] .card,
+[data-theme="fireworks"] .store-card,
+[data-theme="fireworks"] .modal,
+[data-theme="fireworks"] .dropdown-menu,
+[data-theme="fireworks"] .mini-cart-panel,
+[data-theme="fireworks"] .popup {
+    background: color-mix(in srgb, var(--card) 78%, transparent);
+    border-color: color-mix(in srgb, var(--accent) 14%, var(--border));
+    backdrop-filter: blur(8px) saturate(115%);
+    -webkit-backdrop-filter: blur(8px) saturate(115%);
+}
+
+[data-theme="fireworks"][data-mode="light"] .card,
+[data-theme="fireworks"][data-mode="light"] .store-card,
+[data-theme="fireworks"][data-mode="light"] .modal,
+[data-theme="fireworks"][data-mode="light"] .dropdown-menu,
+[data-theme="fireworks"][data-mode="light"] .mini-cart-panel,
+[data-theme="fireworks"][data-mode="light"] .popup {
+    background: rgba(255,255,255,.84);
+}
+
+/* Let launches and bursts remain visible through both navigation bars. */
+[data-theme="fireworks"] .sidebar {
+    background: color-mix(in srgb, var(--bg-2) 72%, transparent);
+    border-right-color: color-mix(in srgb, var(--accent) 16%, var(--border));
+    box-shadow: inset -1px 0 0 color-mix(in srgb, #fff 6%, transparent);
+}
+[data-theme="fireworks"] .sidebar::before {
+    content: ""; position: absolute; inset: 0; z-index: -1; pointer-events: none;
+    backdrop-filter: blur(7px) saturate(112%);
+    -webkit-backdrop-filter: blur(7px) saturate(112%);
+}
+[data-theme="fireworks"] .topbar {
+    background: color-mix(in srgb, var(--bg-2) 68%, transparent);
+    border-bottom-color: color-mix(in srgb, var(--accent) 15%, var(--border));
+    backdrop-filter: blur(9px) saturate(115%);
+    -webkit-backdrop-filter: blur(9px) saturate(115%);
+}
+[data-theme="fireworks"][data-mode="light"] .sidebar,
+[data-theme="fireworks"][data-mode="light"] .topbar {
+    background: rgba(255,255,255,.78);
+}
+
+[data-theme="fireworks"] .table-wrap {
+    background: color-mix(in srgb, var(--card) 75%, transparent);
+    backdrop-filter: blur(7px) saturate(112%);
+    -webkit-backdrop-filter: blur(7px) saturate(112%);
+}
+[data-theme="fireworks"] table { background: transparent; }
+[data-theme="fireworks"] tbody tr:hover { background: color-mix(in srgb, var(--accent) 8%, var(--bg-3)); }
+
+[data-theme="fireworks"] .user-chip,
+[data-theme="fireworks"] .topbar-link,
+[data-theme="fireworks"] .tabs {
+    background: color-mix(in srgb, var(--bg-3) 72%, transparent);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+}
+
+[data-theme="fireworks"] .btn-primary,
+[data-theme="fireworks"] .nav-item.active {
+    animation: fwGlow 3s ease-in-out infinite;
+}
+@keyframes fwGlow {
+    0%, 100% { box-shadow: 0 0 10px -4px color-mix(in srgb, var(--accent) 45%, transparent); }
+    50%      { box-shadow: 0 0 22px -2px color-mix(in srgb, var(--accent-2) 60%, transparent); }
+}

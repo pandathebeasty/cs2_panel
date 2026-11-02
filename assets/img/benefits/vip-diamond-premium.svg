@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128" role="img" aria-labelledby="diamond-premium-title">
+  <title id="diamond-premium-title">Diamond VIP premium emblem</title>
+  <defs>
+    <linearGradient id="diamond-premium-metal" x1="24" y1="12" x2="103" y2="113" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#e0fbff"/>
+      <stop offset=".27" stop-color="#7fd6ef"/>
+      <stop offset=".54" stop-color="#327eaa"/>
+      <stop offset=".76" stop-color="#a5e7f8"/>
+      <stop offset="1" stop-color="#28638e"/>
+    </linearGradient>
+    <linearGradient id="diamond-premium-core" x1="64" y1="23" x2="64" y2="106" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#203d59"/>
+      <stop offset="1" stop-color="#142333"/>
+    </linearGradient>
+    <linearGradient id="diamond-premium-gem" x1="45" y1="40" x2="78" y2="78" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#e9fdff"/>
+      <stop offset=".5" stop-color="#7de0f7"/>
+      <stop offset="1" stop-color="#3496c8"/>
+    </linearGradient>
+  </defs>
+  <path d="M34 45 5 25l6 23 18 14-14-5 9 23 14 8m56-43 29-20-6 23-18 14 14-5-9 23-14 8" fill="url(#diamond-premium-metal)" stroke="#233e54" stroke-width="3" stroke-linejoin="round"/>
+  <path d="m12 36 19 16m85-16L97 52M24 66l11 7m69-7-11 7" fill="none" stroke="#d9faff" stroke-width="2" stroke-linecap="round"/>
+  <path d="m64 7 34 21v39c0 20-14 36-34 52-20-16-34-32-34-52V28Z" fill="url(#diamond-premium-metal)" stroke="#233e54" stroke-width="3" stroke-linejoin="round"/>
+  <path d="m64 18 25 16v33c0 15-11 28-25 40-14-12-25-25-25-40V34Z" fill="url(#diamond-premium-core)" stroke="#bdefff" stroke-width="1.5"/>
+  <path d="M48 38h32l11 17-27 31-27-31Z" fill="url(#diamond-premium-gem)" stroke="#dffbff" stroke-width="1.75" stroke-linejoin="round"/>
+  <path d="M48 38h32L72 55H56Z" fill="#d7f8ff"/>
+  <path d="m48 38 8 17H37Zm32 0 11 17H72Z" fill="#92d7ed"/>
+  <path d="m37 55 27 31-8-31Zm54 0L64 86l8-31Z" fill="#2c85b8" opacity=".7"/>
+  <path d="M37 55h54M56 55l8 31 8-31M56 55l8-17 8 17" fill="none" stroke="#e1fbff" stroke-width="1.25" stroke-linejoin="round"/>
+  <path d="m64 23 2 5 5 2-5 2-2 5-2-5-5-2 5-2Z" fill="#dffbff"/>
+  <path d="M54 91h20m-17 6h14m-11 6h8m-6 6h4" stroke="#8edaf4" stroke-width="2.5" stroke-linecap="round"/>
+</svg>

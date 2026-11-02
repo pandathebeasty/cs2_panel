@@ -1,0 +1,44 @@
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteBase /
+
+    # Application source, generated config, and backups are never web resources.
+    RewriteRule ^(?:app|config|database|db_backups)(?:/|$) - [F,L]
+
+    # Do not rewrite requests for files/directories that physically exist
+    # (assets, css, js, images) so they are served directly.
+    RewriteCond %{REQUEST_FILENAME} -f [OR]
+    RewriteCond %{REQUEST_FILENAME} -d
+    RewriteRule ^ - [L]
+
+    # Everything else goes to the front controller.
+    RewriteRule ^ index.php [L]
+</IfModule>
+
+# Raise PHP memory for heavy ops (skins/rarity refresh decodes multi-MB JSON).
+# Only applied when running under mod_php; CGI/FastCGI uses .user.ini instead.
+# Wrapped in <IfModule> so a host that forbids php_value doesn't 500.
+<IfModule mod_php.c>
+    php_value memory_limit 256M
+    php_value max_execution_time 300
+</IfModule>
+<IfModule mod_php7.c>
+    php_value memory_limit 256M
+    php_value max_execution_time 300
+</IfModule>
+<IfModule mod_php8.c>
+    php_value memory_limit 256M
+    php_value max_execution_time 300
+</IfModule>
+
+# Security: block access to sensitive files.
+<FilesMatch "\.(env|ini|log|sql|md)$">
+    Require all denied
+</FilesMatch>
+
+# Basic security headers.
+<IfModule mod_headers.c>
+    Header set X-Content-Type-Options "nosniff"
+    Header set X-Frame-Options "SAMEORIGIN"
+    Header set Referrer-Policy "strict-origin-when-cross-origin"
+</IfModule>

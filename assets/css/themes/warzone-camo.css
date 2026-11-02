@@ -1,0 +1,129 @@
+/* @theme id:warzone-camo | name:Warzone Camo | accent:#c8a951 | tag:CS2 */
+
+/* CS2 / military theme: drifting camouflage background, the server name shown
+   large in the background (from --server-name) and waving in the sidebar,
+   stencil buttons, scope-line card sweeps, and "deploy" slide-in pop-ups.
+   The background text uses the CSS var --server-name set on <html> in the
+   layout (falls back to a label if missing). */
+
+[data-theme="warzone-camo"] {
+    --accent: #c8a951;
+    --accent-2: #e8d48a;
+    --enter: animGlide;
+    --enter-dur: .55s;
+    --server-name: "SERVER"; /* overridden per-page from site_name */
+}
+[data-theme="warzone-camo"][data-mode="dark"] {
+    --bg: #10120b; --bg-2: #171a10; --bg-3: #1f2415; --card: #171a10;
+    --border: #2e3620; --text: #eef0e2; --text-dim: #b9c09a; --text-mut: #6f7654;
+}
+[data-theme="warzone-camo"][data-mode="light"] {
+    --bg: #eceadd; --bg-2: #f6f4ea; --bg-3: #e2e0d0; --card: #f6f4ea;
+    --border: #cfccb4; --text: #23261a; --text-dim: #55583f; --text-mut: #9a9878;
+}
+
+                                               
+[data-theme="warzone-camo"] .theme-fx::before {
+    content: ""; position: absolute; inset: -15%; z-index: 0; pointer-events: none;
+    background:
+        radial-gradient(closest-side at 18% 22%, #2b3320 0 22%, transparent 60%),
+        radial-gradient(closest-side at 78% 16%, #3a4526 0 20%, transparent 58%),
+        radial-gradient(closest-side at 30% 78%, #232a17 0 24%, transparent 60%),
+        radial-gradient(closest-side at 82% 74%, #39422a 0 20%, transparent 58%),
+        radial-gradient(closest-side at 55% 45%, #2b331f 0 18%, transparent 55%);
+    opacity: .8;
+    animation: wzCamo 34s ease-in-out infinite alternate;
+}
+[data-theme="warzone-camo"][data-mode="light"] .theme-fx::before { opacity: .32; }
+@keyframes wzCamo {
+    0%   { transform: translate(0,0) scale(1.05) rotate(0deg); }
+    50%  { transform: translate(3%, -2%) scale(1.12) rotate(2deg); }
+    100% { transform: translate(-2%, 3%) scale(1.08) rotate(-2deg); }
+}
+
+                                                                                  
+[data-theme="warzone-camo"] .theme-fx::after {
+    content: var(--server-name, "SERVER");
+    position: absolute; z-index: 0; pointer-events: none;
+    left: 50%; top: 42%; transform: translate(-50%, -50%);
+    font-family: 'Rajdhani','Oswald',Inter,sans-serif;
+    font-size: clamp(60px, 15vw, 220px); font-weight: 900; letter-spacing: .06em;
+    white-space: nowrap; text-transform: uppercase;
+    color: transparent; -webkit-text-stroke: 2px color-mix(in srgb, var(--accent) 22%, transparent);
+    opacity: .10;
+    animation: wzWatermark 18s ease-in-out infinite;
+}
+[data-theme="warzone-camo"][data-mode="light"] .theme-fx::after {
+    opacity: .14; -webkit-text-stroke: 2px color-mix(in srgb, var(--accent) 38%, transparent);
+}
+@keyframes wzWatermark {
+    0%,100% { transform: translate(-50%, -50%) scale(1);    opacity: .08; }
+    50%     { transform: translate(-50%, -54%) scale(1.04); opacity: .14; }
+}
+
+                                                              
+[data-theme="warzone-camo"] .brand .name {
+    background: linear-gradient(90deg, var(--accent), var(--accent-2), var(--accent));
+    background-size: 250% 100%;
+    -webkit-background-clip: text; background-clip: text;
+    -webkit-text-fill-color: transparent; color: transparent;
+    font-weight: 900; letter-spacing: .04em; text-transform: uppercase;
+    animation: wzWaveText 3.2s ease-in-out infinite, wzShimmer 6s linear infinite;
+    transform-origin: left center;
+}
+@keyframes wzWaveText {
+    0%,100% { transform: translateY(0) skewX(0deg); }
+    25%     { transform: translateY(-2px) skewX(-2deg); }
+    75%     { transform: translateY(2px) skewX(2deg); }
+}
+@keyframes wzShimmer { 0% { background-position: 0% 50%; } 100% { background-position: 250% 50%; } }
+
+/* Sidebar accent edge + tactical nav. */
+[data-theme="warzone-camo"] .sidebar { border-right: 1px solid color-mix(in srgb, var(--accent) 30%, var(--border)); }
+[data-theme="warzone-camo"] .nav-item.active {
+    background: color-mix(in srgb, var(--accent) 16%, transparent);
+    box-shadow: inset 3px 0 0 var(--accent);
+}
+
+                                                      
+[data-theme="warzone-camo"] .card,
+[data-theme="warzone-camo"] .store-card {
+    border-color: color-mix(in srgb, var(--accent) 22%, var(--border));
+    position: relative; overflow: hidden;
+    transition: transform .2s, box-shadow .25s, border-color .25s;
+}
+[data-theme="warzone-camo"] .store-card::before {
+    content: ""; position: absolute; left: -60%; top: 0; width: 40%; height: 100%;
+    background: linear-gradient(100deg, transparent, color-mix(in srgb, var(--accent) 26%, transparent), transparent);
+    transform: skewX(-16deg); transition: left .6s ease; pointer-events: none;
+}
+[data-theme="warzone-camo"] .store-card:hover::before { left: 130%; }
+[data-theme="warzone-camo"] .store-card:hover {
+    transform: translateY(-3px);
+    border-color: color-mix(in srgb, var(--accent) 50%, transparent);
+    box-shadow: 0 12px 30px -12px color-mix(in srgb, #000 60%, transparent), inset 0 0 0 1px color-mix(in srgb, var(--accent) 20%, transparent);
+}
+
+                                                                      
+[data-theme="warzone-camo"] .btn-primary {
+    background: linear-gradient(180deg, var(--accent-2), var(--accent));
+    color: #141608; font-weight: 900; letter-spacing: .08em; text-transform: uppercase;
+    border-radius: 4px;
+    transition: transform .13s, box-shadow .2s, filter .15s;
+}
+[data-theme="warzone-camo"] .btn-primary:hover { filter: brightness(1.06); box-shadow: 0 6px 18px -6px color-mix(in srgb, var(--accent) 55%, transparent); }
+[data-theme="warzone-camo"] .btn-primary:active { transform: translateY(1px) scale(.97); filter: brightness(1.3); }
+[data-theme="warzone-camo"] .btn {
+    border-radius: 4px; letter-spacing: .04em; text-transform: uppercase; font-size: 12px;
+    transition: border-color .2s, color .2s, transform .12s, box-shadow .2s;
+}
+[data-theme="warzone-camo"] .btn:hover { border-color: color-mix(in srgb, var(--accent) 55%, transparent); color: var(--accent-2); }
+[data-theme="warzone-camo"] .btn:active { transform: scale(.96); }
+
+                                         
+[data-theme="warzone-camo"] .modal-overlay.open .modal { animation: wzDeploy .32s cubic-bezier(.2,.8,.2,1) both; }
+@keyframes wzDeploy { 0% { opacity: 0; transform: translateY(-28px) scale(.98); } 100% { opacity: 1; transform: none; } }
+
+/* Type badges + section titles pick up the gold accent naturally via --accent. */
+[data-theme="warzone-camo"] .store-section-title,
+[data-theme="warzone-camo"] .pkg-group-title { color: var(--accent-2); }

@@ -1,0 +1,59 @@
+/* @theme id:cyber-grid | name:Cyber Grid | accent:#38bdf8 | tag:Animated */
+
+[data-theme="cyber-grid"] {
+    --accent: #0ea5e9;
+    --accent-2: #38bdf8;
+    --enter: animSlideR;
+    --enter-dur: .5s;
+    --theme-fx-opacity: .9;
+    --theme-fx-light-opacity: .6;
+}
+[data-theme="cyber-grid"][data-mode="dark"] {
+    --bg: #060b14; --bg-2: #0a1220; --bg-3: #0f1b2e; --card: #0b1524;
+    --border: #1a2b45; --text: #e7f2ff; --text-dim: #94b2d4; --text-mut: #55708f;
+}
+[data-theme="cyber-grid"][data-mode="light"] {
+    --bg: #cbd4df; --bg-2: #dce4ed; --bg-3: #bccbdb; --card: #d3dfea;
+    --border: #8b9eb2; --text: #203447; --text-dim: #354e66; --text-mut: #455e74;
+}
+
+[data-theme="cyber-grid"] .theme-fx::before {
+    content: "";
+    position: absolute; inset: -96px; z-index: 0; pointer-events: none;
+    background-image:
+        linear-gradient(color-mix(in srgb, var(--accent) 30%, transparent) 1px, transparent 1px),
+        linear-gradient(90deg, color-mix(in srgb, var(--accent) 30%, transparent) 1px, transparent 1px),
+        linear-gradient(color-mix(in srgb, var(--accent-2) 18%, transparent) 1px, transparent 1px),
+        linear-gradient(90deg, color-mix(in srgb, var(--accent-2) 18%, transparent) 1px, transparent 1px);
+    background-size: 48px 48px, 48px 48px, 192px 192px, 192px 192px;
+    opacity: .8;
+    animation: gridScroll 28s linear infinite;
+}
+[data-theme="cyber-grid"][data-mode="light"] .theme-fx::before {
+    opacity: .85;
+}
+
+@keyframes gridScroll {
+    from { transform: translate3d(-96px, -96px, 0); }
+    to { transform: translate3d(96px, 96px, 0); }
+}
+
+[data-theme="cyber-grid"] .theme-fx::after {
+    content: "";
+    position: absolute; left: 0; right: 0; top: -180px; height: 180px; z-index: 1; pointer-events: none;
+    background: linear-gradient(180deg, transparent, color-mix(in srgb, var(--accent-2) 24%, transparent) 55%, color-mix(in srgb, var(--accent) 42%, transparent) 56%, transparent 58%);
+    animation: gridScan 12s linear infinite;
+}
+@keyframes gridScan {
+    from { transform: translate3d(0, 0, 0); }
+    to { transform: translate3d(0, calc(100vh + 180px), 0); }
+}
+
+[data-theme="cyber-grid"] .btn-primary,
+[data-theme="cyber-grid"] .nav-item.active {
+    animation: gridGlow 4s ease-in-out infinite;
+}
+@keyframes gridGlow {
+    0%, 100% { box-shadow: 0 0 0 1px color-mix(in srgb, var(--accent) 22%, transparent); }
+    50%      { box-shadow: 0 0 20px -3px color-mix(in srgb, var(--accent) 55%, transparent); }
+}
