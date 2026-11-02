@@ -25,7 +25,9 @@ Naming: NNN_description.sql   e.g.  001_add_vip_groups.sql
         Use a zero-padded numeric index (001, 002, ...) so files sort in order.
 
 Rules:
-- Use "IF NOT EXISTS" / "IF EXISTS" so re-running is harmless.
+- Use "IF NOT EXISTS" / "IF EXISTS" so re-running is harmless. On MySQL, which
+  has no IF [NOT] EXISTS for ADD/DROP COLUMN|INDEX, Migrator strips that clause
+  based on the detected server version (MariaDB 10.0.2+ keeps it).
 - Plain ADD COLUMN statements may be used for MySQL/MariaDB portability;
   Migrator also tolerates duplicate-column/index errors on partial upgrades.
 - One statement per ";" at end of line.

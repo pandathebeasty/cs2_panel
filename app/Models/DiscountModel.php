@@ -141,9 +141,8 @@ final class DiscountModel
         }
         Database::run(
             'INSERT INTO `' . self::TABLE . '` (code, percent, max_uses, starts_at, ends_at, enabled)
-             VALUES (?, ?, ?, ?, ?, ?)
-             ON DUPLICATE KEY UPDATE percent = VALUES(percent), max_uses = VALUES(max_uses),
-                 starts_at = VALUES(starts_at), ends_at = VALUES(ends_at), enabled = VALUES(enabled)',
+             VALUES (?, ?, ?, ?, ?, ?)'
+             . Database::onDuplicateUpdate(['percent', 'max_uses', 'starts_at', 'ends_at', 'enabled']),
             $params
         );
     }

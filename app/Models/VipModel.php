@@ -352,8 +352,8 @@ final class VipModel
         // grant with a duplicate-key error; it should just be overwritten.
         Database::run(
             "INSERT INTO {$t} (account_id, name, lastvisit, sid, `group`, expires)
-             VALUES (?, ?, ?, ?, ?, ?)
-             ON DUPLICATE KEY UPDATE name = VALUES(name), lastvisit = VALUES(lastvisit), `group` = VALUES(`group`), expires = VALUES(expires)",
+             VALUES (?, ?, ?, ?, ?, ?)"
+             . Database::onDuplicateUpdate(['name', 'lastvisit', 'group', 'expires']),
             [$accountId, $name !== '' ? $name : 'VIP', time(), $sid, $group, $expires]
         );
     }

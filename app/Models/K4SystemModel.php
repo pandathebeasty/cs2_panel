@@ -159,14 +159,15 @@ final class K4SystemModel
         $killsSel  = self::hasStats() ? 'COALESCE(s.`kills`, 0)' : '0';
         $deathsSel = self::hasStats() ? 'COALESCE(s.`deaths`, 0)' : '0';
         $join = self::hasStats() ? "LEFT JOIN `{$stats}` s ON s.`{$sc}` = tm.`{$sc}`" : '';
+        $castMin = static fn(string $col): string => Database::castInt("tm.`{$col}` / 60");
 
         $base = "SELECT tm.`{$sc}` AS steam_id, tm.`name` AS name,
-                        CAST(tm.`all` / 60 AS INTEGER) AS playtime_minutes,
-                        CAST(tm.`ct` / 60 AS INTEGER) AS ct_minutes,
-                        CAST(tm.`t` / 60 AS INTEGER) AS t_minutes,
-                        CAST(tm.`spec` / 60 AS INTEGER) AS spec_minutes,
-                        CAST(tm.`dead` / 60 AS INTEGER) AS dead_minutes,
-                        CAST(tm.`alive` / 60 AS INTEGER) AS alive_minutes,
+                        {$castMin('all')} AS playtime_minutes,
+                        {$castMin('ct')} AS ct_minutes,
+                        {$castMin('t')} AS t_minutes,
+                        {$castMin('spec')} AS spec_minutes,
+                        {$castMin('dead')} AS dead_minutes,
+                        {$castMin('alive')} AS alive_minutes,
                         {$killsSel} AS kills,
                         {$deathsSel} AS deaths,
                         tm.`lastseen` AS last_online
@@ -376,10 +377,11 @@ final class K4SystemModel
         $times = self::timesTable();
         // k4times stores seconds; 'all' is the total, 'ct_t' sums ct + t.
         $secs = $source === 'ct_t' ? '(`ct` + `t`)' : '`all`';
+        $castSecs = Database::castInt("{$secs} / 60");
 
         return Database::all(
             "SELECT `{$sc}` AS steam_id, `name` AS name,
-                    CAST({$secs} / 60 AS INTEGER) AS points, '' AS rank_name,
+                    {$castSecs} AS points, '' AS rank_name,
                     0 AS kills, 0 AS deaths, `lastseen` AS last_online
              FROM `{$times}`
              ORDER BY points DESC, `{$sc}` ASC

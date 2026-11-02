@@ -138,7 +138,10 @@ final class Migrator
     private static function execScript(string $sql, ?\PDO $pdo = null): void
     {
         $pdo = $pdo ?? Database::connection();
-                                                                                 
+        if (!Database::supportsAlterIfExists($pdo)) {
+            $sql = self::stripAlterIfExists($sql);
+        }
+
         // This splitter supports panel migrations, not stored routines.
         $sql = preg_replace('/^\s*--.*$/m', '', $sql) ?? $sql;
         $statements = array_filter(
@@ -158,6 +161,24 @@ final class Migrator
                 }
             }
         }
+    }
+
+    /**
+     * MySQL has no IF [NOT] EXISTS on ADD/DROP COLUMN|INDEX|KEY. Drop the clause;
+     * the duplicate/missing errors it guarded against are in IDEMPOTENT_ERRORS.
+     */
+    private static function stripAlterIfExists(string $sql): string
+    {
+        $sql = preg_replace(
+            '/\b(ADD\s+(?:COLUMN|INDEX|KEY|UNIQUE\s+(?:INDEX|KEY)))\s+IF\s+NOT\s+EXISTS\b/i',
+            '$1',
+            $sql
+        ) ?? $sql;
+        return preg_replace(
+            '/\b(DROP\s+(?:COLUMN|INDEX|KEY))\s+IF\s+EXISTS\b/i',
+            '$1',
+            $sql
+        ) ?? $sql;
     }
 
     private static function record(string $filename, ?\PDO $pdo = null): void

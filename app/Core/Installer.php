@@ -217,8 +217,8 @@ final class Installer
 
         $sql = $preserveExisting
             ? 'INSERT IGNORE INTO panel_settings (`key`, `value`) VALUES (?, ?)'
-            : 'INSERT INTO panel_settings (`key`, `value`) VALUES (?, ?)
-               ON DUPLICATE KEY UPDATE `value` = VALUES(`value`)';
+            : 'INSERT INTO panel_settings (`key`, `value`) VALUES (?, ?)'
+              . Database::onDuplicateUpdate(['value'], $pdo);
         $stmt = $pdo->prepare($sql);
         foreach ($pairs as $k => $v) {
             $stmt->execute([$k, $v]);

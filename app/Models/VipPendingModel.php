@@ -88,9 +88,8 @@ final class VipPendingModel
         try {
             Database::run(
                 'INSERT INTO ' . self::TABLE . ' (steamid, name, sid, `group`, days, contest_id, created_at)
-                 VALUES (?, ?, ?, ?, ?, ?, ?)
-                 ON DUPLICATE KEY UPDATE name = VALUES(name), `group` = VALUES(`group`),
-                    days = VALUES(days), contest_id = VALUES(contest_id), created_at = VALUES(created_at)',
+                 VALUES (?, ?, ?, ?, ?, ?, ?)'
+                 . Database::onDuplicateUpdate(['name', 'group', 'days', 'contest_id', 'created_at']),
                 [$steamId64, $name !== '' ? $name : 'VIP', $sid, $group, $days, $contestId, time()]
             );
         } catch (\Throwable $e) {

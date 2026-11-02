@@ -97,8 +97,8 @@ final class Settings
                 $params[] = $v;
             }
             $stmt = $pdo->prepare(
-                'INSERT INTO panel_settings (`key`, `value`) VALUES ' . $values . '
-                 ON DUPLICATE KEY UPDATE `value` = VALUES(`value`)'
+                'INSERT INTO panel_settings (`key`, `value`) VALUES ' . $values
+                . Database::onDuplicateUpdate(['value'], $pdo)
             );
             $stmt->execute($params);
             if ($ownTx) {
@@ -551,8 +551,8 @@ final class Settings
 
         try {
             Database::run(
-                'INSERT INTO panel_settings (`key`, `value`) VALUES (?, ?)
-                 ON DUPLICATE KEY UPDATE `value` = VALUES(`value`)',
+                'INSERT INTO panel_settings (`key`, `value`) VALUES (?, ?)'
+                . Database::onDuplicateUpdate(['value']),
                 [$key, $value]
             );
         } catch (\Throwable $e) {

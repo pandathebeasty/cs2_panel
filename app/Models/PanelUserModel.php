@@ -66,8 +66,8 @@ final class PanelUserModel
         self::ensureSchema();
         $role = self::normalizeRole($role);
         Database::run(
-            'INSERT INTO panel_users (steamid64, name, role, can_manage, added_by) VALUES (?, ?, ?, ?, ?)
-             ON DUPLICATE KEY UPDATE name = VALUES(name), role = VALUES(role), can_manage = VALUES(can_manage)',
+            'INSERT INTO panel_users (steamid64, name, role, can_manage, added_by) VALUES (?, ?, ?, ?, ?)'
+            . Database::onDuplicateUpdate(['name', 'role', 'can_manage']),
             [$steamId64, $name, $role, $role === 'owner' ? 1 : 0, $addedBy]
         );
     }

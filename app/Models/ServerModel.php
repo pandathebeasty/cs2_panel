@@ -60,8 +60,8 @@ final class ServerModel
                 return;
             }
             Database::run(
-                'INSERT INTO `' . self::RCON_TABLE . '` (server_id, rcon_password) VALUES (?, ?)
-                 ON DUPLICATE KEY UPDATE rcon_password = VALUES(rcon_password)',
+                'INSERT INTO `' . self::RCON_TABLE . '` (server_id, rcon_password) VALUES (?, ?)'
+                . Database::onDuplicateUpdate(['rcon_password']),
                 [$serverId, $password]
             );
         } catch (\Throwable $e) {

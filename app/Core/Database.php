@@ -219,6 +219,70 @@ final class Database
         return $cache[$table] = $exists;
     }
 
+    /**
+     * Detected database server: ['mariadb' => bool, 'version' => 'x.y.z'].
+     * Cached per connection; falls back to MySQL 5.7 when detection fails so
+     * callers pick the most portable syntax.
+     * @return array{mariadb:bool,version:string}
+     */
+    public static function serverInfo(?PDO $pdo = null): array
+    {
+        static $cache = null;
+        $cache ??= new \WeakMap();
+        $pdo = $pdo ?? self::connection();
+        if (isset($cache[$pdo])) {
+            return $cache[$pdo];
+        }
+        try {
+            $raw = (string) $pdo->query('SELECT VERSION()')->fetchColumn();
+        } catch (\Throwable $e) {
+            $raw = '';
+        }
+        $mariadb = stripos($raw, 'mariadb') !== false;
+        $version = preg_match('/(\d+\.\d+(?:\.\d+)?)/', $raw, $m) ? $m[1] : '5.7.0';
+        // Old MariaDB builds report "5.5.5-10.x.y-MariaDB".
+        if ($mariadb && preg_match('/^5\.5\.5-(\d+\.\d+(?:\.\d+)?)/', $raw, $m)) {
+            $version = $m[1];
+        }
+        return $cache[$pdo] = ['mariadb' => $mariadb, 'version' => $version];
+    }
+
+    public static function isMariaDb(?PDO $pdo = null): bool
+    {
+        return self::serverInfo($pdo)['mariadb'];
+    }
+
+    /** MariaDB 10.0.2+ accepts ADD/DROP COLUMN|INDEX IF [NOT] EXISTS; MySQL does not. */
+    public static function supportsAlterIfExists(?PDO $pdo = null): bool
+    {
+        $info = self::serverInfo($pdo);
+        return $info['mariadb'] && version_compare($info['version'], '10.0.2', '>=');
+    }
+
+    /** Integer CAST for the detected server (MariaDB: INTEGER, MySQL: SIGNED). */
+    public static function castInt(string $expr, ?PDO $pdo = null): string
+    {
+        return 'CAST(' . $expr . ' AS ' . (self::isMariaDb($pdo) ? 'INTEGER' : 'SIGNED') . ')';
+    }
+
+    /**
+     * Upsert tail for "INSERT ... VALUES (...)" that updates $columns with the
+     * inserted values. MySQL 8.0.19+ uses a row alias (VALUES() is deprecated
+     * there since 8.0.20); MariaDB and older MySQL use VALUES(col).
+     * @param string[] $columns
+     */
+    public static function onDuplicateUpdate(array $columns, ?PDO $pdo = null): string
+    {
+        $info = self::serverInfo($pdo);
+        $alias = !$info['mariadb'] && version_compare($info['version'], '8.0.19', '>=');
+        $sets = [];
+        foreach ($columns as $column) {
+            $quoted = '`' . str_replace('`', '``', $column) . '`';
+            $sets[] = $quoted . ' = ' . ($alias ? '`_new`.' . $quoted : 'VALUES(' . $quoted . ')');
+        }
+        return ($alias ? ' AS `_new`' : '') . ' ON DUPLICATE KEY UPDATE ' . implode(', ', $sets);
+    }
+
     /** True when a column exists on a table (cached). Safe on missing tables. */
     public static function columnExists(string $table, string $column): bool
     {

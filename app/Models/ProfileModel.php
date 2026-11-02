@@ -82,8 +82,8 @@ final class ProfileModel
     {
         self::ensureTable();
         Database::run(
-            'INSERT INTO `' . self::TABLE . '` (steamid64, discord_tag) VALUES (?, ?)
-             ON DUPLICATE KEY UPDATE discord_tag = VALUES(discord_tag)',
+            'INSERT INTO `' . self::TABLE . '` (steamid64, discord_tag) VALUES (?, ?)'
+            . Database::onDuplicateUpdate(['discord_tag']),
             [$steamId64, $tag !== '' ? $tag : null]
         );
     }
