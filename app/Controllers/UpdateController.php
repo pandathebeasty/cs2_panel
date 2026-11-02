@@ -102,7 +102,8 @@ final class UpdateController extends Controller
         $id = (string) $this->input('step', 'prepare');
         try {
             if (!Updater::isBackgroundStep($id)) {
-                $this->json(Updater::step($id));
+                $parts = $id === 'prepare' ? array_map('strval', (array) $this->input('parts', [])) : [];
+                $this->json(Updater::step($id, $parts));
             }
             $status = Updater::jobStatus($id);
             if ($status !== null) {

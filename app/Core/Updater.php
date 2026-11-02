@@ -543,7 +543,18 @@ final class Updater
      * @return array{ok:bool, done:bool, step:string, next:?string, percent:int,
      *               label:string, message?:string, log?:string[]}
      */
-    public static function step(string $id): array
+    /**
+     * Optional heavy parts of a release. Paths are relative to the release root;
+     * when a part is not selected its files are not extracted, so they are
+     * neither copied nor overwritten on the install.
+     */
+    public const OPTIONAL_PARTS = [
+        'maps'  => ['assets/img/maps', 'public/assets/img/maps'],
+        'skins' => ['app/Data/weaponpaints'],
+    ];
+
+    /** @param string[] $parts selected optional parts (prepare step only) */
+    public static function step(string $id, array $parts = []): array
     {
         @set_time_limit(0);
         if (function_exists('ini_set')) {
@@ -586,6 +597,7 @@ final class Updater
                         'version' => $latest['version'],
                         'tag'     => $latest['tag'],
                         'zipball' => $latest['zipball'],
+                        'parts'   => array_values(array_intersect(array_keys(self::OPTIONAL_PARTS), $parts)),
                     ]);
                     $log[] = 'Preparing update to v' . $latest['version'] . '.';
                     break;
@@ -616,13 +628,28 @@ final class Updater
                     }
                     $extractDir = self::workDir() . '/extracted';
                     @mkdir($extractDir, 0755, true);
-                    $zip->extractTo($extractDir);
+                    $st = self::readState();
+                    $skip = self::skippedPrefixes((array) ($st['parts'] ?? array_keys(self::OPTIONAL_PARTS)));
+                    if ($skip === []) {
+                        $zip->extractTo($extractDir);
+                    } else {
+                        $names = [];
+                        for ($i = 0; $i < $zip->numFiles; $i++) {
+                            $name = (string) $zip->getNameIndex($i);
+                            // Drop the zipball's top-level folder before matching.
+                            $rel = (string) substr($name, (int) strpos($name, '/') + 1);
+                            if (!self::isSkipped($rel, $skip)) {
+                                $names[] = $name;
+                            }
+                        }
+                        $zip->extractTo($extractDir, $names);
+                        $log[] = 'Skipped: ' . implode(', ', array_diff(array_keys(self::OPTIONAL_PARTS), (array) $st['parts'])) . '.';
+                    }
                     $zip->close();
                     $root = self::firstSubdir($extractDir);
                     if ($root === null) {
                         return self::stepFail($id, $meta, 'The archive layout was not recognized.');
                     }
-                    $st = self::readState();
                     $st['root'] = $root;
                     self::writeState($st);
                     $log[] = 'Extracted the archive.';
@@ -728,10 +755,12 @@ final class Updater
             $root . '/app'             => BASE_PATH . '/app',
             $root . '/database'        => BASE_PATH . '/database',
             $root . '/public/assets'   => $assetsDest,
+            // Flat repo layout ships assets/ at the release root.
+            $root . '/assets'          => is_dir($root . '/public/assets') ? null : $assetsDest,
         ];
 
         foreach ($copies as $srcDir => $destDir) {
-            if (!is_dir($srcDir)) {
+            if ($destDir === null || !is_dir($srcDir)) {
                 continue; // release may not ship every folder
             }
             if (!self::copyTree($srcDir, $destDir)) {
@@ -857,6 +886,28 @@ final class Updater
             return false;
         }
         return true;
+    }
+
+    /** Release-relative path prefixes of the optional parts NOT selected. @return string[] */
+    private static function skippedPrefixes(array $selected): array
+    {
+        $skip = [];
+        foreach (self::OPTIONAL_PARTS as $part => $paths) {
+            if (!in_array($part, $selected, true)) {
+                array_push($skip, ...$paths);
+            }
+        }
+        return $skip;
+    }
+
+    private static function isSkipped(string $rel, array $prefixes): bool
+    {
+        foreach ($prefixes as $p) {
+            if ($rel === $p || $rel === $p . '/' || str_starts_with($rel, $p . '/')) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /** Recursively copy a directory tree, creating destinations as needed. */

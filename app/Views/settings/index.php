@@ -1786,9 +1786,9 @@ $L = fn(string $k) => View::e(Lang::t($k));
                     </ul>
                 </div>
                 <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:16px">
-                    <form method="post" action="/update/run" data-confirm="<?= $L('update.confirm') ?>" id="update-run-form">
+                    <form method="post" action="/update/run" id="update-run-form">
                         <input type="hidden" name="csrf" value="<?= View::e($csrf) ?>">
-                        <button type="submit" class="btn btn-primary" id="update-run-btn"><?= $L('update.run') ?> v<?= View::e($u['latest']['version']) ?></button>
+                        <button type="button" class="btn btn-primary" id="update-run-btn" data-modal="modal-update-parts"><?= $L('update.run') ?> v<?= View::e($u['latest']['version']) ?></button>
                     </form>
                     <button type="button" class="btn js-update-check"><?= $L('update.recheck') ?></button>
                 </div>
@@ -1811,6 +1811,36 @@ $L = fn(string $k) => View::e(Lang::t($k));
         </p>
     </div>
     <?php endif; ?>
+
+    <!-- Update scope: code is always updated; heavy parts are optional. -->
+    <div class="modal-overlay" id="modal-update-parts">
+        <div class="modal" role="dialog" aria-modal="true" aria-labelledby="update-parts-title">
+            <div class="modal-head">
+                <h3 id="update-parts-title"><?= $L('update.parts_title') ?></h3>
+                <button type="button" class="modal-close" aria-label="<?= $L('common.cancel') ?>">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p class="hint" style="margin-top:0"><?= $L('update.confirm') ?></p>
+                <div class="check" style="margin-top:14px">
+                    <input type="checkbox" id="update-part-code" checked disabled>
+                    <label for="update-part-code"><strong><?= $L('update.part_code') ?></strong><br><span class="muted"><?= $L('update.part_code_hint') ?></span></label>
+                </div>
+                <div class="check" style="margin-top:12px">
+                    <input type="checkbox" id="update-part-maps" name="update_parts" value="maps">
+                    <label for="update-part-maps"><strong><?= $L('update.part_maps') ?></strong><br><span class="muted"><?= $L('update.part_maps_hint') ?></span></label>
+                </div>
+                <div class="check" style="margin-top:12px">
+                    <input type="checkbox" id="update-part-skins" name="update_parts" value="skins">
+                    <label for="update-part-skins"><strong><?= $L('update.part_skins') ?></strong><br><span class="muted"><?= $L('update.part_skins_hint') ?></span></label>
+                </div>
+                <p class="hint" style="margin-top:14px"><?= $L('update.parts_note') ?></p>
+            </div>
+            <div class="modal-foot">
+                <button type="button" class="btn modal-close"><?= $L('common.cancel') ?></button>
+                <button type="button" class="btn btn-primary" id="update-parts-start"><?= $L('update.parts_start') ?></button>
+            </div>
+        </div>
+    </div>
 
     <!-- Progress HUD overlay (shown while a step-based update runs). -->
     <div class="update-hud" id="update-hud" aria-hidden="true">
@@ -2052,15 +2082,26 @@ document.addEventListener('DOMContentLoaded', function () {
     // the host time limit (the blank-500 cause), while showing a real percent.
     var updRunForm = document.getElementById('update-run-form');
     var updRunBtn = document.getElementById('update-run-btn');
+    var updPartsModal = document.getElementById('modal-update-parts');
+    var updPartsStart = document.getElementById('update-parts-start');
     if (updRunForm && updRunBtn) {
         updRunForm.addEventListener('submit', function (e) {
             e.preventDefault();
-            if (updRunBtn.disabled) return;
-            runStepUpdate();
+        });
+    }
+    if (updPartsStart && updPartsModal) {
+        updPartsStart.addEventListener('click', function () {
+            if (updRunBtn && updRunBtn.disabled) return;
+            var parts = Array.prototype.map.call(
+                updPartsModal.querySelectorAll('input[name="update_parts"]:checked'),
+                function (cb) { return cb.value; }
+            );
+            updPartsModal.classList.remove('open');
+            runStepUpdate(parts);
         });
     }
 
-    function runStepUpdate() {
+    function runStepUpdate(parts) {
         var I18N = window.UPDATE_I18N || { steps: {}, hud_done: 'Done', hud_failed: 'Update failed' };
         var hud     = document.getElementById('update-hud');
         // Move the HUD to <body> so its position:fixed centres against the
@@ -2102,6 +2143,7 @@ document.addEventListener('DOMContentLoaded', function () {
         function runStep(id) {
             var body = new URLSearchParams();
             body.set('step', id);
+            if (id === 'prepare') { (parts || []).forEach(function (p) { body.append('parts[]', p); }); }
             if (window.CS2_CSRF) body.set('csrf', window.CS2_CSRF);
             fetch(base + '/update/step', {
                 method: 'POST',
