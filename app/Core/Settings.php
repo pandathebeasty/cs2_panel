@@ -28,6 +28,10 @@ final class Settings
         'db_schema_attempt',          // Schema: timestamp of last sync attempt
         'last_maintenance_run',       // Maintenance: cron throttle timestamp
         'last_rarity_colors_refresh', // WeaponPaintsData: weekly refresh throttle
+        'last_cron_run',              // Maintenance: last run triggered by /cron
+        'backup_auto_last',           // Backup: last scheduled slot handled
+        'backup_auto_status',         // Backup: result of the last scheduled run
+        'monitor_last_sample',        // Monitor: last server sampling time
     ];
 
     /** Buffer a settings save so persistence and config sync run once. */
@@ -331,6 +335,23 @@ final class Settings
             'discord_log_all' => '1',
             'discord_webhook' => '',
             'discord_invite'  => '',
+            // Scheduled database backups (db_backups/backup_auto_*).
+            'backup_auto_enabled'   => '0',
+            'backup_auto_frequency' => 'daily',
+            'backup_auto_time'      => '03:00',
+            'backup_auto_weekday'   => '1',
+            'backup_auto_keep'      => '7',
+            'backup_auto_compress'  => '1',
+        'backup_max_age_days'   => '0',
+            // Server monitoring (A2S samples, uptime, down/up alerts).
+            'monitor_enabled'        => '1',
+            'monitor_interval'       => '2',
+            'monitor_down_after'     => '3',
+            'monitor_retention_days' => '30',
+            'monitor_webhook'        => '',
+            // Security and audit.
+            'security_require_2fa'  => '0',
+            'audit_retention_days'  => '0',
         ];
 
         foreach (array_keys(Discord::CATEGORIES) as $cat) {

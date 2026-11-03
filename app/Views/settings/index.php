@@ -22,12 +22,18 @@ $L = fn(string $k) => View::e(Lang::t($k));
     if (App\Core\Auth::isRoot()) {
         $tabLabels['updates'] = Lang::t('nav.update');
     }
+    if (!empty($system)) {
+        $tabLabels['sys-health'] = Lang::t('system.tab_health');
+        $tabLabels['sys-backups'] = Lang::t('system.tab_backups');
+        $tabLabels['sys-monitor'] = Lang::t('system.monitor_title');
+        $tabLabels['sys-security'] = Lang::t('system.tab_security');
+    }
 
     // Tabs organized into labeled subgroups instead of one long flat row.
     //  - Panel: how the panel itself looks/behaves (general = branding+theme+steam+session, themes, updates)
     //  - Misc:  feature integrations (contests, discord, integrations, store)
     $groups = [
-        'panel' => ['label' => Lang::t('settings.group_panel'), 'tabs' => ['general', 'themes', 'updates']],
+        'panel' => ['label' => Lang::t('settings.group_panel'), 'tabs' => ['general', 'themes', 'updates', 'sys-health', 'sys-backups', 'sys-monitor', 'sys-security']],
         'misc'  => ['label' => Lang::t('settings.group_misc'),  'tabs' => ['contests', 'discord', 'integrations', 'store', 'benefits']],
         'admin' => ['label' => Lang::t('settings.group_admin'), 'tabs' => ['admin']],
     ];
@@ -191,6 +197,14 @@ $L = fn(string $k) => View::e(Lang::t($k));
                 }
             }
             ?>
+            <div class="card x-dash-layout-card" style="margin-bottom:18px">
+                <div class="card-title"><?= $L('dash.layout_title') ?></div>
+                <p class="hint" style="margin-top:0"><?= $L('dash.layout_hint') ?></p>
+                <div style="display:flex;gap:10px;flex-wrap:wrap">
+                    <a class="btn btn-primary" href="/?customize=1"><?= $L('dash.customize') ?></a>
+                    <button type="button" class="btn" data-dash-reset><?= $L('dash.reset') ?></button>
+                </div>
+            </div>
             <div class="card" style="margin-bottom:18px">
                 <div class="card-title"><?= $L('settings.preset_themes') ?></div>
                 <p class="hint" style="margin:-6px 0 16px"><?= $L('settings.preset_hint') ?></p>
@@ -298,6 +312,10 @@ $L = fn(string $k) => View::e(Lang::t($k));
                 <div class="ct-row" style="margin-top:14px">
                     <label class="ct-accent-label"><?= $L('settings.accent') ?></label>
                     <input type="color" id="ct-accent" value="#3fb6ff" title="Accent">
+                    <button type="button" class="btn" id="ct-generate" title="<?= $L('theme.generate_hint') ?>"><?= $L('theme.generate') ?></button>
+                    <button type="button" class="btn btn-ghost" id="ct-export"><?= $L('theme.export') ?></button>
+                    <label class="btn btn-ghost" for="ct-import"><?= $L('theme.import') ?></label>
+                    <input type="file" id="ct-import" accept="application/json,.json" class="visually-hidden">
                     <button type="button" class="btn btn-primary" id="ct-save"><?= $L('common.save') ?></button>
                 </div>
             </div>
@@ -551,14 +569,6 @@ $L = fn(string $k) => View::e(Lang::t($k));
                 });
             })();
             </script>
-
-            <div class="card" style="margin-bottom:18px">
-                <div class="card-title"><?= $L('settings.community') ?></div>
-                <div class="check" style="margin-bottom:10px"><input type="checkbox" name="appeals_enabled" id="appeals_en" <?= $s['appeals_enabled'] ? 'checked' : '' ?>><label for="appeals_en"><?= $L('settings.enable_appeals') ?></label></div>
-                <p class="hint" style="margin:-4px 0 12px"><?= $L('settings.appeals_hint') ?></p>
-                <div class="check" style="margin-bottom:10px"><input type="checkbox" name="reports_enabled" id="reports_en" <?= $s['reports_enabled'] ? 'checked' : '' ?>><label for="reports_en"><?= $L('settings.enable_reports') ?></label></div>
-                <p class="hint" style="margin:-4px 0 0"><?= $L('settings.reports_hint') ?></p>
-            </div>
 
             <!-- Store credits (schwarper/cs2-store) — an integration, not the
                  PayPal store. Enable + table name live here; the credit PACKAGES
@@ -1485,6 +1495,14 @@ $L = fn(string $k) => View::e(Lang::t($k));
                         
         <div data-tabpanel="discord" style="display:none">
             <div class="card" style="margin-bottom:18px">
+                <div class="card-title"><?= $L('settings.community') ?></div>
+                <div class="check" style="margin-bottom:10px"><input type="checkbox" name="appeals_enabled" id="appeals_en" <?= $s['appeals_enabled'] ? 'checked' : '' ?>><label for="appeals_en"><?= $L('settings.enable_appeals') ?></label></div>
+                <p class="hint" style="margin:-4px 0 12px"><?= $L('settings.appeals_hint') ?></p>
+                <div class="check" style="margin-bottom:10px"><input type="checkbox" name="reports_enabled" id="reports_en" <?= $s['reports_enabled'] ? 'checked' : '' ?>><label for="reports_en"><?= $L('settings.enable_reports') ?></label></div>
+                <p class="hint" style="margin:-4px 0 0"><?= $L('settings.reports_hint') ?></p>
+            </div>
+
+            <div class="card" style="margin-bottom:18px">
                 <div class="card-title"><?= $L('settings.discord2') ?></div>
                 <div class="check" style="margin-bottom:14px"><input type="checkbox" name="discord_enabled" id="dc_en" <?= $s['discord_enabled'] ? 'checked' : '' ?>><label for="dc_en"><?= $L('settings.enable_discord') ?></label></div>
                 <div class="field"><label><?= $L('settings.webhook_url') ?></label><input type="url" name="discord_webhook" value="<?= View::e($s['discord_webhook']) ?>" placeholder="https://discord.com/api/webhooks/..."></div>
@@ -1773,6 +1791,23 @@ $L = fn(string $k) => View::e(Lang::t($k));
                 </div>
                 <?php endif; ?>
 
+                <?php
+                $upAssets = (array) ($u['latest']['assets'] ?? []);
+                $upMb = array_sum(array_map(static fn ($a) => (int) ($a['size'] ?? 0), $upAssets)) / 1048576;
+                [$curMaj, $curMin] = array_map('intval', array_pad(explode('.', (string) $u['current']), 2, '0'));
+                [$newMaj, $newMin] = array_map('intval', array_pad(explode('.', (string) $u['latest']['version']), 2, '0'));
+                $upLarge = $upMb >= 15 || $newMaj > $curMaj || $newMin - $curMin >= 1 || empty($upAssets['core']);
+                if ($upLarge):
+                ?>
+                <div class="update-warn update-warn-large">
+                    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 8v4l3 2"/><circle cx="12" cy="12" r="9"/></svg>
+                    <span>
+                        <strong><?= $L('update.large_title') ?></strong>
+                        <?php if ($upMb > 0): ?>(~<?= number_format($upMb, 1) ?> MB)<?php endif; ?>
+                        — <?= $L('update.large_text') ?>
+                    </span>
+                </div>
+                <?php endif; ?>
                 <div class="update-warn">
                     <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 20h20L12 2z"/><path d="M12 9v5M12 17h.01"/></svg>
                     <span><?= $L('update.backup_warn') ?></span>
@@ -1811,6 +1846,11 @@ $L = fn(string $k) => View::e(Lang::t($k));
         </p>
     </div>
     <?php endif; ?>
+    <?php if (!empty($system)) {
+        (static function (array $system, string $csrf, callable $L): void {
+            require __DIR__ . '/../system/panels.php';
+        })($system, $csrf, $L);
+    } ?>
 
     <!-- Update scope: code is always updated; heavy parts are optional. -->
     <div class="modal-overlay" id="modal-update-parts">
@@ -2116,6 +2156,12 @@ document.addEventListener('DOMContentLoaded', function () {
 
         if (updRunBtn) { updRunBtn.disabled = true; }
         if (hud) { hud.classList.add('open'); hud.setAttribute('aria-hidden', 'false'); }
+        var running = true;
+        window.addEventListener('beforeunload', function (e) {
+            if (!running) return;
+            e.preventDefault();
+            e.returnValue = '';
+        });
 
         function setProgress(pct, labelKey) {
             if (barEl) barEl.style.width = pct + '%';
@@ -2132,6 +2178,7 @@ document.addEventListener('DOMContentLoaded', function () {
             logEl.scrollTop = logEl.scrollHeight;
         }
         function fail(msg) {
+            running = false;
             if (stepEl) { stepEl.textContent = I18N.hud_failed + (msg ? ': ' + msg : ''); stepEl.classList.add('is-error'); }
             if (updRunBtn) updRunBtn.disabled = false;
         }
@@ -2170,6 +2217,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     return;
                 }
                 if (d.done || !d.next) {
+                    running = false;
                     setProgress(100, null);
                     if (stepEl) stepEl.textContent = I18N.hud_done;
                     setTimeout(function () { window.location.href = base + '/settings#updates'; window.location.reload(); }, 1500);
@@ -2195,8 +2243,14 @@ document.addEventListener('DOMContentLoaded', function () {
         if (!saveRow) return;
         var active = document.querySelector('.tabs [data-tab].active');
         var name = active ? active.getAttribute('data-tab') : '';
-        saveRow.style.display = (name === 'updates' || name === 'benefits') ? 'none' : '';
+        saveRow.style.display = (name === 'updates' || name === 'benefits' || name.indexOf('sys-') === 0) ? 'none' : '';
     }
+    document.addEventListener('click', function (e) {
+        var link = e.target.closest && e.target.closest('[data-tab-link]');
+        if (!link) return;
+        var tab = document.querySelector('.tabs [data-tab="' + link.getAttribute('data-tab-link') + '"]');
+        if (tab) { e.preventDefault(); tab.click(); window.scrollTo({ top: 0, behavior: 'smooth' }); }
+    });
     document.querySelectorAll('.tabs [data-tab]').forEach(function (b) {
         b.addEventListener('click', function () { setTimeout(syncSaveVisibility, 0); });
     });

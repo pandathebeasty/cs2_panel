@@ -28,12 +28,12 @@ $avatars = $avatars ?? [];
                     <?php $sid = (string) $u['steamid64']; ?>
                     <tr>
                         <td>
-                            <a class="player-cell" href="<?= View::e(Steam::profileUrl($sid)) ?>" target="_blank" rel="noopener">
+                            <a class="player-cell" <?= Steam::linkAttrs($sid) ?>>
                                 <img class="player-avatar" src="<?= View::e($avatars[$sid] ?? Steam::avatarPlaceholder()) ?>" alt="" loading="lazy">
                                 <span class="pname"><?= View::e($u['name']) ?></span>
                             </a>
                         </td>
-                        <td class="mono"><a href="<?= View::e(Steam::profileUrl($sid)) ?>" target="_blank"><?= View::e($sid) ?></a></td>
+                        <td class="mono"><a <?= Steam::linkAttrs($sid) ?>><?= View::e($sid) ?></a></td>
                         <td><span class="badge badge-role-<?= View::e($u['role']) ?>"><?= View::e(ucfirst($u['role'])) ?></span></td>
                         <td class="muted"><?= View::e($u['created_at']) ?></td>
                         <td style="white-space:nowrap">

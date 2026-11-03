@@ -39,7 +39,7 @@ final class VipModel
      * want listed under active VIPs). Comma-separated in settings.
      * @return string[]
      */
-    private static function ignoredGroups(): array
+    public static function ignoredGroups(): array
     {
         $raw = (string) \App\Core\Settings::get('vip_ignored_groups', '');
         $list = array_filter(array_map('trim', explode(',', $raw)), static fn($g) => $g !== '');

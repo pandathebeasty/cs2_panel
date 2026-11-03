@@ -48,7 +48,11 @@ $errClass = function (string $block): string {
                         <option value="<?= View::e($a) ?>" <?= $filters['action'] === $a ? 'selected' : '' ?>><?= View::e($label($a)) ?></option>
                     <?php endforeach; ?>
                 </select>
+                <input type="text" name="ip" class="x-filter-ip" placeholder="IP" value="<?= View::e($filters['ip'] ?? '') ?>" aria-label="IP">
+                <input type="date" name="from" value="<?= View::e($filters['from'] ?? '') ?>" aria-label="<?= View::e(Lang::t('logs.from')) ?>" title="<?= View::e(Lang::t('logs.from')) ?>">
+                <input type="date" name="to" value="<?= View::e($filters['to'] ?? '') ?>" aria-label="<?= View::e(Lang::t('logs.to')) ?>" title="<?= View::e(Lang::t('logs.to')) ?>">
                 <button class="btn" type="submit"><?= View::e(Lang::t('common.filter')) ?></button>
+                <a class="btn btn-ghost" href="<?= View::e(url('/logs/export?' . http_build_query(array_filter($filters)))) ?>" download><?= View::e(Lang::t('logs.export_csv')) ?></a>
             </form>
             <?php if (Auth::isRoot()): ?>
                 <div class="toolbar-actions">

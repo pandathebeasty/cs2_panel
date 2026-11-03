@@ -18,7 +18,7 @@ $playerCell = function (string $steamId, string $name) use ($avatars): string {
         return '<span class="pname">' . $label . '</span>';
     }
     $img = View::e($avatars[$steamId] ?? Steam::avatarPlaceholder());
-    return '<a class="player-cell" href="' . View::e(Steam::profileUrl($steamId)) . '" target="_blank" rel="noopener">'
+    return '<a class="player-cell" ' . Steam::linkAttrs($steamId) . '>'
         . '<img class="player-avatar" src="' . $img . '" alt="" loading="lazy">'
         . '<span class="pname">' . $label . '</span></a>';
 };

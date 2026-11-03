@@ -104,23 +104,43 @@ final class Logger
         return $_SERVER['REMOTE_ADDR'] ?? '0.0.0.0';
     }
 
-    public static function paginate(array $filters, int $page, int $perPage): Paginator
+    /**
+     * WHERE clause for the audit filters: search, action, ip, from, to (Y-m-d).
+     * @return array{0:string,1:array}
+     */
+    public static function filterSql(array $filters): array
     {
         $where = [];
         $params = [];
         if (!empty($filters['search'])) {
             $steamId = Steam::toSteamId64Any((string) $filters['search']);
-            $where[] = '(actor_name LIKE ? OR actor_steamid LIKE ? OR target LIKE ? OR action LIKE ?'
+            $where[] = '(actor_name LIKE ? OR actor_steamid LIKE ? OR target LIKE ? OR action LIKE ? OR details LIKE ?'
                 . ($steamId !== null ? ' OR actor_steamid = ? OR target = ?)' : ')');
             $like = '%' . $filters['search'] . '%';
-            array_push($params, $like, $like, $like, $like);
+            array_push($params, $like, $like, $like, $like, $like);
             if ($steamId !== null) array_push($params, $steamId, $steamId);
         }
         if (!empty($filters['action'])) {
             $where[] = 'action = ?';
             $params[] = $filters['action'];
         }
-        $whereSql = $where ? ('WHERE ' . implode(' AND ', $where)) : '';
+        if (!empty($filters['ip'])) {
+            $where[] = 'ip LIKE ?';
+            $params[] = $filters['ip'] . '%';
+        }
+        foreach (['from' => '>=', 'to' => '<'] as $key => $op) {
+            $date = (string) ($filters[$key] ?? '');
+            if (preg_match('/^\d{4}-\d{2}-\d{2}$/', $date)) {
+                $where[] = "created_at {$op} ?";
+                $params[] = $key === 'to' ? date('Y-m-d', strtotime($date . ' +1 day')) . ' 00:00:00' : $date . ' 00:00:00';
+            }
+        }
+        return [$where ? ('WHERE ' . implode(' AND ', $where)) : '', $params];
+    }
+
+    public static function paginate(array $filters, int $page, int $perPage): Paginator
+    {
+        [$whereSql, $params] = self::filterSql($filters);
 
         return Paginator::make(
             "SELECT * FROM panel_logs {$whereSql}",

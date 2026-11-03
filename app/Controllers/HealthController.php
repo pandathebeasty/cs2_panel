@@ -24,6 +24,8 @@ final class HealthController extends Controller
         'panel_server_rcon', 'panel_orders', 'panel_order_items',
         'panel_contests', 'panel_contest_winners',
         'panel_profiles', 'panel_discount_codes', 'panel_appeals', 'panel_reports',
+        'panel_activity', 'panel_benefits', 'panel_vip_pending',
+        'panel_server_samples', 'panel_server_monitor', 'panel_2fa',
     ];
 
     public function index(): void

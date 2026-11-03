@@ -303,7 +303,7 @@ $areaPath = $linePath !== '' ? $linePath . ' L' . $pts[$n - 1][0] . ' 94 L' . $p
             <ul class="panel-recent-list">
                 <?php foreach ($recentActive as $p): ?>
                 <li>
-                    <a href="<?= View::e(Steam::profileUrl($p['steam_id'])) ?>" target="_blank" rel="noopener" class="panel-recent-player">
+                    <a <?= Steam::linkAttrs($p['steam_id']) ?> class="panel-recent-player">
                         <img class="player-avatar" src="<?= View::e($activeAvatars[(string) $p['steam_id']] ?? Steam::avatarPlaceholder()) ?>" alt="" loading="lazy">
                         <span class="panel-recent-info"><strong class="pname" title="<?= View::e($p['name'] ?: 'Player') ?>"><?= View::e($p['name'] ?: 'Player') ?></strong><span><span class="panel-recent-marker" aria-hidden="true"></span><?= $tt('dash.last_seen') ?> <span><?= View::e($ago($p['last_online'] ?? null)) ?></span></span></span>
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M7 17L17 7M7 7h10v10"/></svg>
@@ -333,7 +333,7 @@ $areaPath = $linePath !== '' ? $linePath . ' L' . $pts[$n - 1][0] . ' 94 L' . $p
                 <tr>
                     <td class="muted hide-mobile"><span class="panel-rank-position"><?= $i + 1 ?></span></td>
                     <td>
-                        <a href="<?= View::e(Steam::profileUrl($p['steam_id'])) ?>" target="_blank" rel="noopener" class="player-cell">
+                        <a <?= Steam::linkAttrs($p['steam_id']) ?> class="player-cell">
                             <img class="player-avatar" src="<?= View::e($avatars[(string) $p['steam_id']] ?? Steam::avatarPlaceholder()) ?>" alt="" loading="lazy">
                             <span class="pname"><?= View::e($p['name'] ?: 'Player') ?></span>
                         </a>
@@ -376,7 +376,7 @@ $playerCell = function (array $row) use ($recentAvatars): string {
     $img  = $recentAvatars[$sid] ?? Steam::avatarPlaceholder();
     $avatar = '<img class="player-avatar" src="' . View::e($img) . '" alt="" loading="lazy">';
     if ($sid !== '') {
-        return '<a href="' . View::e(Steam::profileUrl($sid)) . '" target="_blank" rel="noopener" class="player-cell">'
+        return '<a ' . Steam::linkAttrs($sid) . ' class="player-cell">'
             . $avatar . '<span class="pname">' . $name . '</span></a>';
     }
     return '<span class="player-cell">' . $avatar . '<span class="pname">' . $name . '</span></span>';

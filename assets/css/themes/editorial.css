@@ -1,0 +1,352 @@
+/* @theme id:editorial | name:Editorial | accent:#b23a26 | tag:Print */
+@import url("https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,700;0,9..144,900;1,9..144,500;1,9..144,700&display=swap");
+
+/* Printed-newspaper look: paper and ink, serif headlines, hairline and double
+   rules instead of shadows, no rounded corners, no background effects.
+   Light mode is the "day edition" (cream paper), dark is the "night edition".
+   Selectors use :root:root so they outrank the shared portal layer in design.css. */
+
+[data-theme="editorial"] {
+    --accent: #b23a26;
+    --accent-2: #8a2a1a;
+    --enter: animFade;
+    --enter-dur: .3s;
+    --theme-fx-opacity: 0;
+    --theme-fx-light-opacity: 0;
+}
+
+:root:root[data-theme="editorial"][data-mode="light"] {
+    --bg: #f4efe6; --bg-2: #f8f4ec; --bg-3: #ebe4d6; --card: #fbf8f2;
+    --border: #cfc4b1; --text: #1a1714; --text-dim: #4a433a; --text-mut: #6e6558;
+    --portal-muted: #4a433a; --portal-subtle: #6e6558;
+    --portal-accent: #a3321f;
+    --portal-action: #1a1714;
+    --portal-action-text: #f8f4ec;
+    --ed-rule: #1a1714;
+    --ed-paper-alt: #f1ebdf;
+}
+
+:root:root[data-theme="editorial"][data-mode="dark"] {
+    --bg: #1b1a17; --bg-2: #201f1b; --bg-3: #2b2924; --card: #22211d;
+    --border: #3d3a33; --text: #efe7d6; --text-dim: #c7bda9; --text-mut: #978d7b;
+    --portal-accent: #de6a52;
+    --portal-action: #efe7d6;
+    --portal-action-text: #1b1a17;
+    --ed-rule: #efe7d6;
+    --ed-paper-alt: #262420;
+}
+
+:root:root[data-theme="editorial"][data-mode] {
+    --portal-display: "Fraunces", "Georgia", "Times New Roman", serif;
+    --portal-line: color-mix(in srgb, var(--ed-rule) 70%, var(--bg));
+    --portal-soft-line: color-mix(in srgb, var(--ed-rule) 22%, var(--bg));
+    --portal-tint: var(--ed-paper-alt);
+    --panel-surface: var(--card);
+    --panel-inset: none;
+    --panel-elevation: none;
+    --panel-highlight: transparent;
+    --portal-shadow: none;
+    --shadow: none;
+    --radius: 0px;
+    --radius-sm: 0px;
+}
+
+[data-theme="editorial"] .theme-fx { display: none; }
+
+/* ---------- Typography ---------- */
+
+:root:root[data-theme="editorial"][data-mode] :is(.portal-page-heading h1, .x-page-title, .portal-section-heading h2, .modal-head h3) {
+    font-family: var(--portal-display);
+    font-weight: 900;
+    text-transform: none;
+    letter-spacing: -.025em;
+}
+
+:root:root[data-theme="editorial"][data-mode] .portal-page-heading {
+    position: relative;
+    margin-bottom: 30px;
+    padding-bottom: 22px;
+}
+:root:root[data-theme="editorial"][data-mode] .portal-page-heading::after {
+    content: "";
+    position: absolute;
+    left: var(--portal-gutter);
+    right: var(--portal-gutter);
+    bottom: 0;
+    border-top: 3px double var(--ed-rule);
+}
+
+:root:root[data-theme="editorial"][data-mode] .portal-kicker {
+    font-family: "Inter", sans-serif;
+    font-weight: 700;
+    color: var(--portal-accent);
+    letter-spacing: .2em;
+}
+
+:root:root[data-theme="editorial"][data-mode] .portal-page-stamp {
+    font-family: var(--portal-display);
+    font-style: italic;
+    font-weight: 500;
+    color: color-mix(in srgb, var(--text) 18%, transparent);
+}
+:root:root[data-theme="editorial"][data-mode] .portal-page-stamp span { color: color-mix(in srgb, var(--accent) 45%, transparent); }
+
+:root:root[data-theme="editorial"][data-mode] .portal-section-heading {
+    border-top: 3px double var(--ed-rule);
+}
+:root:root[data-theme="editorial"][data-mode] .portal-section-number {
+    font-family: var(--portal-display);
+    font-style: italic;
+    font-weight: 500;
+    color: var(--portal-accent);
+}
+
+/* ---------- Header (masthead) & drawer ---------- */
+
+:root:root[data-theme="editorial"][data-mode] .portal-header {
+    background: var(--bg);
+    border-bottom: 3px double var(--ed-rule);
+    box-shadow: none;
+}
+
+:root:root[data-theme="editorial"][data-mode] .portal-brand strong {
+    font-family: var(--portal-display);
+    font-weight: 900;
+    font-size: 26px;
+    letter-spacing: -.02em;
+}
+:root:root[data-theme="editorial"][data-mode] .portal-brand small { letter-spacing: .24em; }
+:root:root[data-theme="editorial"][data-mode] .portal-brand img { filter: grayscale(1) contrast(1.1); }
+
+:root:root[data-theme="editorial"][data-mode] .portal-nav-link { letter-spacing: .14em; }
+:root:root[data-theme="editorial"][data-mode] .portal-nav-link::after { height: 1px; background: var(--ed-rule); }
+
+:root:root[data-theme="editorial"][data-mode] :is(.user-chip, .topbar-link, .user-chip img) { border-radius: 0; box-shadow: none; }
+
+:root:root[data-theme="editorial"][data-mode] .portal-drawer {
+    background: var(--bg);
+    border: 1px solid var(--ed-rule);
+    border-radius: 0;
+    box-shadow: none;
+}
+
+:root:root[data-theme="editorial"][data-mode] .nav-label {
+    font-family: var(--portal-display);
+    font-style: italic;
+    font-size: 13px;
+    letter-spacing: 0;
+    text-transform: none;
+    color: var(--portal-accent);
+    border-bottom: 1px solid var(--portal-soft-line);
+    padding-bottom: 6px;
+}
+
+:root:root[data-theme="editorial"][data-mode] .nav-item { border-radius: 0; }
+:root:root[data-theme="editorial"][data-mode] .nav-item:hover { background: transparent; border-color: transparent; text-decoration: underline; text-underline-offset: 4px; }
+:root:root[data-theme="editorial"][data-mode] .nav-item.active {
+    background: transparent;
+    border-color: transparent;
+    box-shadow: inset 3px 0 var(--portal-accent);
+    color: var(--text);
+    font-weight: 700;
+}
+
+/* ---------- Surfaces (articles) ---------- */
+
+:root:root[data-theme="editorial"][data-mode] :is(.card, .contest-card, .store-card, .server-card, .skins-main, .skins-sidebar, .auth-card, .theme-card, .popup, .update-hud-box) {
+    background: var(--card);
+    border: 1px solid var(--portal-soft-line);
+    border-top: 3px solid var(--ed-rule);
+    border-radius: 0;
+    box-shadow: none;
+    transition: border-color .2s;
+}
+:root:root[data-theme="editorial"][data-mode] :is(.card, .contest-card, .store-card, .server-card, .theme-card):hover {
+    border-color: var(--portal-soft-line);
+    border-top-color: var(--portal-accent);
+    box-shadow: none;
+    transform: none;
+}
+
+:root:root[data-theme="editorial"][data-mode] .card-title {
+    font-family: var(--portal-display);
+    font-weight: 700;
+    font-size: 23px;
+    text-transform: none;
+    letter-spacing: -.015em;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--portal-soft-line);
+}
+
+:root:root[data-theme="editorial"][data-mode] .toolbar {
+    background: transparent;
+    border: 0;
+    border-top: 1px solid var(--ed-rule);
+    border-bottom: 1px solid var(--ed-rule);
+    border-radius: 0;
+    box-shadow: none;
+}
+
+:root:root[data-theme="editorial"][data-mode] :is(.portal-hero, .server-banner, .player-avatar, .server-map-tag, .server-status, .panel-hud-card, .portal-hero-note) { border-radius: 0; }
+:root:root[data-theme="editorial"][data-mode] .panel-hud-card { border: 1px solid var(--ed-rule); background: var(--card); box-shadow: none; backdrop-filter: none; }
+:root:root[data-theme="editorial"][data-mode] .portal-hero { border: 1px solid var(--ed-rule); box-shadow: none; }
+
+:root:root[data-theme="editorial"][data-mode] .x-callout { border-radius: 0; border-left-width: 3px; box-shadow: none; }
+
+/* ---------- Stats (newspaper figures) ---------- */
+
+:root:root[data-theme="editorial"][data-mode] .dashboard-stats { gap: 0; border-top: 3px double var(--ed-rule); border-bottom: 1px solid var(--ed-rule); }
+:root:root[data-theme="editorial"][data-mode] .dashboard-stats .stat {
+    border: 0;
+    border-right: 1px solid var(--portal-soft-line);
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
+}
+:root:root[data-theme="editorial"][data-mode] .dashboard-stats .stat:last-child { border-right: 0; }
+:root:root[data-theme="editorial"][data-mode] .stat .value { font-family: var(--portal-display); font-weight: 900; letter-spacing: -.03em; }
+:root:root[data-theme="editorial"][data-mode] .stat .label { font-variant: small-caps; text-transform: lowercase; font-size: 12px; letter-spacing: .1em; }
+
+:root:root[data-theme="editorial"][data-mode] :is(.server-stat, .x-stat) {
+    border: 0;
+    border-top: 1px solid var(--ed-rule);
+    border-radius: 0;
+    background: transparent;
+}
+:root:root[data-theme="editorial"][data-mode] :is(.server-stat .v, .x-stat b) { font-family: var(--portal-display); }
+
+/* ---------- Tables ---------- */
+
+:root:root[data-theme="editorial"][data-mode] .table-wrap {
+    border: 0;
+    border-top: 2px solid var(--ed-rule);
+    border-bottom: 2px solid var(--ed-rule);
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
+}
+:root:root[data-theme="editorial"][data-mode] :is(table, thead) { background: transparent; }
+:root:root[data-theme="editorial"][data-mode] thead th {
+    color: var(--text);
+    font-variant: small-caps;
+    text-transform: lowercase;
+    font-size: 12.5px;
+    letter-spacing: .12em;
+    border-bottom: 1px solid var(--ed-rule);
+}
+:root:root[data-theme="editorial"][data-mode] tbody td { border-bottom: 1px dotted var(--portal-line); }
+:root:root[data-theme="editorial"][data-mode] tbody tr:nth-child(even) { background: var(--ed-paper-alt); }
+:root:root[data-theme="editorial"][data-mode] tbody tr:hover { background: color-mix(in srgb, var(--accent) 7%, var(--card)); }
+
+/* ---------- Controls ---------- */
+
+:root:root[data-theme="editorial"][data-mode] .btn {
+    border: 1px solid var(--ed-rule);
+    border-radius: 0;
+    background: transparent;
+    color: var(--text);
+    box-shadow: none;
+    text-transform: uppercase;
+    letter-spacing: .12em;
+    font-size: 11px;
+    font-weight: 700;
+    transition: background .2s, color .2s, border-color .2s;
+}
+:root:root[data-theme="editorial"][data-mode] .btn:hover {
+    transform: none;
+    background: var(--ed-rule);
+    color: var(--bg);
+    border-color: var(--ed-rule);
+}
+:root:root[data-theme="editorial"][data-mode] .btn:active { transform: none; }
+:root:root[data-theme="editorial"][data-mode] .btn-primary {
+    background: var(--portal-action);
+    color: var(--portal-action-text);
+    border-color: var(--portal-action);
+}
+:root:root[data-theme="editorial"][data-mode] .btn-primary:hover {
+    background: var(--portal-accent);
+    color: #fff;
+    border-color: var(--portal-accent);
+    box-shadow: none;
+}
+:root:root[data-theme="editorial"][data-mode] .btn-danger { color: var(--red); border-color: var(--red); background: transparent; }
+:root:root[data-theme="editorial"][data-mode] .btn-danger:hover { background: var(--red); color: var(--bg); }
+:root:root[data-theme="editorial"][data-mode] .btn-ghost { border-color: transparent; }
+:root:root[data-theme="editorial"][data-mode] .btn-ghost:hover { border-color: var(--ed-rule); }
+
+:root:root[data-theme="editorial"][data-mode] :is(input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="color"]), select, textarea) {
+    border: 0;
+    border-bottom: 1px solid var(--ed-rule);
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
+}
+:root:root[data-theme="editorial"][data-mode] select { background-color: var(--bg); }
+:root:root[data-theme="editorial"][data-mode] :is(input, select, textarea):focus {
+    border-bottom: 2px solid var(--portal-accent);
+    background: var(--ed-paper-alt);
+    outline: none;
+}
+
+:root:root[data-theme="editorial"][data-mode] :is(.tabs, .subtabs, .x-seg) {
+    background: transparent;
+    border: 0;
+    border-bottom: 1px solid var(--ed-rule);
+    border-radius: 0;
+    box-shadow: none;
+}
+:root:root[data-theme="editorial"][data-mode] :is(.tabs [data-tab], .subtab, .x-seg a) {
+    border-radius: 0;
+    font-family: var(--portal-display);
+    font-size: 14px;
+    letter-spacing: 0;
+    text-transform: none;
+}
+:root:root[data-theme="editorial"][data-mode] :is(.tabs [data-tab].active, .subtab.active, .x-seg a.is-active) {
+    background: transparent;
+    color: var(--portal-accent);
+    font-style: italic;
+    font-weight: 700;
+    box-shadow: inset 0 -3px var(--portal-accent);
+}
+
+:root:root[data-theme="editorial"][data-mode] .badge {
+    border: 1px solid currentColor;
+    border-radius: 0;
+    background: transparent;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .1em;
+}
+
+:root:root[data-theme="editorial"][data-mode] .modal {
+    background: var(--card);
+    border: 1px solid var(--ed-rule);
+    border-top: 4px double var(--ed-rule);
+    border-radius: 0;
+    box-shadow: 0 30px 80px rgba(0, 0, 0, .25);
+}
+
+/* ---------- Theme picker preview ---------- */
+
+[data-preview="editorial"] .theme-preview.anim { background: #f4efe6; }
+[data-preview="editorial"] .tp-anim-glow { display: none; }
+[data-preview="editorial"] .tp-pattern::before {
+    content: "Aa";
+    position: absolute;
+    left: 12px;
+    top: 6px;
+    font: italic 900 34px/1 "Fraunces", Georgia, serif;
+    color: #1a1714;
+}
+[data-preview="editorial"] .tp-pattern::after {
+    content: "";
+    position: absolute;
+    left: 12px;
+    right: 12px;
+    top: 46px;
+    height: 4px;
+    border-top: 3px double #1a1714;
+    background: repeating-linear-gradient(90deg, #b23a26 0 18px, transparent 18px 22px) 0 10px / 100% 2px no-repeat;
+}

@@ -77,6 +77,13 @@ $icon = function (string $name): string {
         'sun'     => '<circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.2 4.2l1.4 1.4M18.4 18.4l1.4 1.4M1 12h2M21 12h2M4.2 19.8l1.4-1.4M18.4 5.6l1.4-1.4"/>',
         'moon'    => '<path d="M21 12.8A9 9 0 1111.2 3 7 7 0 0021 12.8z"/>',
         'globe'   => '<circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15 15 0 010 20 15 15 0 010-20z"/>',
+        'pulse'   => '<path d="M3 12h4l3-8 4 16 3-8h4"/>',
+        'shield'  => '<path d="M12 2l8 4v6c0 5-3.5 8-8 10-4.5-2-8-5-8-10V6l8-4z"/><path d="M9 12l2 2 4-4"/>',
+        'eye'     => '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8S1 12 1 12z"/><circle cx="12" cy="12" r="3"/>',
+        'health'  => '<path d="M20.8 4.6a5.5 5.5 0 00-7.8 0L12 5.7l-1-1.1a5.5 5.5 0 00-7.8 7.8L12 21l8.8-8.6a5.5 5.5 0 000-7.8z"/><path d="M7 12h3l1-2 2 4 1-2h3"/>',
+        'lock'    => '<rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 018 0v4"/>',
+        'search'  => '<circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/>',
+        'player'  => '<circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0116 0"/>',
     ];
     return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' . ($icons[$name] ?? '') . '</svg>';
 };
@@ -97,6 +104,10 @@ $navigationSections = [
         ['path' => '/servers', 'icon' => 'server', 'label' => 'nav.servers'],
     ]],
 ];
+if (Auth::canModerate()) {
+    $navigationSections['moderation']['items'][] = ['path' => '/players', 'icon' => 'player', 'label' => 'nav.players'];
+    $navigationSections['moderation']['items'][] = ['path' => '/bans/evasion', 'icon' => 'eye', 'label' => 'nav.evasion'];
+}
 if ($appealsOn) {
     $navigationSections['moderation']['items'][] = ['path' => '/appeals', 'icon' => 'appeal', 'label' => 'nav.appeals', 'badge' => $openAppeals];
 }
@@ -203,11 +214,13 @@ if ($themeName === 'default') {
         })();
     </script>
     <link rel="stylesheet" href="/assets/css/app.css?v=<?= View::e($cssVer) ?>">
-    <?php foreach (\App\Core\Themes::cssLinks() as $themeCss): ?>
+    <?php foreach (\App\Core\Themes::cssLinks(str_starts_with($path, '/settings') ? null : $themeName) as $themeCss): ?>
     <link rel="stylesheet" href="<?= View::e($themeCss) ?>">
     <?php endforeach; ?>
     <?php require BASE_PATH . '/app/Views/partials/motion-assets.php'; ?>
     <link rel="stylesheet" href="/assets/css/design.css?v=<?= View::e($designVer) ?>">
+    <?php $enhanceCss = PUBLIC_PATH . '/assets/css/enhance.css'; ?>
+    <link rel="stylesheet" href="/assets/css/enhance.css?v=<?= View::e($assetVer . (is_file($enhanceCss) ? '.' . filemtime($enhanceCss) : '')) ?>">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=IBM+Plex+Mono:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800;900&family=Oxanium:wght@400;500;600;700;800&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet">
     <!-- Theme config comes from the SERVER (shared for everyone). No localStorage. -->
@@ -216,6 +229,7 @@ if ($themeName === 'default') {
             name: <?= json_encode($themeName) ?>,
             mode: <?= json_encode($themeMode) ?>,
             accent: <?= json_encode($accent) ?>,
+            canTheme: <?= Auth::canManage() ? 'true' : 'false' ?>,
             custom: <?= $customThemes !== '' ? $customThemes : '{}' ?>
         };
     </script>
@@ -249,12 +263,18 @@ if ($themeName === 'default') {
             d.setAttribute('data-theme-name', cfg.name);
             d.setAttribute('data-theme', cfg.name.indexOf('custom:') === 0 ? '__custom' : cfg.name);
             if (cfg.name === 'default' && cfg.accent) { d.style.setProperty('--accent', cfg.accent); d.style.setProperty('--accent-2', cfg.accent); }
+            // Visitors may override the shared mode on their own device only.
+            if (!cfg.canTheme) {
+                try { var vm = localStorage.getItem('cs2.visitorMode'); if (vm === 'light' || vm === 'dark') d.setAttribute('data-mode', vm); } catch (e) {}
+            }
             // Sidebar collapsed state is a per-device preference (kept in localStorage).
             if (localStorage.getItem('sidebarCollapsed') === '1') d.classList.add('sidebar-collapsed');
         })();
     </script>
 </head>
 <body class="panel-body<?= $path === '/' ? ' portal-home' : '' ?>">
+<a class="x-skip-link" href="#main-content"><?= $t('a11y.skip') ?></a>
+<div class="x-live" id="x-live" aria-live="polite" aria-atomic="true"></div>
 <script>
     window.CS2_BASE = <?= json_encode(defined('BASE_URL') ? BASE_URL : '') ?>;
     <?php
@@ -359,10 +379,18 @@ if ($themeName === 'default') {
 <?php /* Language is a site-wide setting changed only from Settings > General
           (owner only, applied on Save) — no quick switcher in the topbar. */ ?>
 
+                <button class="btn btn-icon x-palette-trigger" type="button" data-palette-open aria-label="<?= $t('palette.open') ?>" title="<?= $t('palette.open') ?> (Ctrl+K)">
+                    <?= $icon('search') ?><kbd>Ctrl K</kbd>
+                </button>
                 <!-- Theme mode is shared by the panel and changed only by managers. -->
                 <?php require BASE_PATH . '/app/Views/partials/effects-control.php'; ?>
                 <?php if (Auth::canManage()): ?>
                 <button class="btn btn-icon theme-toggle" aria-label="<?= $t('theme.toggle') ?>" title="<?= $t('theme.toggle') ?>">
+                    <span class="theme-ico theme-ico-light"><?= $icon('sun') ?></span>
+                    <span class="theme-ico theme-ico-dark"><?= $icon('moon') ?></span>
+                </button>
+                <?php else: ?>
+                <button class="btn btn-icon x-visitor-mode" type="button" aria-label="<?= $t('theme.toggle') ?>" title="<?= $t('theme.toggle') ?>">
                     <span class="theme-ico theme-ico-light"><?= $icon('sun') ?></span>
                     <span class="theme-ico theme-ico-dark"><?= $icon('moon') ?></span>
                 </button>
@@ -379,6 +407,9 @@ if ($themeName === 'default') {
                         </button>
                         <div class="dropdown-menu">
                             <button type="button" class="dropdown-item" data-modal="modal-profile"><?= $t('nav.profile') ?></button>
+                            <?php if (Auth::isAdmin()): ?>
+                            <a class="dropdown-item" href="/account/security"><?= $t('nav.security') ?></a>
+                            <?php endif; ?>
                             <a class="dropdown-item" href="/logout"><?= $t('nav.logout') ?></a>
                         </div>
                     </div>
@@ -417,10 +448,12 @@ if ($themeName === 'default') {
         </section>
         <?php endif; ?>
 
-        <div class="content page-enter">
+        <div class="content page-enter" id="main-content" tabindex="-1">
+            <div class="x-flash-source">
             <?php foreach ($flashes as $f): ?>
-                <div class="flash flash-<?= View::e($f['type']) ?>"><?= View::e($f['message']) ?></div>
+                <div class="flash flash-<?= View::e($f['type']) ?>" role="<?= $f['type'] === 'error' ? 'alert' : 'status' ?>"><?= View::e($f['message']) ?></div>
             <?php endforeach; ?>
+            </div>
             <?= $content ?>
         </div>
 
@@ -508,6 +541,48 @@ if ($themeName === 'default') {
 })();
 </script>
 <?php endif; ?>
+<?php
+$paletteLinks = [['label' => Lang::t('nav.dashboard'), 'url' => '/', 'group' => '']];
+foreach ($navigationSections as $section) {
+    foreach ($section['items'] as $entry) {
+        $paletteLinks[] = ['label' => Lang::t($entry['label']), 'url' => $entry['path'], 'group' => Lang::t($section['label'])];
+    }
+}
+if ($user && Auth::isAdmin()) {
+    $paletteLinks[] = ['label' => Lang::t('nav.security'), 'url' => '/account/security', 'group' => Lang::t('nav.profile')];
+}
+?>
+<script>
+    window.CS2_UI = <?= json_encode([
+        'links' => $paletteLinks,
+        'search' => Auth::canModerate(),
+        'canTheme' => Auth::canManage(),
+        'i18n' => [
+            'palette_placeholder' => Lang::t('palette.placeholder'),
+            'palette_pages' => Lang::t('palette.pages'),
+            'palette_players' => Lang::t('palette.players'),
+            'palette_empty' => Lang::t('palette.empty'),
+            'palette_hint' => Lang::t('palette.hint'),
+            'confirm_title' => Lang::t('confirm.title'),
+            'confirm_ok' => Lang::t('confirm.ok'),
+            'confirm_cancel' => Lang::t('common.cancel'),
+            'confirm_type' => Lang::t('confirm.type'),
+            'dash_customize' => Lang::t('dash.customize'),
+            'dash_done' => Lang::t('dash.done'),
+            'dash_reset' => Lang::t('dash.reset'),
+            'dash_reset_done' => Lang::t('dash.reset_done'),
+            'dash_hide' => Lang::t('dash.hide'),
+            'dash_show' => Lang::t('dash.show'),
+            'ctx_profile' => Lang::t('ctx.profile'),
+            'ctx_steam' => Lang::t('ctx.steam'),
+            'ctx_copy' => Lang::t('ctx.copy_id'),
+            'ctx_copied' => Lang::t('ctx.copied'),
+            'close' => Lang::t('common.close'),
+        ],
+    ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG | JSON_HEX_AMP) ?>;
+</script>
+<?php $enhanceJs = PUBLIC_PATH . '/assets/js/enhance.js'; ?>
+<script src="/assets/js/enhance.js?v=<?= View::e($assetVer . (is_file($enhanceJs) ? '.' . filemtime($enhanceJs) : '')) ?>"></script>
 <script src="/assets/js/app.js?v=<?= View::e($jsVer) ?>"></script>
 <script defer src="/assets/js/live-search.js?v=<?= View::e($searchVer) ?>"></script>
 <script defer src="/assets/js/portal.js?v=<?= View::e($portalVer) ?>"></script>

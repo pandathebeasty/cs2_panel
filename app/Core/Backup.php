@@ -25,7 +25,7 @@ final class Backup
      * Dump every table (structure + data) to a timestamped .sql file.
      * Returns the absolute file path, or null if the backup could not be made.
      */
-    public static function full(): ?string
+    public static function full(string $prefix = 'backup'): ?string
     {
         // Never attempt a real dump against the dev in-memory SQLite.
         if (DevMode::enabled() && (string) Config::get('db.name', '') === '') {
@@ -38,7 +38,7 @@ final class Backup
             return null;
         }
 
-        $file = $dir . '/backup_' . date('Y-m-d_H-i-s') . '.sql';
+        $file = $dir . '/' . preg_replace('/[^a-z0-9_]/i', '', $prefix) . '_' . date('Y-m-d_H-i-s') . '.sql';
 
         // A full dump of a large database can take minutes. A fixed time limit
         // killed it with a fatal 500 before the contest reset could run, so the
@@ -191,5 +191,227 @@ final class Backup
                 @$pdo->setAttribute(PDO::MYSQL_ATTR_USE_BUFFERED_QUERY, true);
             }
         }
+    }
+
+    public const AUTO_PREFIX = 'backup_auto';
+    public const FREQUENCIES = ['hourly', 'daily', 'weekly'];
+
+    /**
+     * Backup files in db_backups/, newest first.
+     * @return array<int,array{name:string,size:int,mtime:int,type:string}>
+     */
+    public static function files(): array
+    {
+        $out = [];
+        foreach (@scandir(self::dir()) ?: [] as $name) {
+            if (!preg_match('/\.(sql|sql\.gz|zip)$/', $name)) {
+                continue;
+            }
+            $path = self::dir() . '/' . $name;
+            $type = str_starts_with($name, 'code_') ? 'code'
+                : (str_starts_with($name, self::AUTO_PREFIX . '_') ? 'auto' : 'manual');
+            $out[] = ['name' => $name, 'size' => (int) @filesize($path), 'mtime' => (int) @filemtime($path), 'type' => $type];
+        }
+        usort($out, static fn(array $a, array $b): int => $b['mtime'] <=> $a['mtime']);
+        return $out;
+    }
+
+    /** Absolute path of a backup by file name, or null when it is not a backup. */
+    public static function path(string $name): ?string
+    {
+        $name = basename($name);
+        if (!preg_match('/^[A-Za-z0-9_.\-]+\.(sql|sql\.gz|zip)$/', $name)) {
+            return null;
+        }
+        $path = self::dir() . '/' . $name;
+        return is_file($path) ? $path : null;
+    }
+
+    /** Gzip a .sql dump (streamed), delete the original and return the .sql.gz path. */
+    public static function compress(string $file): ?string
+    {
+        if (!function_exists('gzopen')) {
+            return null;
+        }
+        $target = $file . '.gz';
+        $in = @fopen($file, 'rb');
+        $out = @gzopen($target . '.part', 'wb6');
+        $ok = $in !== false && $out !== false;
+        while ($ok && !feof($in)) {
+            $chunk = fread($in, 1048576);
+            $ok = $chunk !== false && gzwrite($out, $chunk) !== false;
+        }
+        if ($in !== false) {
+            fclose($in);
+        }
+        if ($out !== false) {
+            gzclose($out);
+        }
+        if (!$ok || !@rename($target . '.part', $target)) {
+            @unlink($target . '.part');
+            return null;
+        }
+        @unlink($file);
+        return $target;
+    }
+
+    /**
+     * Run a dump made by full() (plain or gzipped) against the database.
+     * Statements end with ";" at the end of a line; string values never contain
+     * raw newlines because PDO::quote escapes them.
+     * @return array{ok:bool,message:string,statements:int}
+     */
+    public static function restore(string $file): array
+    {
+        @set_time_limit(0);
+        @ignore_user_abort(true);
+        $gz = str_ends_with($file, '.gz');
+        $handle = $gz ? @gzopen($file, 'rb') : @fopen($file, 'rb');
+        if ($handle === false) {
+            return ['ok' => false, 'message' => 'Cannot open ' . basename($file), 'statements' => 0];
+        }
+        $count = 0;
+        $buffer = '';
+        try {
+            $pdo = Database::connection();
+            $pdo->exec('SET FOREIGN_KEY_CHECKS=0');
+            while (($line = $gz ? gzgets($handle) : fgets($handle)) !== false) {
+                if ($buffer === '' && (str_starts_with($line, '--') || trim($line) === '')) {
+                    continue;
+                }
+                $buffer .= $line;
+                if (str_ends_with(rtrim($line, "\r\n"), ';')) {
+                    $pdo->exec($buffer);
+                    $buffer = '';
+                    $count++;
+                }
+            }
+            if (trim($buffer) !== '') {
+                $pdo->exec($buffer);
+                $count++;
+            }
+            $pdo->exec('SET FOREIGN_KEY_CHECKS=1');
+        } catch (\Throwable $e) {
+            try {
+                Database::connection()->exec('SET FOREIGN_KEY_CHECKS=1');
+            } catch (\Throwable $ignored) {
+            }
+            $gz ? gzclose($handle) : fclose($handle);
+            return ['ok' => false, 'message' => $e->getMessage(), 'statements' => $count];
+        }
+        $gz ? gzclose($handle) : fclose($handle);
+        return ['ok' => true, 'message' => 'ok', 'statements' => $count];
+    }
+
+    /** Delete the oldest automatic backups, keeping $keep of them. */
+    public static function prune(int $keep): int
+    {
+        $auto = array_values(array_filter(self::files(), static fn(array $f): bool => $f['type'] === 'auto'));
+        $removed = 0;
+        foreach (array_slice($auto, max(1, $keep)) as $f) {
+            if (@unlink(self::dir() . '/' . $f['name'])) {
+                $removed++;
+            }
+        }
+        return $removed;
+    }
+
+    /**
+     * Delete backups older than $days (0 = never). The newest database backup
+     * and the files referenced by the current update rollback are always kept.
+     */
+    public static function expire(int $days, ?int $now = null): int
+    {
+        if ($days <= 0) {
+            return 0;
+        }
+        $cutoff = ($now ?? time()) - $days * 86400;
+        $protected = [];
+        try {
+            $rb = Updater::rollbackInfo();
+            if ($rb) {
+                $protected[] = $rb['code_backup'];
+                if ($rb['db_backup'] !== '') $protected[] = $rb['db_backup'];
+            }
+        } catch (\Throwable $e) {
+        }
+        $newestDb = null;
+        foreach (self::files() as $f) {
+            if ($f['type'] !== 'code') {
+                $newestDb = $f['name'];
+                break;
+            }
+        }
+        $removed = 0;
+        foreach (self::files() as $f) {
+            if ($f['mtime'] >= $cutoff || $f['name'] === $newestDb || in_array($f['name'], $protected, true)) {
+                continue;
+            }
+            if (@unlink(self::dir() . '/' . $f['name'])) {
+                $removed++;
+            }
+        }
+        if ($removed > 0) {
+            Logger::log('backup.expired', null, $removed . ' file(s) older than ' . $days . ' days');
+        }
+        return $removed;
+    }
+    public static function lastSlot(string $frequency, string $time, int $weekday, int $now): int
+    {
+        if (!preg_match('/^(\d{1,2}):(\d{2})$/', $time, $m)) {
+            $m = [0, 3, 0];
+        }
+        $hour = max(0, min(23, (int) $m[1]));
+        $minute = max(0, min(59, (int) $m[2]));
+        $d = (new \DateTimeImmutable('@' . $now))->setTimezone(new \DateTimeZone(date_default_timezone_get()));
+        if ($frequency === 'hourly') {
+            $slot = $d->setTime((int) $d->format('H'), $minute);
+            return ($slot->getTimestamp() > $now ? $slot->modify('-1 hour') : $slot)->getTimestamp();
+        }
+        $slot = $d->setTime($hour, $minute);
+        if ($frequency === 'weekly') {
+            $diff = ((int) $d->format('N') - max(1, min(7, $weekday)) + 7) % 7;
+            $slot = $slot->modify('-' . $diff . ' days');
+            return ($slot->getTimestamp() > $now ? $slot->modify('-7 days') : $slot)->getTimestamp();
+        }
+        return ($slot->getTimestamp() > $now ? $slot->modify('-1 day') : $slot)->getTimestamp();
+    }
+
+    /** Run the scheduled backup when its slot is due. Called from Maintenance. */
+    public static function scheduledTick(?int $now = null): ?string
+    {
+        if (!Settings::bool('backup_auto_enabled', false)) {
+            return null;
+        }
+        $now ??= time();
+        $last = (int) Settings::get('backup_auto_last', '0');
+        if ($last === 0) {
+            // First tick after enabling: start counting from now.
+            Settings::set('backup_auto_last', (string) $now);
+            return null;
+        }
+        $slot = self::lastSlot(
+            (string) Settings::get('backup_auto_frequency', 'daily'),
+            (string) Settings::get('backup_auto_time', '03:00'),
+            (int) Settings::get('backup_auto_weekday', '1'),
+            $now
+        );
+        if ($last >= $slot) {
+            return null;
+        }
+        // Claim the slot first so a parallel tick does not start a second dump.
+        Settings::set('backup_auto_last', (string) $now);
+        $file = self::full(self::AUTO_PREFIX);
+        if ($file === null) {
+            Settings::set('backup_auto_status', 'error|' . $now);
+            Logger::log('backup.auto_failed');
+            return null;
+        }
+        if (Settings::bool('backup_auto_compress', true)) {
+            $file = self::compress($file) ?? $file;
+        }
+        self::prune(max(1, (int) Settings::get('backup_auto_keep', '7')));
+        Settings::set('backup_auto_status', 'ok|' . $now . '|' . basename($file));
+        return $file;
     }
 }

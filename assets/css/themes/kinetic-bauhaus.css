@@ -1,0 +1,387 @@
+/* @theme id:kinetic-bauhaus | name:Kinetic Bauhaus | accent:#e63946 | tag:Animated */
+@import url("https://fonts.googleapis.com/css2?family=Jost:wght@500;600;700;800;900&display=swap");
+
+/* Flat primary colors, hard offset shadows and slowly orbiting geometric shapes.
+   Selectors use :root:root so they outrank the shared portal layer in design.css. */
+
+[data-theme="kinetic-bauhaus"] {
+    --accent: #e63946;
+    --accent-2: #f4c430;
+    --enter: animRise;
+    --enter-dur: .45s;
+    --theme-fx-opacity: .55;
+    --theme-fx-light-opacity: .5;
+    --kb-red: #e63946;
+    --kb-yellow: #f4c430;
+    --kb-blue: #2f5bea;
+}
+
+:root:root[data-theme="kinetic-bauhaus"][data-mode="dark"] {
+    --bg: #15171d; --bg-2: #1b1e26; --bg-3: #252935; --card: #1e212a;
+    --border: #3a3f4d; --text: #f3f1ea; --text-dim: #c3c0b6; --text-mut: #8f8c84;
+    --kb-ink: #f3f1ea;
+    --kb-shadow: #000;
+    --portal-accent: #ff5562;
+    --portal-action: var(--kb-red);
+    --portal-action-text: #fff;
+}
+
+:root:root[data-theme="kinetic-bauhaus"][data-mode="light"] {
+    --bg: #ece8de; --bg-2: #f6f3ec; --bg-3: #e0dbcf; --card: #fbf9f4;
+    --border: #1c1c1c; --text: #141414; --text-dim: #3a3a3a; --text-mut: #5c5a55;
+    --portal-muted: #3a3a3a; --portal-subtle: #5c5a55;
+    --kb-ink: #141414;
+    --kb-shadow: #141414;
+    --portal-accent: #c81f2d;
+    --portal-action: var(--kb-red);
+    --portal-action-text: #fff;
+}
+
+:root:root[data-theme="kinetic-bauhaus"][data-mode] {
+    --portal-display: "Jost", "Futura", "Century Gothic", "Inter", sans-serif;
+    --portal-line: color-mix(in srgb, var(--kb-ink) 55%, var(--bg));
+    --portal-soft-line: color-mix(in srgb, var(--kb-ink) 22%, var(--bg));
+    --portal-tint: color-mix(in srgb, var(--kb-yellow) 12%, var(--card));
+    --panel-surface: var(--card);
+    --panel-inset: none;
+    --panel-elevation: 6px 6px 0 var(--kb-shadow);
+    --radius: 0px;
+    --radius-sm: 0px;
+}
+
+/* ---------- Background: orbiting flat shapes ---------- */
+
+[data-theme="kinetic-bauhaus"] .theme-fx::before {
+    content: "";
+    position: absolute;
+    inset: -25%;
+    pointer-events: none;
+    background:
+        radial-gradient(circle at 78% 26%, var(--kb-red) 0 11vmin, transparent calc(11vmin + 1px)),
+        radial-gradient(circle at 22% 74%, transparent 0 13vmin, var(--kb-blue) calc(13vmin + 1px) 16vmin, transparent calc(16vmin + 1px)),
+        radial-gradient(circle at 0 100%, var(--kb-yellow) 0 18vmin, transparent calc(18vmin + 1px)) 63% 66% / 18vmin 18vmin no-repeat,
+        linear-gradient(var(--kb-ink), var(--kb-ink)) 30% 30% / 26vmin 1.6vmin no-repeat,
+        linear-gradient(var(--kb-blue), var(--kb-blue)) 70% 82% / 9vmin 9vmin no-repeat;
+    animation: kbOrbit 90s linear infinite;
+}
+
+[data-theme="kinetic-bauhaus"] .theme-fx::after {
+    content: "";
+    position: absolute;
+    width: 24vmin;
+    aspect-ratio: 1;
+    left: 12%;
+    top: 14%;
+    pointer-events: none;
+    background: var(--kb-yellow);
+    clip-path: polygon(50% 0, 100% 100%, 0 100%);
+    animation: kbDrift 26s ease-in-out infinite alternate;
+}
+
+@keyframes kbOrbit {
+    to { transform: rotate(360deg); }
+}
+
+@keyframes kbDrift {
+    0%   { transform: translate3d(0, 0, 0) rotate(0deg); }
+    50%  { transform: translate3d(38vw, 22vh, 0) rotate(160deg); }
+    100% { transform: translate3d(58vw, -4vh, 0) rotate(300deg); }
+}
+
+/* ---------- Typography ---------- */
+
+[data-theme="kinetic-bauhaus"] body { font-family: "Jost", "Inter", "Segoe UI", sans-serif; font-size: 14.5px; }
+
+:root:root[data-theme="kinetic-bauhaus"][data-mode] :is(.portal-page-heading h1, .x-page-title, .portal-section-heading h2) {
+    font-family: var(--portal-display);
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: -.01em;
+}
+
+:root:root[data-theme="kinetic-bauhaus"][data-mode] .portal-page-heading h1::after {
+    content: "";
+    display: inline-block;
+    width: .32em;
+    height: .32em;
+    margin-left: .22em;
+    vertical-align: .08em;
+    background: var(--kb-red);
+    border-radius: 50%;
+    animation: kbHop 2.8s cubic-bezier(.5, 0, .5, 1) infinite;
+}
+
+@keyframes kbHop {
+    0%, 100% { transform: translateY(0); border-radius: 50%; background: var(--kb-red); }
+    33%      { transform: translateY(-.25em); border-radius: 0; background: var(--kb-yellow); }
+    66%      { transform: translateY(0) rotate(45deg); border-radius: 0; background: var(--kb-blue); }
+}
+
+:root:root[data-theme="kinetic-bauhaus"][data-mode] .portal-kicker { font-family: var(--portal-display); font-weight: 700; letter-spacing: .18em; }
+:root:root[data-theme="kinetic-bauhaus"][data-mode] .portal-section-number { color: var(--kb-yellow); -webkit-text-stroke: 0; }
+
+/* ---------- Header & drawer ---------- */
+
+:root:root[data-theme="kinetic-bauhaus"][data-mode] .portal-header {
+    background: var(--bg-2);
+    border-bottom: 4px solid transparent;
+    border-image: linear-gradient(90deg, var(--kb-red) 0 33.3%, var(--kb-yellow) 33.3% 66.6%, var(--kb-blue) 66.6%) 1;
+    box-shadow: none;
+}
+
+:root:root[data-theme="kinetic-bauhaus"][data-mode] .portal-brand strong {
+    font-weight: 900;
+    text-transform: uppercase;
+}
+
+:root:root[data-theme="kinetic-bauhaus"][data-mode] .portal-nav-link::after {
+    height: 4px;
+    background: var(--kb-yellow);
+}
+
+:root:root[data-theme="kinetic-bauhaus"][data-mode] .portal-drawer {
+    border: 2px solid var(--kb-ink);
+    border-radius: 0;
+    box-shadow: 10px 10px 0 var(--kb-red);
+}
+
+:root:root[data-theme="kinetic-bauhaus"][data-mode] .nav-item {
+    border-radius: 0;
+    font-weight: 600;
+}
+
+:root:root[data-theme="kinetic-bauhaus"][data-mode] .nav-item.active {
+    color: #141414;
+    background: linear-gradient(var(--kb-yellow), var(--kb-yellow)) left / 100% 100% no-repeat;
+    border-color: var(--kb-ink);
+    box-shadow: 4px 4px 0 var(--kb-shadow);
+    animation: kbWipe .5s cubic-bezier(.2, .8, .2, 1) backwards;
+}
+:root:root[data-theme="kinetic-bauhaus"][data-mode] .nav-item.active svg { color: #141414; animation: kbSpin 6s linear infinite; }
+
+@keyframes kbWipe {
+    from { background-size: 0 100%; }
+}
+
+@keyframes kbSpin {
+    to { transform: rotate(360deg); }
+}
+
+/* ---------- Surfaces ---------- */
+
+:root:root[data-theme="kinetic-bauhaus"][data-mode] :is(.card, .contest-card, .store-card, .server-card, .skins-main, .skins-sidebar, .auth-card, .theme-card, .popup, .update-hud-box, .table-wrap, .toolbar) {
+    background: var(--card);
+    border: 2px solid var(--kb-ink);
+    border-radius: 0;
+    box-shadow: 6px 6px 0 var(--kb-shadow);
+    transition: transform .22s cubic-bezier(.3, 1.4, .5, 1), box-shadow .22s cubic-bezier(.3, 1.4, .5, 1);
+}
+
+:root:root[data-theme="kinetic-bauhaus"][data-mode] :is(.card, .contest-card, .store-card, .server-card):hover {
+    border-color: var(--kb-ink);
+    box-shadow: 6px 6px 0 var(--kb-red);
+}
+:root:root[data-theme="kinetic-bauhaus"][data-mode] :is(.contest-card, .store-card, .server-card, .x-monitor-card, .theme-card):hover {
+    transform: translate(-3px, -3px);
+    box-shadow: 9px 9px 0 var(--kb-red);
+}
+
+:root:root[data-theme="kinetic-bauhaus"][data-mode] .content :is(.card, .server-card, .table-wrap, .x-monitor-card) {
+    animation: kbDrop .6s cubic-bezier(.2, 1.3, .4, 1) backwards;
+}
+:root:root[data-theme="kinetic-bauhaus"][data-mode] .content :is(.card, .server-card):nth-child(2) { animation-delay: .07s; }
+:root:root[data-theme="kinetic-bauhaus"][data-mode] .content :is(.card, .server-card):nth-child(3) { animation-delay: .14s; }
+:root:root[data-theme="kinetic-bauhaus"][data-mode] .content :is(.card, .server-card):nth-child(4) { animation-delay: .21s; }
+:root:root[data-theme="kinetic-bauhaus"][data-mode] .content :is(.card, .server-card):nth-child(n+5) { animation-delay: .28s; }
+
+@keyframes kbDrop {
+    from { opacity: 0; transform: translate(-18px, 26px) rotate(-2.5deg); }
+}
+
+:root:root[data-theme="kinetic-bauhaus"][data-mode] .toolbar { border-left-width: 10px; border-left-color: var(--kb-blue); }
+
+:root:root[data-theme="kinetic-bauhaus"][data-mode] .card-title {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-weight: 800;
+    text-transform: uppercase;
+}
+
+:root:root[data-theme="kinetic-bauhaus"][data-mode] .card-title::before {
+    content: "";
+    flex: none;
+    width: 14px;
+    height: 14px;
+    background: var(--kb-red);
+    border-radius: 50%;
+}
+:root:root[data-theme="kinetic-bauhaus"][data-mode] .card:nth-of-type(3n+2) > .card-title::before { background: var(--kb-yellow); border-radius: 0; }
+:root:root[data-theme="kinetic-bauhaus"][data-mode] .card:nth-of-type(3n) > .card-title::before { background: var(--kb-blue); border-radius: 0; clip-path: polygon(50% 0, 100% 100%, 0 100%); }
+
+/* ---------- Stats ---------- */
+
+:root:root[data-theme="kinetic-bauhaus"][data-mode] .dashboard-stats .stat {
+    position: relative;
+    border: 2px solid var(--kb-ink);
+    border-radius: 0;
+    background: var(--card);
+    box-shadow: 5px 5px 0 var(--kb-shadow);
+    overflow: hidden;
+}
+
+:root:root[data-theme="kinetic-bauhaus"][data-mode] .dashboard-stats .stat::before {
+    content: "";
+    position: absolute;
+    inset: -14px -14px auto auto;
+    width: 52px;
+    height: 52px;
+    background: var(--kb-red);
+    border-radius: 50%;
+    opacity: .9;
+    transform: none;
+    z-index: 0;
+    animation: kbBreathe 5s ease-in-out infinite;
+}
+:root:root[data-theme="kinetic-bauhaus"][data-mode] .dashboard-stats .stat > * { position: relative; z-index: 1; }
+:root:root[data-theme="kinetic-bauhaus"][data-mode] .dashboard-stats .stat:nth-child(3n+2)::before { background: var(--kb-yellow); border-radius: 0; animation-name: kbSpinSlow; }
+:root:root[data-theme="kinetic-bauhaus"][data-mode] .dashboard-stats .stat:nth-child(3n)::before { background: var(--kb-blue); border-radius: 0; clip-path: polygon(50% 0, 100% 100%, 0 100%); animation-name: kbSpinSlow; animation-duration: 9s; }
+
+@keyframes kbBreathe {
+    50% { transform: scale(1.25); }
+}
+
+@keyframes kbSpinSlow {
+    to { transform: rotate(360deg); }
+}
+
+:root:root[data-theme="kinetic-bauhaus"][data-mode] .stat .value { font-family: var(--portal-display); font-weight: 900; }
+
+:root:root[data-theme="kinetic-bauhaus"][data-mode] :is(.server-stat, .x-stat) {
+    border: 2px solid var(--portal-line);
+    border-radius: 0;
+    background: var(--bg-2);
+}
+
+/* ---------- Controls ---------- */
+
+:root:root[data-theme="kinetic-bauhaus"][data-mode] .btn {
+    border: 2px solid var(--kb-ink);
+    border-radius: 0;
+    background: var(--card);
+    color: var(--text);
+    font-family: var(--portal-display);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .05em;
+    box-shadow: 4px 4px 0 var(--kb-shadow);
+    transition: transform .14s ease, box-shadow .14s ease, background .2s;
+}
+:root:root[data-theme="kinetic-bauhaus"][data-mode] .btn:hover {
+    transform: translate(-2px, -2px);
+    border-color: var(--kb-ink);
+    background: var(--portal-tint);
+    box-shadow: 6px 6px 0 var(--kb-shadow);
+}
+:root:root[data-theme="kinetic-bauhaus"][data-mode] .btn:active {
+    transform: translate(4px, 4px);
+    box-shadow: 0 0 0 var(--kb-shadow);
+}
+:root:root[data-theme="kinetic-bauhaus"][data-mode] .btn-primary,
+:root:root[data-theme="kinetic-bauhaus"][data-mode] .btn-primary:hover {
+    background: var(--kb-red);
+    color: #fff;
+    border-color: var(--kb-ink);
+}
+:root:root[data-theme="kinetic-bauhaus"][data-mode] .btn-danger { color: #fff; background: #9d1c26; }
+:root:root[data-theme="kinetic-bauhaus"][data-mode] .btn-ghost { background: transparent; box-shadow: none; }
+:root:root[data-theme="kinetic-bauhaus"][data-mode] .btn-ghost:hover { box-shadow: 4px 4px 0 var(--kb-shadow); }
+
+:root:root[data-theme="kinetic-bauhaus"][data-mode] :is(input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="color"]), select, textarea) {
+    border: 2px solid var(--portal-line);
+    border-radius: 0;
+    background: var(--bg-2);
+    box-shadow: none;
+}
+:root:root[data-theme="kinetic-bauhaus"][data-mode] :is(input, select, textarea):focus {
+    border-color: var(--kb-ink);
+    box-shadow: 4px 4px 0 var(--kb-blue);
+    outline: none;
+}
+
+:root:root[data-theme="kinetic-bauhaus"][data-mode] :is(.tabs, .subtabs, .x-seg) {
+    border: 2px solid var(--kb-ink);
+    border-radius: 0;
+    background: var(--bg-2);
+    box-shadow: 4px 4px 0 var(--kb-shadow);
+}
+:root:root[data-theme="kinetic-bauhaus"][data-mode] :is(.tabs [data-tab], .subtab, .x-seg a) {
+    border-radius: 0;
+    font-family: var(--portal-display);
+    font-weight: 700;
+    text-transform: uppercase;
+}
+:root:root[data-theme="kinetic-bauhaus"][data-mode] :is(.tabs [data-tab].active, .subtab.active, .x-seg a.is-active) {
+    background: var(--kb-yellow);
+    color: #141414;
+    box-shadow: none;
+    animation: kbWipe .35s ease-out backwards;
+}
+
+:root:root[data-theme="kinetic-bauhaus"][data-mode] .badge {
+    border: 2px solid currentColor;
+    border-radius: 0;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: .06em;
+}
+
+:root:root[data-theme="kinetic-bauhaus"][data-mode] thead {
+    background: var(--bg-3);
+    border-bottom: 3px solid var(--kb-yellow);
+}
+:root:root[data-theme="kinetic-bauhaus"][data-mode] thead th { font-family: var(--portal-display); font-weight: 800; color: var(--text); }
+:root:root[data-theme="kinetic-bauhaus"][data-mode] tbody tr:hover { background: color-mix(in srgb, var(--kb-blue) 12%, var(--card)); }
+
+:root:root[data-theme="kinetic-bauhaus"][data-mode] .modal {
+    border: 3px solid var(--kb-ink);
+    border-radius: 0;
+    box-shadow: 12px 12px 0 var(--kb-red);
+}
+
+:root:root[data-theme="kinetic-bauhaus"][data-mode] :is(.portal-hero, .server-banner, .player-avatar, .user-chip, .user-chip img, .topbar-link, .panel-hud-card, .portal-hero-note) { border-radius: 0; }
+:root:root[data-theme="kinetic-bauhaus"][data-mode] .panel-hud-card { border: 2px solid var(--kb-ink); background: var(--card); box-shadow: 5px 5px 0 var(--kb-shadow); backdrop-filter: none; }
+:root:root[data-theme="kinetic-bauhaus"][data-mode] .portal-hero { border: 2px solid var(--kb-ink); box-shadow: 8px 8px 0 var(--kb-blue); }
+
+/* ---------- Theme picker preview ---------- */
+
+[data-preview="kinetic-bauhaus"] .theme-preview.anim { background: #15171d; }
+[data-preview="kinetic-bauhaus"] .tp-pattern::before {
+    content: "";
+    position: absolute;
+    inset: -30%;
+    background:
+        radial-gradient(circle at 70% 35%, #e63946 0 16px, transparent 17px),
+        radial-gradient(circle at 30% 65%, transparent 0 14px, #2f5bea 15px 19px, transparent 20px),
+        linear-gradient(#f4c430, #f4c430) 46% 62% / 34px 6px no-repeat;
+    animation: kbOrbit 14s linear infinite;
+}
+[data-preview="kinetic-bauhaus"] .tp-pattern::after {
+    content: "";
+    position: absolute;
+    width: 26px;
+    height: 26px;
+    left: 18%;
+    top: 16%;
+    background: #f4c430;
+    clip-path: polygon(50% 0, 100% 100%, 0 100%);
+    animation: kbSpinSlow 7s linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    [data-theme="kinetic-bauhaus"] .theme-fx::before,
+    [data-theme="kinetic-bauhaus"] .theme-fx::after,
+    :root:root[data-theme="kinetic-bauhaus"][data-mode] :is(.content .card, .content .server-card, .content .table-wrap, .content .x-monitor-card, .nav-item.active, .nav-item.active svg, .dashboard-stats .stat::before, .portal-page-heading h1::after) {
+        animation: none;
+    }
+}

@@ -468,6 +468,7 @@ final class ContestController extends Controller
         }
 
         try {
+            Settings::set('last_cron_run', (string) time());
             // All periodic work lives in one place (see Maintenance::run),
             // shared by this cron endpoint and the throttled lazy page-load tick.
             $r = \App\Core\Maintenance::run();

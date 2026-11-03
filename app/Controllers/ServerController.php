@@ -36,6 +36,9 @@ final class ServerController extends Controller
             'canRcon'   => Auth::isRoot(),
             'canManage' => Auth::canManage(),
             'canModerate' => Auth::canModerate(),
+            'monitor'   => \App\Core\Settings::bool('monitor_enabled', true)
+                ? MonitorController::data((string) $this->query('range', '24h'))
+                : null,
             'csrf'      => $this->csrfToken(),
         ]);
     }
@@ -183,7 +186,7 @@ final class ServerController extends Controller
         }
         foreach ($players as &$p) {
             $p['avatar']      = $avatars[$p['steamid64']] ?? \App\Core\Steam::avatarPlaceholder();
-            $p['profile_url'] = $p['steamid64'] !== '' ? \App\Core\Steam::profileUrl($p['steamid64']) : '';
+            $p['profile_url'] = $p['steamid64'] !== '' ? \App\Core\Steam::playerUrl($p['steamid64']) : '';
         }
         unset($p);
 

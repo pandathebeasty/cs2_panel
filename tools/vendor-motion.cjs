@@ -9,6 +9,7 @@ const distributions = [
     ['gsap', 'gsap.min.js'],
     ['lenis', 'lenis.min.js'],
     ['lenis', 'lenis.css'],
+    ['qrcode-generator', 'qrcode.js'],
 ];
 
 fs.mkdirSync(destination, { recursive: true });
@@ -46,3 +47,14 @@ for (const name of ['gsap', 'lenis']) {
     fs.copyFileSync(path.join(directory, license), path.join(destination, `${name}-LICENSE.txt`));
     console.log(`Preserved ${name} license.`);
 }
+
+// qrcode-generator ships its MIT notice in the file header; keep a separate notice too.
+const qrMeta = JSON.parse(fs.readFileSync(path.join(root, 'node_modules', 'qrcode-generator', 'package.json'), 'utf8'));
+fs.writeFileSync(path.join(destination, 'qrcode-NOTICE.txt'), [
+    `qrcode-generator ${qrMeta.version}`,
+    `License: ${qrMeta.license}`,
+    'Copyright (c) 2009 Kazuhiko Arase',
+    'Source: https://github.com/kazuhikoarase/qrcode-generator',
+    '',
+].join('\n'));
+console.log('Preserved qrcode-generator license notice.');

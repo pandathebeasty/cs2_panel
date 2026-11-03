@@ -32,7 +32,7 @@ final class Paginator
     ): self {
         $p = new self();
         $p->perPage = max(1, min(200, $perPage));
-        $p->total   = (int) Database::scalar($countSql, $params);
+        $p->total   = self::count($countSql, $params);
         $p->lastPage = max(1, (int) ceil($p->total / $p->perPage));
         $p->page    = max(1, min($page, $p->lastPage));
 
@@ -43,5 +43,23 @@ final class Paginator
 
         $p->items = Database::all($sql, $params);
         return $p;
+    }
+
+    /**
+     * COUNT(*) on large tables is the slowest part of a list page. Totals of
+     * 5 000+ rows are reused for 30 seconds; smaller ones are always exact.
+     */
+    private static function count(string $countSql, array $params): int
+    {
+        $key = 'count:' . sha1($countSql . "\0" . serialize($params));
+        $cached = Cache::get($key);
+        if (is_int($cached)) {
+            return $cached;
+        }
+        $total = (int) Database::scalar($countSql, $params);
+        if ($total >= 5000) {
+            Cache::set($key, $total, 30);
+        }
+        return $total;
     }
 }

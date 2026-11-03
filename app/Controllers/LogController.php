@@ -7,6 +7,7 @@ namespace App\Controllers;
 use App\Core\Auth;
 use App\Core\Config;
 use App\Core\Controller;
+use App\Core\Database;
 use App\Core\Logger;
 
 final class LogController extends Controller
@@ -17,14 +18,22 @@ final class LogController extends Controller
         return BASE_PATH . '/error.log';
     }
 
+    private function filters(): array
+    {
+        return [
+            'search' => trim((string) $this->query('search', '')),
+            'action' => (string) $this->query('action', ''),
+            'ip'     => trim((string) $this->query('ip', '')),
+            'from'   => (string) $this->query('from', ''),
+            'to'     => (string) $this->query('to', ''),
+        ];
+    }
+
     public function index(): void
     {
         Auth::requireManage();
 
-        $filters = [
-            'search' => trim((string) $this->query('search', '')),
-            'action' => (string) $this->query('action', ''),
-        ];
+        $filters = $this->filters();
 
         $logs = Logger::paginate($filters, $this->page(), (int) Config::get('app.per_page', 25));
 
@@ -71,6 +80,34 @@ final class LogController extends Controller
         $blocks = array_reverse($blocks);
         $blocks = array_slice($blocks, 0, 200);
         return ['entries' => $blocks, 'size' => strlen($raw), 'path' => $path];
+    }
+
+    /** Stream the filtered action log as CSV (max 50 000 rows). */
+    public function export(): void
+    {
+        Auth::requireManage();
+        if (!Database::tableExists('panel_logs')) {
+            $this->redirect('/logs');
+        }
+        [$whereSql, $params] = Logger::filterSql($this->filters());
+        Logger::log('logs.export', null, http_build_query(array_filter($this->filters())));
+        while (ob_get_level() > 0) {
+            ob_end_clean();
+        }
+        header('Content-Type: text/csv; charset=utf-8');
+        header('Content-Disposition: attachment; filename="audit-' . date('Ymd-His') . '.csv"');
+        header('X-Content-Type-Options: nosniff');
+        $out = fopen('php://output', 'wb');
+        fwrite($out, "\xEF\xBB\xBF");
+        fputcsv($out, ['id', 'created_at', 'actor_steamid', 'actor_name', 'action', 'target', 'details', 'ip'], ',', '"', '\\');
+        $stmt = Database::run("SELECT id, created_at, actor_steamid, actor_name, action, target, details, ip FROM panel_logs {$whereSql} ORDER BY id DESC LIMIT 50000", $params);
+        while (($row = $stmt->fetch(\PDO::FETCH_NUM)) !== false) {
+            // Neutralize spreadsheet formulas in user-controlled fields.
+            $row = array_map(static fn($v) => is_string($v) && $v !== '' && strpbrk($v[0], '=+-@') !== false ? "'" . $v : $v, $row);
+            fputcsv($out, $row, ',', '"', '\\');
+        }
+        fclose($out);
+        exit;
     }
 
     /** Clear the error log (root only). */

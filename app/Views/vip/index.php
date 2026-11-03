@@ -58,12 +58,12 @@ $groupField = function (string $selected = '') use ($vipGroups): string {
                 <?php foreach ($pg->items as $v): ?>
                     <tr>
                         <td>
-                            <a class="player-cell" href="<?= View::e(Steam::profileUrl($v['steamid64'])) ?>" target="_blank" rel="noopener">
+                            <a class="player-cell" <?= Steam::linkAttrs($v['steamid64']) ?>>
                                 <img class="player-avatar" src="<?= View::e($avatars[(string) $v['steamid64']] ?? Steam::avatarPlaceholder()) ?>" alt="" loading="lazy">
                                 <span class="pname"><?= View::e($v['name']) ?></span>
                             </a>
                         </td>
-                        <td class="mono"><a href="<?= View::e(Steam::profileUrl($v['steamid64'])) ?>" target="_blank" rel="noopener"><?= View::e($v['steamid64']) ?></a></td>
+                        <td class="mono"><a <?= Steam::linkAttrs($v['steamid64']) ?>><?= View::e($v['steamid64']) ?></a></td>
                         <td><span class="badge badge-mute"><?= View::e($v['group']) ?></span></td>
                         <td class="muted"><?= View::e(($v['server_ip'] ?? '') !== '' ? $v['server_ip'] . ':' . $v['server_port'] : '—') ?></td>
                         <td class="muted">

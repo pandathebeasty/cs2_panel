@@ -103,7 +103,7 @@ $teamBadges = ['unassigned' => 'badge-expired', 'spec' => 'badge-expired', 't' =
                                 <td class="muted"><?= View::e($entry['date']) ?></td>
                                 <td class="chat-log-player">
                                     <?php if ($steamId !== null && Steam::isValidSteamId64($steamId)): ?>
-                                        <a href="<?= View::e(Steam::profileUrl($steamId)) ?>" target="_blank" rel="noopener noreferrer"><?= View::e($name) ?></a>
+                                        <a <?= Steam::linkAttrs($steamId) ?>><?= View::e($name) ?></a>
                                     <?php else: ?>
                                         <strong><?= View::e($name) ?></strong>
                                     <?php endif; ?>

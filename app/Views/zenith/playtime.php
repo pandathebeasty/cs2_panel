@@ -75,7 +75,7 @@ $sortH = function (string $col, string $label) use ($sort, $dir): string {
                         <tr>
                             <td class="muted"><?= $offset + $i + 1 ?></td>
                             <td>
-                                <a class="player-cell" href="<?= View::e(Steam::profileUrl($r['steam_id'])) ?>" target="_blank" rel="noopener">
+                                <a class="player-cell" <?= Steam::linkAttrs($r['steam_id']) ?>>
                                     <img class="player-avatar" src="<?= View::e($avatars[(string) $r['steam_id']] ?? Steam::avatarPlaceholder()) ?>" alt="" loading="lazy">
                                     <span class="pname"><?= View::e($r['name'] ?: 'Player') ?></span>
                                 </a>

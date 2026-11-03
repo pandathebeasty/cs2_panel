@@ -11,8 +11,9 @@
     function effectsReduced() {
         return document.documentElement.dataset.effects === 'reduced';
     }
-    if (!animationLibrary) console.error('[CS2 Panel] GSAP failed to load; using native animation fallbacks.');
-    if (!window.Lenis) console.error('[CS2 Panel] Lenis failed to load; retaining native scrolling.');
+    var motionSkipped = window.CS2_MOTION_LOADED === false;
+    if (!animationLibrary && !motionSkipped) console.error('[CS2 Panel] GSAP failed to load; using native animation fallbacks.');
+    if (!window.Lenis && !motionSkipped) console.error('[CS2 Panel] Lenis failed to load; retaining native scrolling.');
     document.body.classList.toggle('panel-gsap-motion', !!animationLibrary && !reducedMotion.matches);
     var panelTitle = document.getElementById('dashboard-overview-title');
     if (panelTitle) {
@@ -287,7 +288,7 @@
             syncTouch: false,
             anchors: false,
             prevent: function (node) {
-                if (node.closest('.modal-overlay, dialog, .portal-drawer')) return true;
+                if (node.closest('.modal-overlay, dialog, .portal-drawer, .x-modal-layer')) return true;
                 var region = node.closest('.dropdown-menu, .panel-nav-panel, .rcon-out, .err-trace, .install-form-scroll, .chat-log-text');
                 if (!region || region.scrollHeight <= region.clientHeight) return false;
                 var overflow = getComputedStyle(region).overflowY;

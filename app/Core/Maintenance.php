@@ -112,6 +112,34 @@ final class Maintenance
             error_log('[CS2Panel] maintenance rarity-colors refresh failed: ' . $e->getMessage());
         }
 
+        // Server monitoring (throttled internally by monitor_interval).
+        try {
+            $counters['servers_sampled'] = \App\Models\MonitorModel::sample();
+        } catch (\Throwable $e) {
+            error_log('[CS2Panel] maintenance monitor sample failed: ' . $e->getMessage());
+        }
+
+        // Scheduled database backups (no-op unless enabled and a slot is due).
+        try {
+            $counters['backup'] = Backup::scheduledTick();
+            $counters['backups_expired'] = Backup::expire((int) Settings::get('backup_max_age_days', '0'));
+        } catch (\Throwable $e) {
+            error_log('[CS2Panel] maintenance scheduled backup failed: ' . $e->getMessage());
+        }
+
+        // Audit log retention (0 = keep forever).
+        try {
+            $counters['logs_purged'] = self::purgeAuditLog();
+        } catch (\Throwable $e) {
+            error_log('[CS2Panel] maintenance audit purge failed: ' . $e->getMessage());
+        }
+
+        try {
+            $counters['cache_pruned'] = Cache::prune();
+        } catch (\Throwable $e) {
+            error_log('[CS2Panel] maintenance cache prune failed: ' . $e->getMessage());
+        }
+
         // Record when a full pass last completed. This is what lazyTick() checks,
         // so a real cron run keeps the timestamp fresh and page-load ticks stay
         // silent (no redundant work) while the cron handles everything in real
@@ -123,6 +151,17 @@ final class Maintenance
         }
 
         return $counters;
+    }
+
+    /** Delete audit entries older than audit_retention_days, in batches. */
+    public static function purgeAuditLog(): int
+    {
+        $days = (int) Settings::get('audit_retention_days', '0');
+        if ($days <= 0 || !Database::tableExists('panel_logs')) {
+            return 0;
+        }
+        $cutoff = date('Y-m-d H:i:s', time() - $days * 86400);
+        return Database::run('DELETE FROM panel_logs WHERE created_at < ? LIMIT 5000', [$cutoff])->rowCount();
     }
 
     /**

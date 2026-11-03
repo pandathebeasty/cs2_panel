@@ -23,8 +23,62 @@ final class Auth
     public static function login(array $user): void
     {
         session_regenerate_id(true);
-        unset($_SESSION['guest']);
+        unset($_SESSION['guest'], $_SESSION['2fa_pending']);
         $_SESSION['user'] = $user;
+    }
+
+    /**
+     * Steam login succeeded but the account has 2FA: keep the user aside until
+     * the authenticator code is verified on /2fa.
+     */
+    public static function beginTwoFactor(array $user): void
+    {
+        session_regenerate_id(true);
+        unset($_SESSION['user'], $_SESSION['guest']);
+        $_SESSION['2fa_pending'] = ['user' => $user, 'at' => time()];
+    }
+
+    /** The user waiting for a 2FA code, or null (expires after 5 minutes). */
+    public static function pendingTwoFactor(): ?array
+    {
+        $pending = $_SESSION['2fa_pending'] ?? null;
+        if (!is_array($pending) || time() - (int) ($pending['at'] ?? 0) > 300) {
+            unset($_SESSION['2fa_pending']);
+            return null;
+        }
+        return $pending['user'] ?? null;
+    }
+
+    public static function completeTwoFactor(): bool
+    {
+        $user = self::pendingTwoFactor();
+        if ($user === null) {
+            return false;
+        }
+        $user['mfa'] = true;
+        self::login($user);
+        return true;
+    }
+
+    public static function markTwoFactorVerified(): void
+    {
+        if (isset($_SESSION['user'])) {
+            $_SESSION['user']['mfa'] = true;
+        }
+    }
+
+    /** Staff must set up 2FA first when the owner made it mandatory. */
+    private static function enforceTwoFactor(): void
+    {
+        if (!self::isAdmin() || !empty($_SESSION['user']['mfa']) || !\App\Models\TwoFactorModel::required()) {
+            return;
+        }
+        if (\App\Models\TwoFactorModel::enabled((string) self::steamId())) {
+            self::markTwoFactorVerified();
+            return;
+        }
+        header('Location: ' . Url::to('/account/security?required=1'));
+        exit;
     }
 
     /**
@@ -240,6 +294,7 @@ final class Auth
             View::render('errors/403', [], 'main');
             exit;
         }
+        self::enforceTwoFactor();
     }
 
     /** Stop execution if not the owner (for settings & panel management). */
@@ -251,6 +306,7 @@ final class Auth
             View::render('errors/403', [], 'main');
             exit;
         }
+        self::enforceTwoFactor();
     }
 
     /** Stop execution if the user cannot edit the site (owner only). */
@@ -262,5 +318,6 @@ final class Auth
             View::render('errors/403', [], 'main');
             exit;
         }
+        self::enforceTwoFactor();
     }
 }

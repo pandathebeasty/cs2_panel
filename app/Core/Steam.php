@@ -116,6 +116,20 @@ final class Steam
         return 'https://steamcommunity.com/profiles/' . $steamid64;
     }
 
+    /** Staff open the panel player profile; everyone else goes to Steam. */
+    public static function playerUrl(string|int $steamid64): string
+    {
+        return Auth::canModerate() ? Url::to('/player/' . $steamid64) : self::profileUrl($steamid64);
+    }
+
+    /** href + target attributes for a player link (data-steamid enables the right-click menu). */
+    public static function linkAttrs(string|int $steamid64): string
+    {
+        $sid = View::e((string) $steamid64);
+        $attrs = 'href="' . View::e(self::playerUrl($steamid64)) . '" data-steamid="' . $sid . '"';
+        return Auth::canModerate() ? $attrs : $attrs . ' target="_blank" rel="noopener"';
+    }
+
     /**
      * The Steam Web API key. A value set in Settings (UI) takes precedence over
      * the one in config.php, so root can change it without editing files.
@@ -149,7 +163,7 @@ final class Steam
             return '<span class="pname">' . $label . '</span>';
         }
         $avatar = View::e($avatars[$steamId64] ?? self::avatarPlaceholder());
-        return '<a class="player-cell" href="' . View::e(self::profileUrl($steamId64)) . '" target="_blank" rel="noopener">'
+        return '<a class="player-cell" ' . self::linkAttrs($steamId64) . '>'
             . '<img class="player-avatar" src="' . $avatar . '" alt="" loading="lazy">'
             . '<span class="pname">' . $label . '</span></a>';
     }
@@ -160,7 +174,7 @@ final class Steam
         if (!self::isValidSteamId64($steamId64)) {
             return View::e($steamId64);
         }
-        return '<a href="' . View::e(self::profileUrl($steamId64)) . '" target="_blank" rel="noopener">'
+        return '<a ' . self::linkAttrs($steamId64) . '>'
             . View::e($steamId64) . '</a>';
     }
     
@@ -171,7 +185,7 @@ final class Steam
         if (!self::isValidSteamId64($steamId64)) {
             return '<span class="pname">' . $label . '</span>';
         }
-        return '<a href="' . View::e(self::profileUrl($steamId64)) . '" target="_blank" rel="noopener">' . $label . '</a>';
+        return '<a ' . self::linkAttrs($steamId64) . '>' . $label . '</a>';
     }
 
     /**
@@ -190,11 +204,11 @@ final class Steam
         // Persistent disk cache (loaded once per request), so navigating between
         // list pages does NOT hit the Steam Web API every time. Entries expire
         // after AVATAR_TTL seconds; only cache misses trigger a network call.
-        static $disk = null;
-        static $diskDirty = false;
+        static $diskInit = false;
 
-        if ($disk === null) {
-            $disk = self::avatarDiskLoad();
+        if (!$diskInit) {
+            $diskInit = true;
+            self::avatarDiskLoad();
             // Flush any newly fetched entries at the end of the request.
             if (!self::$shutdownRegistered) {
                 self::$shutdownRegistered = true;
@@ -212,8 +226,9 @@ final class Steam
             if ($id === '' || isset($cache[$id])) {
                 continue;
             }
-            if (isset($disk[$id]) && ($now - (int) ($disk[$id]['ts'] ?? 0)) < self::AVATAR_TTL) {
-                $cache[$id] = (string) $disk[$id]['url'];
+            $hit = self::$avatarCache[$id] ?? null;
+            if ($hit && ($now - (int) ($hit['ts'] ?? 0)) < self::AVATAR_TTL) {
+                $cache[$id] = (string) $hit['url'];
             }
         }
 
@@ -252,20 +267,8 @@ final class Steam
             $json = curl_exec($ch);
             curl_close($ch);
 
-            $players = [];
-            if ($json !== false) {
-                $data = json_decode((string) $json, true);
-                $players = $data['response']['players'] ?? [];
-            }
-            foreach ($players as $p) {
-                if (!empty($p['steamid'])) {
-                    $sid = (string) $p['steamid'];
-                    $avatar = $p['avatarfull'] ?? $p['avatarmedium'] ?? self::avatarPlaceholder();
-                    $cache[$sid] = $avatar;
-                    // Persist real avatars only (not placeholders).
-                    $disk[$sid] = ['url' => $avatar, 'ts' => $now];
-                    $diskDirty = true;
-                }
+            foreach (self::storeSummaries($json) as $sid => $avatar) {
+                $cache[$sid] = $avatar;
             }
             // Any id the API didn't return -> placeholder for this request only
             // (do NOT persist, so a temporary miss is retried next time).
@@ -276,12 +279,47 @@ final class Steam
             }
         }
 
-        if ($diskDirty) {
-            self::$avatarDirty = true;
-            self::$avatarCache = $disk;
-        }
-
         return self::pick($cache, $steamIds);
+    }
+
+    /**
+     * Persist avatar + persona name from a GetPlayerSummaries response.
+     * @return array<string,string> steamid => avatar url
+     */
+    private static function storeSummaries(string|false $json): array
+    {
+        $out = [];
+        $players = $json !== false ? (json_decode((string) $json, true)['response']['players'] ?? []) : [];
+        foreach ((array) $players as $p) {
+            if (empty($p['steamid'])) {
+                continue;
+            }
+            $sid = (string) $p['steamid'];
+            $out[$sid] = (string) ($p['avatarfull'] ?? $p['avatarmedium'] ?? self::avatarPlaceholder());
+            self::$avatarCache[$sid] = ['url' => $out[$sid], 'name' => (string) ($p['personaname'] ?? ''), 'ts' => time()];
+            self::$avatarDirty = true;
+        }
+        return $out;
+    }
+
+    /** Current Steam persona name ('' when unknown or no API key). */
+    public static function personaName(string $steamId64): string
+    {
+        self::avatars([$steamId64]);
+        $hit = self::$avatarCache[$steamId64] ?? null;
+        if (is_array($hit) && isset($hit['name']) && (time() - (int) ($hit['ts'] ?? 0)) < self::AVATAR_TTL) {
+            return (string) $hit['name'];
+        }
+        $key = self::apiKey();
+        if ($key === '' || !function_exists('curl_init')) {
+            return '';
+        }
+        $ch = curl_init('https://api.steampowered.com/ISteamUser/GetPlayerSummaries/v2/?key=' . urlencode($key) . '&steamids=' . urlencode($steamId64));
+        curl_setopt_array($ch, [CURLOPT_RETURNTRANSFER => true, CURLOPT_TIMEOUT => 3, CURLOPT_CONNECTTIMEOUT => 1]);
+        $json = curl_exec($ch);
+        curl_close($ch);
+        self::storeSummaries($json);
+        return (string) (self::$avatarCache[$steamId64]['name'] ?? '');
     }
 
     /** TTL for a cached avatar URL (12 hours). */

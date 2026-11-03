@@ -41,11 +41,13 @@ unset($_SESSION['flash']);
     <title><?= View::e($title ?? $siteName) ?></title>
     <link rel="icon" href="<?= View::e($favicon) ?>">
     <link rel="stylesheet" href="/assets/css/app.css?v=<?= View::e($cssVer) ?>">
-    <?php foreach (\App\Core\Themes::cssLinks() as $themeCss): ?>
+    <?php foreach (\App\Core\Themes::cssLinks($themeName) as $themeCss): ?>
     <link rel="stylesheet" href="<?= View::e($themeCss) ?>">
     <?php endforeach; ?>
     <?php require BASE_PATH . '/app/Views/partials/motion-assets.php'; ?>
     <link rel="stylesheet" href="/assets/css/design.css?v=<?= View::e($designVer) ?>">
+    <?php $enhanceCss = PUBLIC_PATH . '/assets/css/enhance.css'; ?>
+    <link rel="stylesheet" href="/assets/css/enhance.css?v=<?= View::e(\App\Core\Version::current() . (is_file($enhanceCss) ? '.' . filemtime($enhanceCss) : '')) ?>">
     <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=IBM+Plex+Mono:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800;900&family=Oxanium:wght@400;500;600;700;800&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet">
     <!-- Theme config comes from the SERVER (shared for everyone). No localStorage. -->
     <script>

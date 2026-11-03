@@ -73,10 +73,20 @@ final class SettingsController extends Controller
             }
         }
 
+        $system = null;
+        if (Auth::isRoot()) {
+            try {
+                $system = SystemController::viewData();
+            } catch (\Throwable $e) {
+                error_log('[CS2Panel] system tabs failed: ' . $e->getMessage());
+            }
+        }
+
         \cs2panel_trace('settings.index.before-render');
         $this->view('settings/index', [
             'csrf' => $this->csrfToken(),
             'update' => $update,
+            'system' => $system,
             's'    => [
                 'site_name'       => Settings::get('site_name', 'CS2 Panel'),
                 'theme_accent'    => Settings::get('theme_accent', '#e01e37'),

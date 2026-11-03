@@ -717,6 +717,8 @@
                                                       
     document.addEventListener('submit', function (e) {
         var form = e.target;
+        // enhance.js shows a styled dialog instead when it is loaded.
+        if (window.CS2Confirm) return;
         if (form.matches('[data-confirm]')) {
             if (!window.confirm(form.getAttribute('data-confirm'))) {
                 e.preventDefault();

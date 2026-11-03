@@ -32,6 +32,10 @@ use App\Controllers\K4Controller;
 use App\Controllers\CreditsController;
 use App\Controllers\SkinsController;
 use App\Controllers\BenefitController;
+use App\Controllers\MonitorController;
+use App\Controllers\PlayerController;
+use App\Controllers\SystemController;
+use App\Controllers\TwoFactorController;
 
 $router = new Router();
 
@@ -68,6 +72,7 @@ $router->post('/bans/delete-all', [BanController::class, 'deleteAll']);
 $router->post('/bans/{id}/update', [BanController::class, 'update']);
 $router->post('/bans/{id}/unban', [BanController::class, 'unban']);
 $router->post('/bans/{id}/delete', [BanController::class, 'delete']);
+$router->get('/bans/evasion', [PlayerController::class, 'evasion']);
 $router->get('/bans/{id}', [BanController::class, 'show']);
 
 // Mutes / Gags / Silences
@@ -239,5 +244,36 @@ $router->post('/skins/save', [SkinsController::class, 'save']);
 // Benefits page (public, gated on benefits_enabled in controller)
 $router->get('/benefits', [BenefitController::class, 'index']);
 $router->post('/benefits/save', [BenefitController::class, 'save']);
+
+// Staff two-factor authentication
+$router->get('/2fa', [TwoFactorController::class, 'challenge']);
+$router->post('/2fa', [TwoFactorController::class, 'verify']);
+$router->post('/2fa/cancel', [TwoFactorController::class, 'cancel']);
+$router->get('/account/security', [TwoFactorController::class, 'index']);
+$router->post('/account/security/enable', [TwoFactorController::class, 'enable']);
+$router->post('/account/security/disable', [TwoFactorController::class, 'disable']);
+$router->post('/account/security/recovery', [TwoFactorController::class, 'regenerate']);
+
+// Player profile, ban evasion and the command-palette search (staff)
+$router->get('/players', [PlayerController::class, 'index']);
+$router->get('/player/{steamid}', [PlayerController::class, 'show']);
+$router->get('/search', [PlayerController::class, 'search']);
+
+// Server monitoring
+$router->get('/monitor', [MonitorController::class, 'index']);
+$router->post('/monitor/sample', [MonitorController::class, 'sampleNow']);
+
+// Owner system center: health, backups, monitoring, security, rollback
+$router->get('/system', [SystemController::class, 'index']);
+$router->post('/system/backups/schedule', [SystemController::class, 'saveBackups']);
+$router->post('/system/backups/create', [SystemController::class, 'backupNow']);
+$router->get('/system/backups/download', [SystemController::class, 'download']);
+$router->post('/system/backups/delete', [SystemController::class, 'deleteBackup']);
+$router->post('/system/backups/restore', [SystemController::class, 'restoreBackup']);
+$router->post('/system/monitoring', [SystemController::class, 'saveMonitor']);
+$router->post('/system/security', [SystemController::class, 'saveSecurity']);
+$router->post('/system/2fa/{steamid}/reset', [TwoFactorController::class, 'reset']);
+$router->post('/system/rollback', [SystemController::class, 'rollback']);
+$router->get('/logs/export', [LogController::class, 'export']);
 
 return $router;

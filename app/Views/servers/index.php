@@ -5,6 +5,7 @@ use App\Core\View;
 $title = Lang::t('nav.servers');
 $L = fn(string $k) => View::e(Lang::t($k));
 $canModerate = $canModerate ?? false;
+$monitor = $monitor ?? null;
 $rconServers = array_values(array_filter($servers, static fn($s) => !empty($s['rcon_password'])));
 ?>
 <div class="tab-host">
@@ -12,6 +13,7 @@ $rconServers = array_values(array_filter($servers, static fn($s) => !empty($s['r
         <div class="tabs" style="display:inline-flex">
             <button type="button" data-tab="overview" class="active"><?= $L('servers.overview') ?></button>
             <?php if ($canModerate): ?><button type="button" data-tab="players"><?= $L('servers.players_tab') ?></button><?php endif; ?>
+            <?php if ($monitor !== null): ?><button type="button" data-tab="monitor"><?= $L('nav.monitor') ?></button><?php endif; ?>
             <?php if ($canRcon): ?><button type="button" data-tab="rcon"><?= $L('servers.rcon') ?></button><?php endif; ?>
         </div>
         <?php if ($canManage): ?>
@@ -116,6 +118,13 @@ $rconServers = array_values(array_filter($servers, static fn($s) => !empty($s['r
                 </div>
             <?php endforeach; ?>
         <?php endif; ?>
+    </div>
+    <?php endif; ?>
+
+    <?php if ($monitor !== null): ?>
+    <!-- Monitor tab -->
+    <div data-tabpanel="monitor" style="display:none">
+        <?php require __DIR__ . '/../monitor/panel.php'; ?>
     </div>
     <?php endif; ?>
 
@@ -260,7 +269,8 @@ $rconServers = array_values(array_filter($servers, static fn($s) => !empty($s['r
         }
         var rows = players.map(function (p) {
             var name = p.profile_url
-                ? '<a class="player-cell" href="' + esc(p.profile_url) + '" target="_blank" rel="noopener">'
+                ? '<a class="player-cell" href="' + esc(p.profile_url) + '" data-steamid="' + esc(p.steamid64) + '"'
+                    + (/^https?:/.test(p.profile_url) ? ' target="_blank" rel="noopener"' : '') + '>'
                     + '<img class="player-avatar" src="' + esc(p.avatar) + '" alt="" loading="lazy">'
                     + '<span class="pname">' + esc(p.name) + '</span></a>'
                 : '<span class="pname">' + esc(p.name) + '</span>';

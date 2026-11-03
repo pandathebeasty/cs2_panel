@@ -42,7 +42,7 @@ $liveSearchKey = 'warns';
                         <td>
                             <?php $sid = (string) ($w['player_steamid'] ?? ''); $valid = Steam::isValidSteamId64($sid); ?>
                             <?php if ($valid): ?>
-                                <a class="player-cell" href="<?= View::e(Steam::profileUrl($sid)) ?>" target="_blank" rel="noopener">
+                                <a class="player-cell" <?= Steam::linkAttrs($sid) ?>>
                                     <img class="player-avatar" src="<?= View::e($avatars[$sid] ?? Steam::avatarPlaceholder()) ?>" alt="" loading="lazy">
                                     <span class="pname"><?= View::e($w['player_name'] ?: Lang::t('common.unknown')) ?></span>
                                 </a>

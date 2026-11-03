@@ -20,7 +20,7 @@ unset($_SESSION['flash']);
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title><?= View::e($title ?? 'Install') ?></title>
     <link rel="icon" href="<?= View::e($favicon) ?>">
-    <link rel="stylesheet" href="/assets/css/app.css">
+    <link rel="stylesheet" href="/assets/css/app.css?v=<?= \App\Core\View::e(\App\Core\Version::current() . '.' . @filemtime(PUBLIC_PATH . '/assets/css/app.css')) ?>">
     <?php foreach (\App\Core\Themes::cssLinks() as $themeCss): ?>
     <link rel="stylesheet" href="<?= View::e($themeCss) ?>">
     <?php endforeach; ?>
@@ -83,7 +83,7 @@ unset($_SESSION['flash']);
         </div>
     <?php endif; ?>
     <?= $content ?>
-    <script src="/assets/js/app.js"></script>
+    <script src="/assets/js/app.js?v=<?= \App\Core\View::e(\App\Core\Version::current() . '.' . @filemtime(PUBLIC_PATH . '/assets/js/app.js')) ?>"></script>
     <script defer src="/assets/js/portal.js?v=<?= View::e($portalVer) ?>"></script>
 </body>
 </html>

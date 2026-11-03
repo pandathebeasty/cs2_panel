@@ -136,6 +136,7 @@ final class Updater
             if ($rel !== null) {
                 $best['release_name']  = $rel['name'];
                 $best['release_notes'] = $rel['body'];
+                $best['assets']        = $rel['assets'];
             }
         }
         return $best;
@@ -156,11 +157,35 @@ final class Updater
         if (!is_array($rel)) {
             return null;
         }
+        $assets = [];
+        foreach ((array) ($rel['assets'] ?? []) as $asset) {
+            $name = (string) ($asset['name'] ?? '');
+            foreach (self::RELEASE_ASSETS as $part => $file) {
+                if ($name === $file && !empty($asset['browser_download_url'])) {
+                    $assets[$part] = [
+                        'url'  => (string) $asset['browser_download_url'],
+                        'size' => (int) ($asset['size'] ?? 0),
+                    ];
+                }
+            }
+        }
         return [
-            'name' => trim((string) ($rel['name'] ?? '')),
-            'body' => trim((string) ($rel['body'] ?? '')),
+            'name'   => trim((string) ($rel['name'] ?? '')),
+            'body'   => trim((string) ($rel['body'] ?? '')),
+            'assets' => $assets,
         ];
     }
+
+    /**
+     * Split release archives published by .github/workflows/release-assets.yml.
+     * When "core" exists, only core + the selected optional parts are downloaded;
+     * otherwise the updater falls back to the full GitHub zipball.
+     */
+    public const RELEASE_ASSETS = [
+        'core'  => 'cs2-panel-core.zip',
+        'maps'  => 'cs2-panel-maps.zip',
+        'skins' => 'cs2-panel-skins.zip',
+    ];
 
                                                                             
     // Updating
@@ -414,8 +439,17 @@ final class Updater
 
     private const BACKGROUND_STEPS = ['download', 'extract', 'backup_db', 'backup_code', 'apply', 'migrate'];
 
-    /** Seconds after which a job with no stored result is considered dead. */
-    private const JOB_STALE_AFTER = 1800;
+    /** Seconds without a heartbeat after which a job is considered dead. */
+    private const JOB_STALE_AFTER = 300;
+
+    /** Steps that may stay silent longer (a large database dump has no heartbeat). */
+    private const JOB_STALE_SLOW = ['backup_db' => 1800, 'backup_code' => 900, 'migrate' => 900];
+
+    /** A dead job is restarted this many times (chunked steps resume from their cursor). */
+    private const JOB_MAX_RETRIES = 3;
+
+    /** Work budget per request for chunked steps, well under common host limits. */
+    private const CHUNK_SECONDS = 15;
 
     private static ?string $runningJob = null;
 
@@ -458,19 +492,36 @@ final class Updater
         if ($meta === null || $job === null) {
             return null;
         }
+        if (($job['status'] ?? '') === 'resume') {
+            // The previous chunk stopped on its time budget: run the next one.
+            @unlink(self::jobFile($id));
+            return null;
+        }
         if (($job['status'] ?? '') === 'done' && is_array($job['result'] ?? null)) {
             return $job['result'];
         }
-        if (time() - (int) ($job['started'] ?? 0) > self::JOB_STALE_AFTER) {
+        $lastBeat = max((int) ($job['started'] ?? 0), (int) ($job['beat'] ?? 0));
+        if (time() - $lastBeat > (self::JOB_STALE_SLOW[$id] ?? self::JOB_STALE_AFTER)) {
+            $st = self::readState();
+            $retries = (int) ($st['retries'][$id] ?? 0);
+            if ($retries < self::JOB_MAX_RETRIES) {
+                // The host killed the worker (time/memory limit). Start it again;
+                // chunked steps continue where they stopped.
+                $st['retries'][$id] = $retries + 1;
+                self::writeState($st);
+                self::logError('Step "' . $id . '" stopped without a result; retry ' . ($retries + 1) . '/' . self::JOB_MAX_RETRIES . '.');
+                @unlink(self::jobFile($id));
+                return null;
+            }
             $msg = 'The "' . $id . '" step stopped without reporting a result (host time or memory limit?).';
             self::logError($msg);
             return self::stepFail($id, $meta, $msg);
         }
-        return self::pendingResult($id, (string) ($job['detail'] ?? ''));
+        return self::pendingResult($id, (string) ($job['detail'] ?? ''), isset($job['fraction']) ? (float) $job['fraction'] : null);
     }
 
     /** "Still working" answer: keeps the previous step's percent, polls the same step. */
-    public static function pendingResult(string $id, string $detail = ''): array
+    public static function pendingResult(string $id, string $detail = '', ?float $fraction = null): array
     {
         $meta = self::stepMeta($id) ?? ['label' => '', 'percent' => 0];
         $percent = 0;
@@ -479,6 +530,9 @@ final class Updater
                 break;
             }
             $percent = $s['percent'];
+        }
+        if ($fraction !== null) {
+            $percent += (int) floor(max(0.0, min(0.99, $fraction)) * ((int) ($meta['percent'] ?? $percent) - $percent));
         }
         return [
             'ok'      => true,
@@ -514,26 +568,47 @@ final class Updater
                 ? $err['message'] . ' in ' . basename((string) ($err['file'] ?? '')) . ':' . ($err['line'] ?? '?')
                 : 'The step stopped unexpectedly (possible time or memory limit on the host).';
             self::logError('Step "' . $id . '" aborted: ' . $reason);
+            $st = self::readState();
+            $retries = (int) ($st['retries'][$id] ?? 0);
+            if ($st !== [] && $retries < self::JOB_MAX_RETRIES) {
+                // Chunked steps resume from their cursor; others simply run again.
+                $st['retries'][$id] = $retries + 1;
+                self::writeState($st);
+                self::writeJob($id, ['status' => 'resume', 'started' => $started, 'beat' => time()]);
+                return;
+            }
             $meta = self::stepMeta($id) ?? [];
             self::writeJob($id, ['status' => 'done', 'started' => $started, 'result' => self::stepFail($id, $meta, $reason)]);
         });
 
         $result = self::step($id);
 
-        self::writeJob($id, ['status' => 'done', 'started' => $started, 'result' => $result]);
+        self::writeJob($id, !empty($result['resume'])
+            ? ['status' => 'resume', 'started' => $started, 'beat' => time()]
+            : ['status' => 'done', 'started' => $started, 'result' => $result]);
         self::$runningJob = null;
         return $result;
     }
 
     /** Update the "detail" text shown by polls while a job runs (e.g. MB downloaded). */
-    private static function jobDetail(string $id, string $detail): void
+    private static function jobDetail(string $id, string $detail, ?float $fraction = null): void
     {
         $job = self::readJob($id);
         if ($job === null || ($job['status'] ?? '') !== 'running') {
             return;
         }
         $job['detail'] = $detail;
+        $job['beat'] = time();
+        if ($fraction !== null) {
+            $job['fraction'] = $fraction;
+        }
         self::writeJob($id, $job);
+    }
+
+    /** Result of a chunked step that ran out of its time budget. */
+    private static function resumeResult(string $id, string $detail, float $fraction): array
+    {
+        return ['resume' => true] + self::pendingResult($id, $detail, $fraction);
     }
 
     /**
@@ -592,14 +667,33 @@ final class Updater
                     if (!@mkdir($work, 0755, true) && !is_dir($work)) {
                         return self::stepFail($id, $meta, 'Cannot create the temp folder: ' . $work);
                     }
+                    $selectedParts = array_values(array_intersect(array_keys(self::OPTIONAL_PARTS), $parts));
+                    $downloads = [];
+                    $assets = (array) ($latest['assets'] ?? []);
+                    if (!empty($assets['core']['url'])) {
+                        $downloads['core'] = (string) $assets['core']['url'];
+                        foreach ($selectedParts as $part) {
+                            if (!empty($assets[$part]['url'])) {
+                                $downloads[$part] = (string) $assets[$part]['url'];
+                            } else {
+                                // A selected part without its own archive: use the full zipball.
+                                $downloads = [];
+                                break;
+                            }
+                        }
+                    }
                     self::writeState([
-                        'from'    => $from,
-                        'version' => $latest['version'],
-                        'tag'     => $latest['tag'],
-                        'zipball' => $latest['zipball'],
-                        'parts'   => array_values(array_intersect(array_keys(self::OPTIONAL_PARTS), $parts)),
+                        'from'      => $from,
+                        'version'   => $latest['version'],
+                        'tag'       => $latest['tag'],
+                        'zipball'   => $latest['zipball'],
+                        'parts'     => $selectedParts,
+                        'downloads' => $downloads,
                     ]);
                     $log[] = 'Preparing update to v' . $latest['version'] . '.';
+                    if ($downloads) {
+                        $log[] = 'Using split release archives: ' . implode(', ', array_keys($downloads)) . '.';
+                    }
                     break;
 
                 case 'download':
@@ -607,58 +701,67 @@ final class Updater
                     if (empty($st['zipball'])) {
                         return self::stepFail($id, $meta, 'Update state missing; restart the update.');
                     }
-                    $lastReport = 0.0;
-                    $onProgress = static function (int $bytes) use (&$lastReport): void {
-                        $now = microtime(true);
-                        if ($now - $lastReport >= 1.0) {
-                            $lastReport = $now;
-                            self::jobDetail('download', round($bytes / 1048576, 1) . ' MB');
-                        }
-                    };
-                    if (!self::download($st['zipball'], self::workDir() . '/release.zip', $onProgress)) {
-                        return self::stepFail($id, $meta, 'Failed to download the release archive.');
+                    $targets = (array) ($st['downloads'] ?? []);
+                    if (!$targets) {
+                        $targets = ['release' => (string) $st['zipball']];
                     }
-                    $log[] = 'Downloaded ' . ($st['tag'] ?? '') . '.';
+                    foreach ($targets as $name => $url) {
+                        $lastReport = 0.0;
+                        $onProgress = static function (int $bytes) use (&$lastReport, $name): void {
+                            $now = microtime(true);
+                            if ($now - $lastReport >= 1.0) {
+                                $lastReport = $now;
+                                self::jobDetail('download', $name . ': ' . round($bytes / 1048576, 1) . ' MB');
+                            }
+                        };
+                        $file = self::workDir() . '/' . ($name === 'release' ? 'release' : 'part_' . $name) . '.zip';
+                        if (!self::download((string) $url, $file, $onProgress)) {
+                            return self::stepFail($id, $meta, 'Failed to download the release archive (' . $name . ').');
+                        }
+                        $log[] = 'Downloaded ' . $name . ' (' . round(filesize($file) / 1048576, 1) . ' MB).';
+                    }
                     break;
 
                 case 'extract':
-                    $zip = new \ZipArchive();
-                    if ($zip->open(self::workDir() . '/release.zip') !== true) {
-                        return self::stepFail($id, $meta, 'Failed to open the downloaded archive.');
-                    }
                     $extractDir = self::workDir() . '/extracted';
                     @mkdir($extractDir, 0755, true);
                     $st = self::readState();
-                    $skip = self::skippedPrefixes((array) ($st['parts'] ?? array_keys(self::OPTIONAL_PARTS)));
-                    if ($skip === []) {
-                        $zip->extractTo($extractDir);
-                    } else {
-                        $names = [];
-                        for ($i = 0; $i < $zip->numFiles; $i++) {
-                            $name = (string) $zip->getNameIndex($i);
-                            // Drop the zipball's top-level folder before matching.
-                            $rel = (string) substr($name, (int) strpos($name, '/') + 1);
-                            if (!self::isSkipped($rel, $skip)) {
-                                $names[] = $name;
-                            }
+                    $planFile = self::workDir() . '/extract_plan.json';
+                    $plan = is_file($planFile) ? json_decode((string) @file_get_contents($planFile), true) : null;
+                    if (!is_array($plan)) {
+                        $plan = self::extractPlan($st, $log);
+                        if (isset($plan['error'])) {
+                            return self::stepFail($id, $meta, (string) $plan['error']);
                         }
-                        $zip->extractTo($extractDir, $names);
-                        $log[] = 'Skipped: ' . implode(', ', array_diff(array_keys(self::OPTIONAL_PARTS), (array) $st['parts'])) . '.';
+                        self::writeJsonAtomic($planFile, $plan);
                     }
-                    $zip->close();
+                    $progress = self::extractChunk($plan, $extractDir);
+                    if ($progress['error'] !== null) {
+                        return self::stepFail($id, $meta, $progress['error']);
+                    }
+                    self::writeJsonAtomic($planFile, $plan);
+                    if (!$progress['finished']) {
+                        return self::resumeResult($id, $progress['detail'], $progress['fraction']);
+                    }
+                    $log[] = 'Extracted ' . $plan['total'] . ' files.';
                     $root = self::firstSubdir($extractDir);
                     if ($root === null) {
                         return self::stepFail($id, $meta, 'The archive layout was not recognized.');
                     }
                     $st['root'] = $root;
                     self::writeState($st);
-                    $log[] = 'Extracted the archive.';
+                    if (!empty($plan['skipped'])) {
+                        $log[] = 'Skipped: ' . $plan['skipped'] . '.';
+                    }
                     break;
 
                 case 'backup_db':
                     $backup = Backup::full();
                     if ($backup) {
                         $log[] = 'Database backup: db_backups/' . basename($backup);
+                        $st = self::readState();
+                        $st['db_backup'] = basename($backup);
+                        self::writeState($st);
                     }
                     break;
 
@@ -666,6 +769,9 @@ final class Updater
                     $codeBackup = self::backupCode();
                     if ($codeBackup) {
                         $log[] = 'Code backup: ' . basename($codeBackup);
+                        $st = self::readState();
+                        $st['code_backup'] = basename($codeBackup);
+                        self::writeState($st);
                     }
                     break;
 
@@ -677,6 +783,9 @@ final class Updater
                     $applied = self::applyFiles($st['root'], $log);
                     if (!$applied['ok']) {
                         return self::stepFail($id, $meta, $applied['message'], $log);
+                    }
+                    if (empty($applied['finished'])) {
+                        return self::resumeResult($id, (string) $applied['detail'], (float) $applied['fraction']);
                     }
                     break;
 
@@ -699,6 +808,15 @@ final class Updater
                     $from = (string) ($st['from'] ?? Version::current());
                     @file_put_contents(BASE_PATH . '/VERSION', $ver . "\n");
                     $log[] = 'Updated VERSION to ' . $ver . '.';
+                    if (!empty($st['code_backup'])) {
+                        self::writeJsonAtomic(self::rollbackFile(), [
+                            'from'        => $from,
+                            'to'          => $ver,
+                            'code_backup' => (string) $st['code_backup'],
+                            'db_backup'   => (string) ($st['db_backup'] ?? ''),
+                            'at'          => time(),
+                        ]);
+                    }
                     self::rrmdir(self::workDir());
                     self::latest(true);
                     Logger::log('panel.update', null, 'v' . $from . ' -> v' . $ver);
@@ -739,34 +857,46 @@ final class Updater
     }
 
     /**
-     * Copy the updatable parts of the release over the current install.
-     * We only overlay code/asset folders and never touch config/config.php,
-     * db_backups/, or the user's uploaded logo/favicon.
-     * @return array{ok:bool, message:string}
+     * Copy the release files over the current install in time-boxed chunks;
+     * the cursor is kept in apply_plan.json so the next request resumes.
+     * @return array{ok:bool, message:string, finished?:bool, detail?:string, fraction?:float}
      */
     private static function applyFiles(string $root, array &$log): array
     {
-        // Map source (in the release) -> destination (in this install).
-        // Assets live under public/assets in layout A, or /assets in layout B
-        // (the flat deploy). Detect which one this install uses.
-        $assetsDest = is_dir(PUBLIC_PATH . '/assets') ? PUBLIC_PATH . '/assets' : BASE_PATH . '/assets';
-
-        $copies = [
-            $root . '/app'             => BASE_PATH . '/app',
-            $root . '/database'        => BASE_PATH . '/database',
-            $root . '/public/assets'   => $assetsDest,
-            // Flat repo layout ships assets/ at the release root.
-            $root . '/assets'          => is_dir($root . '/public/assets') ? null : $assetsDest,
-        ];
-
-        foreach ($copies as $srcDir => $destDir) {
-            if ($destDir === null || !is_dir($srcDir)) {
-                continue; // release may not ship every folder
+        $planFile = self::workDir() . '/apply_plan.json';
+        $plan = is_file($planFile) ? json_decode((string) @file_get_contents($planFile), true) : null;
+        if (!is_array($plan)) {
+            $plan = ['files' => self::applyList($root), 'i' => 0];
+            self::writeJsonAtomic($planFile, $plan);
+        }
+        $files = (array) $plan['files'];
+        $total = count($files);
+        $i = (int) $plan['i'];
+        $deadline = microtime(true) + self::CHUNK_SECONDS;
+        $failed = null;
+        for (; $i < $total; $i++) {
+            [$src, $dest] = $files[$i];
+            $dir = dirname($dest);
+            if ((!is_dir($dir) && !@mkdir($dir, 0755, true) && !is_dir($dir)) || !@copy($src, $dest)) {
+                $failed = $dest;
+                break;
             }
-            if (!self::copyTree($srcDir, $destDir)) {
-                return ['ok' => false, 'message' => 'Failed while copying ' . basename($destDir) . '/ (check folder permissions).'];
+            if ($i % 50 === 0) {
+                self::jobDetail('apply', ($i + 1) . ' / ' . $total, $total ? $i / $total : 0.0);
+                if (microtime(true) >= $deadline) {
+                    $i++;
+                    break;
+                }
             }
-            $log[] = 'Applied ' . basename($destDir) . '/.';
+        }
+        $plan['i'] = $i;
+        self::writeJsonAtomic($planFile, $plan);
+        if ($failed !== null) {
+            $rel = ltrim(str_replace('\\', '/', substr($failed, strlen(BASE_PATH))), '/');
+            return ['ok' => false, 'message' => 'Failed while copying ' . $rel . ' (check folder permissions).'];
+        }
+        if ($i < $total) {
+            return ['ok' => true, 'finished' => false, 'message' => 'ok', 'detail' => $i . ' / ' . $total, 'fraction' => $i / $total];
         }
 
         // Only VERSION is worth syncing from the top level. README.md and other
@@ -776,10 +906,129 @@ final class Updater
         if (is_file($root . '/VERSION')) {
             @copy($root . '/VERSION', BASE_PATH . '/VERSION');
         }
-        return ['ok' => true, 'message' => 'ok'];
+        $log[] = 'Applied ' . $total . ' files.';
+        return ['ok' => true, 'finished' => true, 'message' => 'ok'];
     }
 
-    /** Make a zip backup of the current app/ folder before overwriting it. */
+    /**
+     * Files to copy over the install, as [source, destination] pairs.
+     * We only overlay code/asset folders and never touch config/config.php,
+     * db_backups/, or the user's uploaded logo/favicon.
+     * @return array<int,array{0:string,1:string}>
+     */
+    private static function applyList(string $root): array
+    {
+        // Assets live under public/assets in layout A, or /assets in layout B
+        // (the flat deploy). Detect which one this install uses.
+        $assetsDest = is_dir(PUBLIC_PATH . '/assets') ? PUBLIC_PATH . '/assets' : BASE_PATH . '/assets';
+        $copies = [
+            $root . '/app'             => BASE_PATH . '/app',
+            $root . '/database'        => BASE_PATH . '/database',
+            $root . '/public/assets'   => $assetsDest,
+            // Flat repo layout ships assets/ at the release root.
+            $root . '/assets'          => is_dir($root . '/public/assets') ? null : $assetsDest,
+        ];
+        $list = [];
+        foreach ($copies as $srcDir => $destDir) {
+            if ($destDir === null || !is_dir($srcDir)) {
+                continue; // release may not ship every folder
+            }
+            $it = new \RecursiveIteratorIterator(
+                new \RecursiveDirectoryIterator($srcDir, \FilesystemIterator::SKIP_DOTS)
+            );
+            foreach ($it as $f) {
+                /** @var \SplFileInfo $f */
+                if ($f->isFile()) {
+                    $list[] = [$f->getPathname(), $destDir . '/' . str_replace('\\', '/', substr($f->getPathname(), strlen($srcDir) + 1))];
+                }
+            }
+        }
+        return $list;
+    }
+
+    /**
+     * Archives and entry indexes to extract, honouring the unselected optional parts.
+     * @return array{archives:array<int,array{file:string,entries:int[]}>, a:int, i:int, done:int, total:int, skipped:string}|array{error:string}
+     */
+    private static function extractPlan(array $st, array &$log): array
+    {
+        $split = glob(self::workDir() . '/part_*.zip') ?: [];
+        $archives = $split ?: [self::workDir() . '/release.zip'];
+        $skip = $split ? [] : self::skippedPrefixes((array) ($st['parts'] ?? array_keys(self::OPTIONAL_PARTS)));
+        $plan = ['archives' => [], 'a' => 0, 'i' => 0, 'done' => 0, 'total' => 0, 'skipped' => ''];
+        foreach ($archives as $archive) {
+            $zip = new \ZipArchive();
+            if ($zip->open($archive) !== true) {
+                return ['error' => 'Failed to open ' . basename($archive) . '.'];
+            }
+            $entries = [];
+            for ($i = 0; $i < $zip->numFiles; $i++) {
+                $name = (string) $zip->getNameIndex($i);
+                // Drop the zipball's top-level folder before matching.
+                $rel = (string) substr($name, (int) strpos($name, '/') + 1);
+                if ($skip === [] || !self::isSkipped($rel, $skip)) {
+                    $entries[] = $i;
+                }
+            }
+            $zip->close();
+            $plan['archives'][] = ['file' => $archive, 'entries' => $entries];
+            $plan['total'] += count($entries);
+        }
+        if ($skip !== []) {
+            $plan['skipped'] = implode(', ', array_diff(array_keys(self::OPTIONAL_PARTS), (array) ($st['parts'] ?? [])));
+        }
+        return $plan;
+    }
+
+    /**
+     * Extract entries from the plan until the time budget runs out. The plan's
+     * cursor is advanced in place.
+     * @return array{finished:bool, error:?string, detail:string, fraction:float}
+     */
+    private static function extractChunk(array &$plan, string $extractDir): array
+    {
+        $deadline = microtime(true) + self::CHUNK_SECONDS;
+        $total = max(1, (int) $plan['total']);
+        while ($plan['a'] < count($plan['archives'])) {
+            $archive = $plan['archives'][$plan['a']];
+            $zip = new \ZipArchive();
+            if ($zip->open($archive['file']) !== true) {
+                return ['finished' => false, 'error' => 'Failed to open ' . basename($archive['file']) . '.', 'detail' => '', 'fraction' => 0.0];
+            }
+            $entries = $archive['entries'];
+            $count = count($entries);
+            while ($plan['i'] < $count) {
+                $batch = [];
+                for ($n = 0; $n < 100 && $plan['i'] < $count; $n++, $plan['i']++) {
+                    $batch[] = (string) $zip->getNameIndex((int) $entries[$plan['i']]);
+                }
+                if (!$zip->extractTo($extractDir, $batch)) {
+                    $zip->close();
+                    return ['finished' => false, 'error' => 'Failed to extract ' . basename($archive['file']) . ' (disk space or permissions?).', 'detail' => '', 'fraction' => 0.0];
+                }
+                $plan['done'] += count($batch);
+                self::jobDetail('extract', $plan['done'] . ' / ' . $plan['total'], $plan['done'] / $total);
+                if (microtime(true) >= $deadline && ($plan['i'] < $count || $plan['a'] + 1 < count($plan['archives']))) {
+                    $zip->close();
+                    if ($plan['i'] >= $count) {
+                        $plan['a']++;
+                        $plan['i'] = 0;
+                    }
+                    return ['finished' => false, 'error' => null, 'detail' => $plan['done'] . ' / ' . $plan['total'], 'fraction' => $plan['done'] / $total];
+                }
+            }
+            $zip->close();
+            $plan['a']++;
+            $plan['i'] = 0;
+        }
+        return ['finished' => true, 'error' => null, 'detail' => '', 'fraction' => 1.0];
+    }
+
+    /**
+     * Zip the code that an update overwrites (app/, database/, assets/ and
+     * VERSION) so it can be rolled back. The heavy data folders (map images,
+     * skin catalog) and user uploads are left out.
+     */
     private static function backupCode(): ?string
     {
         if (!extension_loaded('zip')) {
@@ -794,20 +1043,160 @@ final class Updater
         if ($zip->open($file, \ZipArchive::CREATE | \ZipArchive::OVERWRITE) !== true) {
             return null;
         }
-        $appDir = BASE_PATH . '/app';
-        $base = dirname($appDir);
-        $it = new \RecursiveIteratorIterator(
-            new \RecursiveDirectoryIterator($appDir, \FilesystemIterator::SKIP_DOTS)
-        );
-        foreach ($it as $f) {
-            /** @var \SplFileInfo $f */
-            if ($f->isFile()) {
-                $local = ltrim(str_replace($base, '', $f->getPathname()), '/\\');
-                $zip->addFile($f->getPathname(), $local);
+        $exclude = ['app/Data/weaponpaints', 'assets/img/maps', 'assets/img/uploads'];
+        foreach (self::codeRoots() as $prefix => $source) {
+            if (!is_dir($source)) {
+                continue;
             }
+            $it = new \RecursiveIteratorIterator(
+                new \RecursiveDirectoryIterator($source, \FilesystemIterator::SKIP_DOTS)
+            );
+            foreach ($it as $f) {
+                /** @var \SplFileInfo $f */
+                if (!$f->isFile()) {
+                    continue;
+                }
+                $local = $prefix . '/' . str_replace('\\', '/', substr($f->getPathname(), strlen($source) + 1));
+                if (!self::isSkipped($local, $exclude)) {
+                    $zip->addFile($f->getPathname(), $local);
+                }
+            }
+        }
+        if (is_file(BASE_PATH . '/VERSION')) {
+            $zip->addFile(BASE_PATH . '/VERSION', 'VERSION');
         }
         $zip->close();
         return $file;
+    }
+
+    /** @return array<string,string> backup prefix => install directory */
+    private static function codeRoots(): array
+    {
+        return [
+            'app'      => BASE_PATH . '/app',
+            'database' => BASE_PATH . '/database',
+            'assets'   => is_dir(PUBLIC_PATH . '/assets') ? PUBLIC_PATH . '/assets' : BASE_PATH . '/assets',
+        ];
+    }
+
+    private static function rollbackFile(): string
+    {
+        return BASE_PATH . '/db_backups/last_update.json';
+    }
+
+    /**
+     * The last completed update that can be rolled back, when its code backup
+     * still exists and the panel still runs the version it installed.
+     * @return array{from:string,to:string,code_backup:string,db_backup:string,at:int,has_db:bool}|null
+     */
+    public static function rollbackInfo(): ?array
+    {
+        $file = self::rollbackFile();
+        if (!is_file($file)) {
+            return null;
+        }
+        $info = json_decode((string) @file_get_contents($file), true);
+        if (!is_array($info) || empty($info['code_backup'])) {
+            return null;
+        }
+        $code = BASE_PATH . '/db_backups/' . basename((string) $info['code_backup']);
+        if (!is_file($code) || Version::compare(Version::current(), (string) ($info['to'] ?? '')) !== 0) {
+            return null;
+        }
+        $db = (string) ($info['db_backup'] ?? '');
+        return [
+            'from'        => (string) ($info['from'] ?? ''),
+            'to'          => (string) ($info['to'] ?? ''),
+            'code_backup' => basename((string) $info['code_backup']),
+            'db_backup'   => $db !== '' ? basename($db) : '',
+            'at'          => (int) ($info['at'] ?? 0),
+            'has_db'      => $db !== '' && is_file(BASE_PATH . '/db_backups/' . basename($db)),
+        ];
+    }
+
+    /**
+     * Restore the code (and optionally the database) saved before the last
+     * update. Files added by the newer version under app/ and database/ are
+     * removed so its migrations and classes do not linger.
+     * @return array{ok:bool,message:string,log:string[]}
+     */
+    public static function rollback(bool $restoreDb): array
+    {
+        @set_time_limit(0);
+        @ignore_user_abort(true);
+        $info = self::rollbackInfo();
+        if ($info === null) {
+            return ['ok' => false, 'message' => 'No update to roll back.', 'log' => []];
+        }
+        $log = [];
+        $zip = new \ZipArchive();
+        if ($zip->open(BASE_PATH . '/db_backups/' . $info['code_backup']) !== true) {
+            return ['ok' => false, 'message' => 'Cannot open the code backup.', 'log' => $log];
+        }
+        $roots = self::codeRoots();
+        $kept = [];
+        for ($i = 0; $i < $zip->numFiles; $i++) {
+            $name = (string) $zip->getNameIndex($i);
+            if ($name === '' || str_ends_with($name, '/') || str_contains($name, '..')) {
+                continue;
+            }
+            $prefix = strstr($name, '/', true);
+            if ($name === 'VERSION') {
+                $dest = BASE_PATH . '/VERSION';
+            } elseif ($prefix !== false && isset($roots[$prefix])) {
+                $dest = $roots[$prefix] . substr($name, strlen($prefix));
+            } else {
+                continue;
+            }
+            $kept[str_replace('\\', '/', $dest)] = true;
+            $data = $zip->getFromIndex($i);
+            if ($data === false) {
+                continue;
+            }
+            if (!is_dir(dirname($dest))) {
+                @mkdir(dirname($dest), 0755, true);
+            }
+            if (@file_put_contents($dest, $data) === false) {
+                $zip->close();
+                return ['ok' => false, 'message' => 'Cannot write ' . $name . ' (check permissions).', 'log' => $log];
+            }
+        }
+        $zip->close();
+        $log[] = 'Restored the code of v' . $info['from'] . '.';
+
+        $removed = 0;
+        foreach (['app' => ['php'], 'database' => ['sql']] as $prefix => $extensions) {
+            $it = new \RecursiveIteratorIterator(
+                new \RecursiveDirectoryIterator($roots[$prefix], \FilesystemIterator::SKIP_DOTS)
+            );
+            foreach ($it as $f) {
+                /** @var \SplFileInfo $f */
+                $path = str_replace('\\', '/', $f->getPathname());
+                if ($f->isFile() && in_array(strtolower($f->getExtension()), $extensions, true)
+                    && !str_contains($path, '/app/Data/') && !isset($kept[$path])) {
+                    @unlink($path) && $removed++;
+                }
+            }
+        }
+        if ($removed > 0) {
+            $log[] = 'Removed ' . $removed . ' file(s) added by v' . $info['to'] . '.';
+        }
+
+        if ($restoreDb && $info['has_db']) {
+            $restored = Backup::restore(BASE_PATH . '/db_backups/' . $info['db_backup']);
+            if (!$restored['ok']) {
+                return ['ok' => false, 'message' => 'Code restored, but the database restore failed: ' . $restored['message'], 'log' => $log];
+            }
+            $log[] = 'Database restored from ' . $info['db_backup'] . ' (' . $restored['statements'] . ' statements).';
+        }
+
+        @unlink(self::rollbackFile());
+        @unlink(self::cacheFile());
+        if (function_exists('opcache_reset')) {
+            @opcache_reset();
+        }
+        Logger::log('panel.rollback', null, 'v' . $info['to'] . ' -> v' . $info['from'] . ($restoreDb ? ' (with database)' : ''));
+        return ['ok' => true, 'message' => 'Rolled back to v' . $info['from'] . '.', 'log' => $log];
     }
 
                                                                             
@@ -908,32 +1297,6 @@ final class Updater
             }
         }
         return false;
-    }
-
-    /** Recursively copy a directory tree, creating destinations as needed. */
-    private static function copyTree(string $src, string $dest): bool
-    {
-        if (!is_dir($dest) && !@mkdir($dest, 0755, true) && !is_dir($dest)) {
-            return false;
-        }
-        $it = new \RecursiveIteratorIterator(
-            new \RecursiveDirectoryIterator($src, \FilesystemIterator::SKIP_DOTS),
-            \RecursiveIteratorIterator::SELF_FIRST
-        );
-        foreach ($it as $item) {
-            /** @var \SplFileInfo $item */
-            $target = $dest . '/' . $it->getSubPathName();
-            if ($item->isDir()) {
-                if (!is_dir($target) && !@mkdir($target, 0755, true) && !is_dir($target)) {
-                    return false;
-                }
-            } else {
-                if (!@copy($item->getPathname(), $target)) {
-                    return false;
-                }
-            }
-        }
-        return true;
     }
 
     /** The first sub-directory inside a folder (GitHub zipball root). */

@@ -116,7 +116,7 @@ $renderFlagChecks = function (array $checked) use ($flagGroups, $customFlags, $k
                         <td>
                             <?php $sid = (string) $a['player_steamid']; $valid = Steam::isValidSteamId64($sid); ?>
                             <?php if ($valid): ?>
-                                <a class="player-cell" href="<?= View::e(Steam::profileUrl($sid)) ?>" target="_blank" rel="noopener">
+                                <a class="player-cell" <?= Steam::linkAttrs($sid) ?>>
                                     <img class="player-avatar" src="<?= View::e($avatars[$sid] ?? Steam::avatarPlaceholder()) ?>" alt="" loading="lazy">
                                     <span class="pname"><?= View::e($a['player_name']) ?></span>
                                 </a>
@@ -124,7 +124,7 @@ $renderFlagChecks = function (array $checked) use ($flagGroups, $customFlags, $k
                                 <span class="pname"><?= View::e($a['player_name']) ?></span>
                             <?php endif; ?>
                         </td>
-                        <td class="mono"><?php if ($valid): ?><a href="<?= View::e(Steam::profileUrl($sid)) ?>" target="_blank" rel="noopener"><?= View::e($sid) ?></a><?php else: ?><?= View::e($sid) ?><?php endif; ?></td>
+                        <td class="mono"><?php if ($valid): ?><a <?= Steam::linkAttrs($sid) ?>><?= View::e($sid) ?></a><?php else: ?><?= View::e($sid) ?><?php endif; ?></td>
                         <td><?php $gnames = array_filter(array_map('trim', explode(',', (string) ($a['group_name'] ?? '')))); ?>
                             <?php if ($gnames): ?><div class="tag-flags"><?php foreach ($gnames as $gn): ?><span class="badge badge-role-admin"><?= View::e($gn) ?></span><?php endforeach; ?></div><?php else: ?><span class="muted">—</span><?php endif; ?>
                         </td>

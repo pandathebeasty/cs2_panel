@@ -8,10 +8,12 @@ use App\Core\Auth;
 use App\Core\Config;
 use App\Core\Controller;
 use App\Core\Lang;
+use App\Core\Logger;
 use App\Core\Steam;
 use App\Core\SteamOpenID;
 use App\Models\AdminModel;
 use App\Models\PanelUserModel;
+use App\Models\TwoFactorModel;
 
 /**
  * Authentication is done exclusively through Steam OpenID.
@@ -70,7 +72,7 @@ final class AuthController extends Controller
         // Profile (name/avatar) via Steam Web API if a key is set, otherwise from DB.
         $profile = SteamOpenID::fetchProfile($steamId);
 
-        Auth::login([
+        $sessionUser = [
             'steamid'    => $steamId,
             'name'       => $profile['name'] ?? ($panelUser['name'] ?? ($admin['player_name'] ?? 'Admin')),
             'avatar'     => $profile['avatar'] ?? Steam::avatarPlaceholder(),
@@ -80,13 +82,26 @@ final class AuthController extends Controller
             'panel_role' => $panelRole,
             'can_manage' => $panelRole === 'owner',
             'immunity'   => (int) ($admin['immunity'] ?? ($admin['group_immunity'] ?? 0)),
-        ]);
+        ];
+
+        if ($panelRole !== null && TwoFactorModel::enabled($steamId)) {
+            Auth::beginTwoFactor($sessionUser);
+            $this->redirect('/2fa');
+        }
+
+        Auth::login($sessionUser);
+        if ($panelRole !== null) {
+            Logger::log('auth.login', $steamId, $panelRole);
+        }
 
         $this->redirect('/');
     }
 
     public function logout(): void
     {
+        if (Auth::isAdmin()) {
+            Logger::log('auth.logout', (string) Auth::steamId());
+        }
         Auth::logout();
         $this->redirect('/login');
     }

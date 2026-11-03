@@ -58,6 +58,7 @@ final class Discord
         'panel_users' => 'settings.notify_panel_users',
         'settings'    => 'settings.notify_settings',
         'auth'        => 'settings.notify_auth',
+        'twofa'       => 'settings.notify_2fa',
         'updates'     => 'settings.notify_updates',
         'zenith'      => 'settings.notify_zenith',
     ];
@@ -69,6 +70,7 @@ final class Discord
     public static function categoryForAction(string $action): string
     {
         static $map = [
+            'auth.2fa' => 'twofa',
             'ban.' => 'bans', 'unban.' => 'bans',
             'mute.' => 'mutes', 'warn.' => 'warns',
             'appeal.' => 'appeals', 'report.' => 'reports',
@@ -126,7 +128,7 @@ final class Discord
      */
     private const AUDIT_SKIP = [
         'ban.', 'mute.', 'warn.', 'vip.', 'admin.', 'contest.', 'store.',
-        'appeal.', 'report.',
+        'appeal.', 'report.', 'monitor.', 'auth.login', 'auth.logout',
         'zenith.reset_rank', 'zenith.reset_stats', 'zenith.reset_playtime',
         'zenith.reset_all_ranks', 'zenith.reset_all_stats', 'zenith.reset_all_playtime',
     ];
@@ -139,7 +141,9 @@ final class Discord
      */
     public static function audit(string $action, ?string $target = null, ?string $details = null): void
     {
-        if (!self::enabled() || !Settings::bool('discord_log_all', true)) {
+        // 2FA events are security alerts: governed only by their own toggle.
+        $security = str_starts_with($action, 'auth.2fa');
+        if (!self::enabled() || (!$security && !Settings::bool('discord_log_all', true))) {
             return;
         }
         foreach (self::AUDIT_SKIP as $prefix) {
@@ -175,7 +179,9 @@ final class Discord
 
         $embed = [
             'title'     => $label,
-            'color'     => self::COLORS['info'],
+            'color'     => $security
+                ? (preg_match('/_(failed|locked|disabled|reset|recovery_used)$/', $action) ? 0xE74C3C : 0x2ECC71)
+                : self::COLORS['info'],
             'fields'    => $fields,
             'footer'    => ['text' => $siteName . ' • ' . self::phrase('portal.community')],
             'timestamp' => date('c'),

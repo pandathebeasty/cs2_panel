@@ -3,7 +3,14 @@
     RewriteBase /
 
     # Application source, generated config, and backups are never web resources.
-    RewriteRule ^(?:app|config|database|db_backups)(?:/|$) - [F,L]
+    RewriteRule ^(?:app|config|database|db_backups|storage|tools)(?:/|$) - [F,L]
+
+    # Serve a pre-generated .webp sibling (tools/convert-webp.php) to browsers
+    # that accept it; the original PNG/JPG stays as the fallback.
+    RewriteCond %{HTTP_ACCEPT} image/webp
+    RewriteCond %{REQUEST_FILENAME} ^(.+)\.(?:png|jpe?g)$
+    RewriteCond %1.webp -f
+    RewriteRule ^(.+)\.(?:png|jpe?g)$ $1.webp [T=image/webp,E=WEBP:1,L]
 
     # Do not rewrite requests for files/directories that physically exist
     # (assets, css, js, images) so they are served directly.
@@ -41,4 +48,33 @@
     Header set X-Content-Type-Options "nosniff"
     Header set X-Frame-Options "SAMEORIGIN"
     Header set Referrer-Policy "strict-origin-when-cross-origin"
+    <FilesMatch "\.(png|jpe?g|webp)$">
+        Header append Vary Accept
+    </FilesMatch>
+</IfModule>
+
+# Compress text responses.
+<IfModule mod_deflate.c>
+    AddOutputFilterByType DEFLATE text/html text/plain text/css text/csv application/javascript text/javascript application/json image/svg+xml
+</IfModule>
+
+# Static assets are cache-busted with ?v=<version>.<mtime>, so browsers may keep
+# them for a long time. HTML stays uncached (see layouts).
+<IfModule mod_expires.c>
+    ExpiresActive On
+    ExpiresByType text/css "access plus 1 year"
+    ExpiresByType application/javascript "access plus 1 year"
+    ExpiresByType text/javascript "access plus 1 year"
+    ExpiresByType image/svg+xml "access plus 30 days"
+    ExpiresByType image/png "access plus 30 days"
+    ExpiresByType image/jpeg "access plus 30 days"
+    ExpiresByType image/webp "access plus 30 days"
+    ExpiresByType image/gif "access plus 30 days"
+    ExpiresByType image/x-icon "access plus 30 days"
+    ExpiresByType font/woff2 "access plus 1 year"
+</IfModule>
+<IfModule mod_headers.c>
+    <FilesMatch "\.(css|js|woff2)$">
+        Header set Cache-Control "public, max-age=31536000, immutable"
+    </FilesMatch>
 </IfModule>

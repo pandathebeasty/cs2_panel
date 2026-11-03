@@ -381,7 +381,7 @@ html[data-theme] thead th {
 html[data-theme] tbody td { padding: 18px 20px; border-bottom-color: var(--portal-soft-line); }
 html[data-theme] .table-wrap tbody tr { animation: none; }
 .live-search-feedback { display: flex; align-items: center; flex-wrap: wrap; gap: 10px; margin: 0 0 16px; color: var(--text-dim); font-size: 12px; }
-.live-search-feedback[hidden] { display: none; }
+.live-search-feedback[hidden], .live-search-feedback [hidden] { display: none; }
 .live-search-feedback[data-state="error"] { color: var(--red); }
 .live-search-results { scroll-margin-top: calc(var(--portal-header-h) + 16px); }
 .live-search-results[inert] { opacity: .65; }

@@ -21,7 +21,7 @@ $benefitIcon = static function (string $icon): string {
     // Our own uploaded files live under the uploads sub-folder.
     if (preg_match('/^ben_[a-f0-9]{12}\.(png|jpe?g|gif|webp|svg)$/i', $icon)) {
         $src = url('/assets/img/benefits/uploads/' . $icon);
-        return '<img class="benefits-icon-img" src="' . View::e($src) . '" alt="">';
+        return '<img class="benefits-icon-img" loading="lazy" decoding="async" src="' . View::e($src) . '" alt="">';
     }
     $known = [
         'vip-diamond', 'vip-gold', 'vip-silver', 'vip-bronze', 'admin', 'credits',
@@ -35,7 +35,7 @@ $benefitIcon = static function (string $icon): string {
     }
     if ($file !== '') {
         $src = url('/assets/img/benefits/' . $file);
-        return '<img class="benefits-icon-img" src="' . View::e($src) . '" alt="">';
+        return '<img class="benefits-icon-img" loading="lazy" decoding="async" src="' . View::e($src) . '" alt="">';
     }
     return '<span class="benefits-icon-emoji">' . View::e($icon) . '</span>';
 };

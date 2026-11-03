@@ -41,20 +41,25 @@ final class Themes
         if ($dir === null) {
             return [];
         }
-        $out = [];
-        foreach (glob($dir . '/*.css') ?: [] as $path) {
-            $meta = self::parseHeader($path);
-            if ($meta !== null) {
-                $out[] = $meta;
+        // Theme headers only change when a file changes, so key on the dir mtime.
+        return Cache::remember('themes:' . md5($dir) . ':' . (int) @filemtime($dir), 3600, static function () use ($dir): array {
+            $out = [];
+            foreach (glob($dir . '/*.css') ?: [] as $path) {
+                $meta = self::parseHeader($path);
+                if ($meta !== null) {
+                    $out[] = $meta;
+                }
             }
-        }
-                                                          
-        usort($out, static fn($a, $b) => strcasecmp($a['name'], $b['name']));
-        return $out;
+            usort($out, static fn($a, $b) => strcasecmp($a['name'], $b['name']));
+            return $out;
+        });
     }
 
-    /** Versioned web URLs of every theme CSS file, for reliable cache busting. */
-    public static function cssLinks(): array
+    /**
+     * Versioned web URLs of the theme CSS files, for reliable cache busting.
+     * $only limits the output to one theme id (pages that cannot switch themes).
+     */
+    public static function cssLinks(?string $only = null): array
     {
         $dir = self::diskDir();
         if ($dir === null) {
@@ -62,6 +67,9 @@ final class Themes
         }
         $links = [];
         foreach (self::all() as $t) {
+            if ($only !== null && $t['id'] !== $only) {
+                continue;
+            }
             $path = $dir . '/' . $t['file'];
             $version = Version::current() . (is_file($path) ? '.' . filemtime($path) : '');
             $links[] = Url::to(self::REL_DIR . '/' . $t['file']) . '?v=' . rawurlencode($version);

@@ -119,7 +119,7 @@ $hasUngrantedWinners = !$isPreview && (bool) array_filter($winners, static fn(ar
                     <tr>
                         <td class="cw-pos">#<?= (int) $w['position'] ?></td>
                         <td>
-                            <a href="<?= View::e(Steam::profileUrl($wsid)) ?>" target="_blank" rel="noopener" class="player-cell">
+                            <a <?= Steam::linkAttrs($wsid) ?> class="player-cell">
                                 <img class="player-avatar" src="<?= View::e($winnerAvatars[$wsid] ?? Steam::avatarPlaceholder()) ?>" alt="" loading="lazy">
                                 <span class="pname"><?= View::e($w['name'] ?: '—') ?></span>
                             </a>

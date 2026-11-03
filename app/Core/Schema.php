@@ -48,6 +48,26 @@ final class Schema
         if (!$force && $last > 0 && (time() - $last) < self::RETRY_SECONDS) {
             return;
         }
+
+        // Only one request migrates; concurrent ones get the "updating" page
+        // instead of racing the same ALTER/CREATE INDEX statements.
+        $lock = self::lock();
+        if ($lock === false) {
+            self::updatingPage();
+            return;
+        }
+        try {
+            self::run($current, $force);
+        } finally {
+            if (is_resource($lock)) {
+                @flock($lock, LOCK_UN);
+                @fclose($lock);
+            }
+        }
+    }
+
+    private static function run(string $current, bool $force): void
+    {
         try {
             Settings::set(self::ATTEMPT_KEY, (string) time());
         } catch (\Throwable $e) {
@@ -55,12 +75,6 @@ final class Schema
             return;
         }
 
-        // Back up the database BEFORE touching the schema, but only when there
-        // is actually pending work (new migrations). A hand-uploaded panel
-        // (FTP/zip) never runs the self-updater, so this is the only safety net
-        // that captures the DB before migrations alter it. Skipped on a plain
-        // no-op sync so normal page loads never pay for a dump. Best-effort:
-        // a failed backup must not block the migrations that follow.
         $hasPending = false;
         try {
             $hasPending = Migrator::pending() !== [];
@@ -68,6 +82,32 @@ final class Schema
             // If we can't even tell, assume there may be work and back up.
             $hasPending = true;
         }
+
+        // A backup + new indexes on large tables can outlast max_execution_time,
+        // which used to 500 the first page load after an update. Lift the limit,
+        // keep going if the visitor leaves, and when the SAPI allows it hand the
+        // visitor a self-refreshing page first and finish the work afterwards.
+        if ($hasPending) {
+            @set_time_limit(0);
+            @ignore_user_abort(true);
+            if (!$force && PHP_SAPI !== 'cli' && self::canFinishEarly()) {
+                self::updatingPage(false);
+                self::finishRequest();
+                self::migrate($current, true);
+                exit;
+            }
+        }
+        self::migrate($current, $hasPending);
+    }
+
+    private static function migrate(string $current, bool $hasPending): void
+    {
+        // Back up the database BEFORE touching the schema, but only when there
+        // is actually pending work (new migrations). A hand-uploaded panel
+        // (FTP/zip) never runs the self-updater, so this is the only safety net
+        // that captures the DB before migrations alter it. Skipped on a plain
+        // no-op sync so normal page loads never pay for a dump. Best-effort:
+        // a failed backup must not block the migrations that follow.
         if ($hasPending) {
             try {
                 $path = Backup::full();
@@ -114,6 +154,82 @@ final class Schema
         }
     }
 
+    /** @return resource|false|null lock handle, false when another request holds it, null when locking is unavailable */
+    private static function lock()
+    {
+        $dir = BASE_PATH . '/storage/cache';
+        if (!is_dir($dir) && !@mkdir($dir, 0755, true) && !is_dir($dir)) {
+            return null;
+        }
+        $fh = @fopen($dir . '/schema-sync.lock', 'c');
+        if ($fh === false) {
+            return null;
+        }
+        if (!@flock($fh, LOCK_EX | LOCK_NB)) {
+            fclose($fh);
+            return false;
+        }
+        return $fh;
+    }
+
+    private static function canFinishEarly(): bool
+    {
+        return function_exists('fastcgi_finish_request') || function_exists('litespeed_finish_request');
+    }
+
+    private static function finishRequest(): void
+    {
+        if (session_status() === PHP_SESSION_ACTIVE) {
+            @session_write_close();
+        }
+        if (function_exists('fastcgi_finish_request')) {
+            @fastcgi_finish_request();
+        } elseif (function_exists('litespeed_finish_request')) {
+            @litespeed_finish_request();
+        }
+    }
+
+    /** Small self-refreshing 503 page shown while the database is being upgraded. */
+    private static function updatingPage(bool $exit = true): void
+    {
+        if (PHP_SAPI === 'cli' || headers_sent()) {
+            return;
+        }
+        $t = static function (string $key, string $fallback): string {
+            try {
+                $v = Lang::t($key);
+                return htmlspecialchars($v === $key ? $fallback : $v, ENT_QUOTES, 'UTF-8');
+            } catch (\Throwable $e) {
+                return htmlspecialchars($fallback, ENT_QUOTES, 'UTF-8');
+            }
+        };
+        $ajax = ($_SERVER['HTTP_X_REQUESTED_WITH'] ?? '') !== '' || str_contains((string) ($_SERVER['HTTP_ACCEPT'] ?? ''), 'application/json');
+        while (ob_get_level() > 0) {
+            @ob_end_clean();
+        }
+        http_response_code(503);
+        header('Retry-After: 5');
+        header('Cache-Control: no-store');
+        if ($ajax) {
+            header('Content-Type: application/json; charset=utf-8');
+            echo '{"ok":false,"updating":true}';
+        } else {
+            header('Content-Type: text/html; charset=utf-8');
+            $title = $t('schema.updating_title', 'Updating database…');
+            $text = $t('schema.updating_text', 'The panel was just updated. This page will reload automatically in a few seconds.');
+            echo '<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">'
+                . '<meta http-equiv="refresh" content="5"><title>' . $title . '</title><style>'
+                . 'body{margin:0;min-height:100vh;display:grid;place-items:center;background:#0d1117;color:#e6edf3;font:15px/1.5 system-ui,sans-serif}'
+                . '.b{max-width:420px;padding:32px;text-align:center}.s{width:38px;height:38px;margin:0 auto 18px;border:3px solid #30363d;border-top-color:#e5484d;border-radius:50%;animation:r 1s linear infinite}'
+                . 'h1{font-size:20px;margin:0 0 8px}p{margin:0;color:#8b949e}@keyframes r{to{transform:rotate(1turn)}}'
+                . '</style></head><body><div class="b"><div class="s"></div><h1>' . $title . '</h1><p>' . $text . '</p></div></body></html>';
+        }
+        if ($exit) {
+            exit;
+        }
+        @flush();
+    }
+
     /**
      * What the stored marker is compared against: the panel version plus the
      * number of shipped migrations, so dropping in a new .sql file also
@@ -148,6 +264,8 @@ final class Schema
             [\App\Models\BenefitModel::class, 'ensureTable'],
             [\App\Models\ActivityModel::class, 'ensureTable'],
             [\App\Models\VipPendingModel::class, 'ensureTable'],
+            [\App\Models\MonitorModel::class, 'ensureTable'],
+            [\App\Models\TwoFactorModel::class, 'ensureTable'],
         ];
         foreach ($steps as [$class, $method]) {
             try {
