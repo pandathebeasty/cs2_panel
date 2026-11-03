@@ -1838,7 +1838,6 @@ $L = fn(string $k) => View::e(Lang::t($k));
                     <button type="button" class="btn js-update-check"><?= $L('update.recheck') ?></button>
                     <button type="button" class="btn" id="update-reinstall-btn" data-modal="modal-update-parts" title="<?= $L('update.reinstall_hint') ?>"><?= $L('update.reinstall') ?></button>
                 </div>
-                <p class="hint" style="text-align:center;margin:10px 0 0"><?= $L('update.reinstall_hint') ?></p>
             </div>
         <?php endif; ?>
 
