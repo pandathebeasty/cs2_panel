@@ -305,7 +305,7 @@ $areaPath = $linePath !== '' ? $linePath . ' L' . $pts[$n - 1][0] . ' 94 L' . $p
                 <li>
                     <a <?= Steam::linkAttrs($p['steam_id']) ?> class="panel-recent-player">
                         <img class="player-avatar" src="<?= View::e($activeAvatars[(string) $p['steam_id']] ?? Steam::avatarPlaceholder()) ?>" alt="" loading="lazy">
-                        <span class="panel-recent-info"><strong class="pname" title="<?= View::e($p['name'] ?: 'Player') ?>"><?= View::e($p['name'] ?: 'Player') ?></strong><span><span class="panel-recent-marker" aria-hidden="true"></span><?= $tt('dash.last_seen') ?> <span><?= View::e($ago($p['last_online'] ?? null)) ?></span></span></span>
+                        <span class="panel-recent-info"><strong class="pname" title="<?= View::e(Steam::displayName($p['steam_id'], $p['name']) ?: 'Player') ?>"><?= View::e(Steam::displayName($p['steam_id'], $p['name']) ?: 'Player') ?></strong><span><span class="panel-recent-marker" aria-hidden="true"></span><?= $tt('dash.last_seen') ?> <span><?= View::e($ago($p['last_online'] ?? null)) ?></span></span></span>
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M7 17L17 7M7 7h10v10"/></svg>
                     </a>
                 </li>
@@ -335,7 +335,7 @@ $areaPath = $linePath !== '' ? $linePath . ' L' . $pts[$n - 1][0] . ' 94 L' . $p
                     <td>
                         <a <?= Steam::linkAttrs($p['steam_id']) ?> class="player-cell">
                             <img class="player-avatar" src="<?= View::e($avatars[(string) $p['steam_id']] ?? Steam::avatarPlaceholder()) ?>" alt="" loading="lazy">
-                            <span class="pname"><?= View::e($p['name'] ?: 'Player') ?></span>
+                            <span class="pname"><?= View::e(Steam::displayName($p['steam_id'], $p['name']) ?: 'Player') ?></span>
                         </a>
                     </td>
                     <td><?= \App\Core\RankIcon::html('', 'premier', (int) ($p['points'] ?? 0)) ?></td>
@@ -371,8 +371,8 @@ $recentAvatars = $recentIds ? Steam::avatars(array_values(array_unique($recentId
 
                                                                                         
 $playerCell = function (array $row) use ($recentAvatars): string {
-    $name = View::e($row['player_name'] ?: '—');
     $sid  = (string) ($row['player_steamid'] ?? '');
+    $name = View::e(Steam::displayName($sid, $row['player_name']) ?: '—');
     $img  = $recentAvatars[$sid] ?? Steam::avatarPlaceholder();
     $avatar = '<img class="player-avatar" src="' . View::e($img) . '" alt="" loading="lazy">';
     if ($sid !== '') {

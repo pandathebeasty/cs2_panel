@@ -31,7 +31,7 @@ $L = fn(string $k) => View::e(Lang::t($k));
                     <td data-label="<?= $L('evasion.suspect') ?>">
                         <a class="player-cell" <?= Steam::linkAttrs($r['steamid']) ?>>
                             <img class="player-avatar" src="<?= View::e($avatars[$r['steamid']] ?? Steam::avatarPlaceholder()) ?>" alt="" loading="lazy">
-                            <span class="pname"><?= View::e((string) ($r['name'] ?: $r['steamid'])) ?></span>
+                            <span class="pname"><?= View::e(Steam::displayName($r['steamid'], $r['name']) ?: (string) $r['steamid']) ?></span>
                         </a>
                     </td>
                     <td data-label="<?= $L('common.ip') ?>" class="mono"><?= View::e(\App\Models\AltModel::ip($r['address'])) ?></td>

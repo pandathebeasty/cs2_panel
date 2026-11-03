@@ -118,7 +118,7 @@ $renderFlagChecks = function (array $checked) use ($flagGroups, $customFlags, $k
                             <?php if ($valid): ?>
                                 <a class="player-cell" <?= Steam::linkAttrs($sid) ?>>
                                     <img class="player-avatar" src="<?= View::e($avatars[$sid] ?? Steam::avatarPlaceholder()) ?>" alt="" loading="lazy">
-                                    <span class="pname"><?= View::e($a['player_name']) ?></span>
+                                    <span class="pname"><?= View::e(Steam::displayName($sid, $a['player_name'])) ?></span>
                                 </a>
                             <?php else: ?>
                                 <span class="pname"><?= View::e($a['player_name']) ?></span>

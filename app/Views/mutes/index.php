@@ -52,7 +52,7 @@ $liveSearchKey = 'mutes';
                             <?php if ($valid): ?>
                                 <a class="player-cell" <?= Steam::linkAttrs($sid) ?>>
                                     <img class="player-avatar" src="<?= View::e($avatars[$sid] ?? Steam::avatarPlaceholder()) ?>" alt="" loading="lazy">
-                                    <span class="pname"><?= View::e($m['player_name'] ?: Lang::t('common.unknown')) ?></span>
+                                    <span class="pname"><?= View::e(Steam::displayName($sid, $m['player_name']) ?: Lang::t('common.unknown')) ?></span>
                                 </a>
                             <?php else: ?>
                                 <span class="pname"><?= View::e($m['player_name'] ?: Lang::t('common.unknown')) ?></span>

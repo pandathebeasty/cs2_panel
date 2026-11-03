@@ -158,6 +158,7 @@ final class Steam
      */
     public static function playerCell(string $steamId64, string $name, array $avatars = []): string
     {
+        $name = self::displayName($steamId64, $name);
         $label = View::e($name !== '' ? $name : $steamId64);
         if (!self::isValidSteamId64($steamId64)) {
             return '<span class="pname">' . $label . '</span>';
@@ -181,6 +182,7 @@ final class Steam
     /** A name linked to the Steam profile, no avatar (plain text if invalid/not a player, e.g. "Console"). */
     public static function nameLink(string $steamId64, string $name): string
     {
+        $name = self::displayName($steamId64, $name);
         $label = View::e($name !== '' ? $name : $steamId64);
         if (!self::isValidSteamId64($steamId64)) {
             return '<span class="pname">' . $label . '</span>';
@@ -320,6 +322,24 @@ final class Steam
         curl_close($ch);
         self::storeSummaries($json);
         return (string) (self::$avatarCache[$steamId64]['name'] ?? '');
+    }
+
+    /**
+     * Name to show in lists: the cached Steam persona name when known, otherwise
+     * the name stored by the plugin. Never makes a network call; avatars() fills
+     * the cache for the visible rows.
+     */
+    public static function displayName(string|int $steamId64, ?string $stored = ''): string
+    {
+        $sid = (string) $steamId64;
+        if (self::isValidSteamId64($sid)) {
+            self::avatarDiskLoad();
+            $name = trim((string) (self::$avatarCache[$sid]['name'] ?? ''));
+            if ($name !== '') {
+                return $name;
+            }
+        }
+        return (string) $stored;
     }
 
     /** TTL for a cached avatar URL (12 hours). */

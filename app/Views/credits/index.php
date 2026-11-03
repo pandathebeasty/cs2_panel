@@ -82,7 +82,7 @@ $sortH = function (string $col, string $label) use ($sort, $dir): string {
                             <td>
                                 <a class="player-cell" <?= Steam::linkAttrs($r['steam_id']) ?>>
                                     <img class="player-avatar" src="<?= View::e($avatars[(string) $r['steam_id']] ?? Steam::avatarPlaceholder()) ?>" alt="" loading="lazy">
-                                    <span class="pname"><?= View::e($r['name'] ?: 'Player') ?></span>
+                                    <span class="pname"><?= View::e(Steam::displayName($r['steam_id'], $r['name']) ?: 'Player') ?></span>
                                 </a>
                             </td>
                             <td style="font-weight:700;color:var(--accent-2)"><?= number_format((int) ($r['credits'] ?? 0)) ?></td>

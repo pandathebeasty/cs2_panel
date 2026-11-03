@@ -76,7 +76,7 @@ $ago = function (?string $dt): string {
                                 <a class="player-cell" <?= Steam::linkAttrs($r['steam_id']) ?>>
                                     <img class="player-avatar" src="<?= View::e($avatars[(string) $r['steam_id']] ?? Steam::avatarPlaceholder()) ?>" alt="" loading="lazy">
                                     <span>
-                                        <span class="pname"><?= View::e($r['name'] ?: 'Player') ?></span>
+                                        <span class="pname"><?= View::e(Steam::displayName($r['steam_id'], $r['name']) ?: 'Player') ?></span>
                                         <?php if ($seen !== ''): ?><div class="muted" style="font-size:11px"><?= $L('ranks.last_seen') ?>: <?= View::e($seen) ?></div><?php endif; ?>
                                     </span>
                                 </a>

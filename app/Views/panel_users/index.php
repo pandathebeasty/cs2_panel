@@ -30,7 +30,7 @@ $avatars = $avatars ?? [];
                         <td>
                             <a class="player-cell" <?= Steam::linkAttrs($sid) ?>>
                                 <img class="player-avatar" src="<?= View::e($avatars[$sid] ?? Steam::avatarPlaceholder()) ?>" alt="" loading="lazy">
-                                <span class="pname"><?= View::e($u['name']) ?></span>
+                                <span class="pname"><?= View::e(Steam::displayName($sid, $u['name'])) ?></span>
                             </a>
                         </td>
                         <td class="mono"><a <?= Steam::linkAttrs($sid) ?>><?= View::e($sid) ?></a></td>

@@ -60,7 +60,7 @@ $groupField = function (string $selected = '') use ($vipGroups): string {
                         <td>
                             <a class="player-cell" <?= Steam::linkAttrs($v['steamid64']) ?>>
                                 <img class="player-avatar" src="<?= View::e($avatars[(string) $v['steamid64']] ?? Steam::avatarPlaceholder()) ?>" alt="" loading="lazy">
-                                <span class="pname"><?= View::e($v['name']) ?></span>
+                                <span class="pname"><?= View::e(Steam::displayName($v['steamid64'], $v['name'])) ?></span>
                             </a>
                         </td>
                         <td class="mono"><a <?= Steam::linkAttrs($v['steamid64']) ?>><?= View::e($v['steamid64']) ?></a></td>

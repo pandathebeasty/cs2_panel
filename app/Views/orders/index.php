@@ -13,6 +13,7 @@ $cur = View::e($currency);
 
 $playerCell = function (string $steamId, string $name) use ($avatars): string {
     $valid = Steam::isValidSteamId64($steamId);
+    $name = Steam::displayName($steamId, $name);
     $label = View::e($name !== '' ? $name : ($steamId !== '' ? $steamId : '—'));
     if (!$valid) {
         return '<span class="pname">' . $label . '</span>';
