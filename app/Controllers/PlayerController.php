@@ -188,8 +188,9 @@ final class PlayerController extends Controller
             $where .= ' AND pi.steamid IN (SELECT steamid FROM ' . $t . ' WHERE name LIKE ?)';
             $params[] = '%' . addcslashes($q, '%_\\') . '%';
         }
-        // Latest name = first one when ordered by connection time.
-        $name = $hasName ? "SUBSTRING_INDEX(GROUP_CONCAT(pi.name ORDER BY pi.used_at DESC SEPARATOR CHAR(31)), CHAR(31), 1)" : 'NULL';
+        // Latest name = first one when ordered by connection time. SEPARATOR only
+        // accepts a string literal; \x1f never appears in player names.
+        $name = $hasName ? "SUBSTRING_INDEX(GROUP_CONCAT(pi.name ORDER BY pi.used_at DESC SEPARATOR '\x1f'), '\x1f', 1)" : 'NULL';
         return Paginator::make(
             "SELECT pi.steamid AS sid, {$name} AS name, MAX(pi.used_at) AS last_seen FROM {$t} pi WHERE {$where} GROUP BY pi.steamid",
             "SELECT COUNT(DISTINCT pi.steamid) FROM {$t} pi WHERE {$where}",
