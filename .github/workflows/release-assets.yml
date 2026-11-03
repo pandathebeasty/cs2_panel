@@ -24,7 +24,18 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: ${{ env.TAG }}
+          fetch-depth: 0
+
+      # For a manual run, use the tag if it exists; otherwise build the selected
+      # branch and create the requested tag and release after building.
+      - name: Resolve tag
+        run: |
+          set -euo pipefail
+          if git rev-parse -q --verify "refs/tags/$TAG" >/dev/null; then
+            git checkout -q "$TAG"
+          else
+            echo "Tag $TAG not found; building $GITHUB_REF_NAME ($GITHUB_SHA)"
+          fi
 
       - name: Build archives
         run: |
@@ -45,4 +56,11 @@ jobs:
           ls -lh ./*.zip
 
       - name: Upload to the release
-        run: gh release upload "$TAG" dist/*.zip --clobber --repo "$GITHUB_REPOSITORY"
+        run: |
+          set -euo pipefail
+          if gh release view "$TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            gh release upload "$TAG" dist/*.zip --clobber --repo "$GITHUB_REPOSITORY"
+          else
+            gh release create "$TAG" dist/*.zip --repo "$GITHUB_REPOSITORY" \
+              --target "$(git rev-parse HEAD)" --title "$TAG" --generate-notes
+          fi
