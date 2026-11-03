@@ -207,6 +207,8 @@
     font-weight: 800;
     text-transform: uppercase;
 }
+:root:root[data-theme="kinetic-bauhaus"][data-mode] .card-title.x-title-row { justify-content: flex-start; }
+:root:root[data-theme="kinetic-bauhaus"][data-mode] .card-title.x-title-row > :last-child { margin-left: auto; }
 
 :root:root[data-theme="kinetic-bauhaus"][data-mode] .card-title::before {
     content: "";

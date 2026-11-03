@@ -41,10 +41,15 @@ final class Themes
         if ($dir === null) {
             return [];
         }
-        // Theme headers only change when a file changes, so key on the dir mtime.
-        return Cache::remember('themes:' . md5($dir) . ':' . (int) @filemtime($dir), 3600, static function () use ($dir): array {
+        // Key on dir + file mtimes so added, removed and edited themes are all picked up.
+        $files = glob($dir . '/*.css') ?: [];
+        $stamp = (int) @filemtime($dir);
+        foreach ($files as $path) {
+            $stamp = max($stamp, (int) @filemtime($path));
+        }
+        return Cache::remember('themes:' . md5($dir) . ':' . $stamp . ':' . count($files), 3600, static function () use ($files): array {
             $out = [];
-            foreach (glob($dir . '/*.css') ?: [] as $path) {
+            foreach ($files as $path) {
                 $meta = self::parseHeader($path);
                 if ($meta !== null) {
                     $out[] = $meta;
