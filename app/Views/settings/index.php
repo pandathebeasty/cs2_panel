@@ -2278,6 +2278,7 @@ document.addEventListener('DOMContentLoaded', function () {
         none:      <?= json_encode(Lang::t('update.none_found')) ?>,
         offline:   <?= json_encode(Lang::t('update.check_failed')) ?>,
         gotoGit:   <?= json_encode(Lang::t('update.goto_git')) ?>,
+        install:   <?= json_encode(Lang::t('update.run')) ?>,
         title:     <?= json_encode(Lang::t('nav.update')) ?>
     };
     function updatePopup(html, kind) {
@@ -2340,9 +2341,8 @@ document.addEventListener('DOMContentLoaded', function () {
             // version (otherwise it keeps showing the previously rendered one).
             var runBtn = document.getElementById('update-run-btn');
             if (runBtn) runBtn.textContent = <?= json_encode(Lang::t('update.run')) ?> + ' v' + d.version;
-            // The action card (release notes + Update button) is server-rendered.
-            // If it's not present yet, reload once to bring it in.
-            if (!hasFullCard) { location.reload(); }
+            // The action card (release notes + Update button) is server-rendered;
+            // the popup's Install button reloads to bring it in and opens the dialog.
         } else {
             hero.classList.remove('has-update'); hero.classList.add('up-to-date');
             if (badge) badge.innerHTML = okIcon;
@@ -2350,6 +2350,26 @@ document.addEventListener('DOMContentLoaded', function () {
             // If a stale "Update" card is showing but we're actually up to date, reload to drop it.
             if (hasFullCard) { location.reload(); }
         }
+    }
+
+    function startInstall() {
+        var runBtn = document.getElementById('update-run-btn');
+        if (runBtn) { runBtn.click(); return; }
+        // The "Update to vX" card isn't rendered yet: reload with a flag that opens it.
+        window.location.href = (window.CS2_BASE || '') + '/settings?install=1#updates';
+    }
+    document.addEventListener('click', function (e) {
+        var btn = e.target.closest('.js-update-install');
+        if (!btn) return;
+        var ov = document.getElementById('update-popup-overlay');
+        if (ov) ov.remove();
+        startInstall();
+    });
+    if (/[?&]install=1(&|$)/.test(window.location.search)) {
+        if (window.history.replaceState) {
+            window.history.replaceState(null, '', window.location.pathname + window.location.hash);
+        }
+        if (document.getElementById('update-run-btn')) { setTimeout(startInstall, 300); }
     }
 
     document.querySelectorAll('.js-update-check').forEach(function (btn) {
@@ -2367,9 +2387,12 @@ document.addEventListener('DOMContentLoaded', function () {
                 if (!d || !d.reachable) { updatePopup(esc(UP_MSG.offline), 'error'); return; }
                 if (d.hasUpdate) {
                     var msg = UP_MSG.found.replace('{v}', esc('v' + d.version));
+                    msg += '<div style="margin-top:14px;display:flex;gap:8px;flex-wrap:wrap">'
+                        + '<button type="button" class="btn btn-sm btn-primary js-update-install">' + esc(UP_MSG.install + ' v' + d.version) + '</button>';
                     if (d.url) {
-                        msg += '<div style="margin-top:14px"><a class="btn btn-sm btn-primary" href="' + esc(d.url) + '" target="_blank" rel="noopener">' + esc(UP_MSG.gotoGit) + '</a></div>';
+                        msg += '<a class="btn btn-sm" href="' + esc(d.url) + '" target="_blank" rel="noopener">' + esc(UP_MSG.gotoGit) + '</a>';
                     }
+                    msg += '</div>';
                     updatePopup(msg, 'update');
                 } else {
                     updatePopup(UP_MSG.none.replace('{v}', esc('v' + d.current)), 'ok');
