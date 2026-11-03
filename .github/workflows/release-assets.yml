@@ -1,0 +1,48 @@
+name: Release assets
+
+# Builds the split archives the in-panel updater prefers over the full GitHub
+# zipball: core (code + small assets), maps (map images) and skins (WeaponPaints
+# catalog). Users who untick maps/skins in the update dialog download only core.
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Release tag to build assets for
+        required: true
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    env:
+      TAG: ${{ github.event.release.tag_name || inputs.tag }}
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ env.TAG }}
+
+      - name: Build archives
+        run: |
+          set -euo pipefail
+          # Every archive has one top-level folder, like the GitHub zipball.
+          ROOT=cs2_panel
+          mkdir -p "dist/$ROOT"
+          git archive --format=tar HEAD | tar -x -C "dist/$ROOT"
+          cd dist
+          zip -qr -9 cs2-panel-core.zip "$ROOT" \
+            -x "$ROOT/assets/img/maps/*" "$ROOT/public/assets/img/maps/*" "$ROOT/app/Data/weaponpaints/*" "$ROOT/.github/*"
+          maps=""
+          for d in "$ROOT/assets/img/maps" "$ROOT/public/assets/img/maps"; do
+            if [ -d "$d" ]; then maps="$maps $d"; fi
+          done
+          if [ -n "$maps" ]; then zip -qr -9 cs2-panel-maps.zip $maps; fi
+          if [ -d "$ROOT/app/Data/weaponpaints" ]; then zip -qr -9 cs2-panel-skins.zip "$ROOT/app/Data/weaponpaints"; fi
+          ls -lh ./*.zip
+
+      - name: Upload to the release
+        run: gh release upload "$TAG" dist/*.zip --clobber --repo "$GITHUB_REPOSITORY"
