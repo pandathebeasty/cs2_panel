@@ -103,7 +103,7 @@ final class UpdateController extends Controller
         try {
             if (!Updater::isBackgroundStep($id)) {
                 $parts = $id === 'prepare' ? array_map('strval', (array) $this->input('parts', [])) : [];
-                $this->json(Updater::step($id, $parts));
+                $this->json(Updater::step($id, $parts, $id === 'prepare' && (string) $this->input('reinstall', '') === '1'));
             }
             $status = Updater::jobStatus($id);
             if ($status !== null) {

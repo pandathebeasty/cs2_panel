@@ -216,6 +216,8 @@ return [
     'update.backup_warn' => 'Important: back up your files manually (via FTP/hosting panel) before updating. The panel makes an automatic database + code backup, but a manual copy protects you against any interruption or corruption during the file overwrite.',
     'update.uptodate'  => 'You are on the latest version.',
     'update.uptodate_hint' => 'The panel checks GitHub periodically for new releases.',
+    'update.reinstall' => 'Reinstall latest version',
+    'update.reinstall_hint' => 'Downloads the latest release again and overwrites the panel files (config, uploads and database stay untouched). Useful to repair missing or modified files.',
     'update.repo'      => 'Source:',
     'update.hud_title'   => 'Updating the Panel',
     'update.hud_hint'    => 'Please keep this tab open until it finishes.',

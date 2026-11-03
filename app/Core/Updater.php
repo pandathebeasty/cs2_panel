@@ -629,7 +629,7 @@ final class Updater
     ];
 
     /** @param string[] $parts selected optional parts (prepare step only) */
-    public static function step(string $id, array $parts = []): array
+    public static function step(string $id, array $parts = [], bool $reinstall = false): array
     {
         @set_time_limit(0);
         if (function_exists('ini_set')) {
@@ -656,7 +656,9 @@ final class Updater
                     if ($latest === null) {
                         return self::stepFail($id, $meta, 'Could not reach GitHub to find the latest release.');
                     }
-                    if (Version::compare($latest['version'], $from) <= 0) {
+                    // A reinstall re-applies the same version (repairs missing or edited files); never a downgrade.
+                    $cmp = Version::compare($latest['version'], $from);
+                    if ($cmp < 0 || ($cmp === 0 && !$reinstall)) {
                         return self::stepFail($id, $meta, 'Already up to date (v' . $from . ').');
                     }
                     if (($latest['zipball'] ?? '') === '') {
@@ -690,7 +692,7 @@ final class Updater
                         'parts'     => $selectedParts,
                         'downloads' => $downloads,
                     ]);
-                    $log[] = 'Preparing update to v' . $latest['version'] . '.';
+                    $log[] = ($cmp === 0 ? 'Preparing reinstall of v' : 'Preparing update to v') . $latest['version'] . '.';
                     if ($downloads) {
                         $log[] = 'Using split release archives: ' . implode(', ', array_keys($downloads)) . '.';
                     }

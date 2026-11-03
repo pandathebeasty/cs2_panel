@@ -215,6 +215,8 @@ return [
     'update.backup_warn' => 'Important: fă un backup manual al fișierelor (prin FTP/panoul de hosting) înainte de actualizare. Panelul face automat un backup la baza de date + cod, dar o copie manuală te protejează în caz de întrerupere sau corupție în timpul suprascrierii fișierelor.',
     'update.uptodate'  => 'Ești pe ultima versiune.',
     'update.uptodate_hint' => 'Panelul verifică periodic GitHub pentru versiuni noi.',
+    'update.reinstall' => 'Reinstalează ultima versiune',
+    'update.reinstall_hint' => 'Descarcă din nou ultima versiune și suprascrie fișierele panelului (configurația, upload-urile și baza de date rămân neatinse). Util pentru a repara fișiere lipsă sau modificate.',
     'update.repo'      => 'Sursă:',
     'update.hud_title'   => 'Se Actualizează Panelul',
     'update.hud_hint'    => 'Ține acest tab deschis până se termină.',

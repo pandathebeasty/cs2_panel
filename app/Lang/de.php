@@ -1160,6 +1160,8 @@ return [
     'update.backup_warn' => 'Wichtig: Sichere deine Dateien manuell (per FTP/Hosting-Panel) vor dem Update. Das Panel erstellt ein automatisches Datenbank- + Code-Backup, aber eine manuelle Kopie schützt dich bei Unterbrechungen oder Beschädigungen während des Überschreibens.',
     'update.uptodate'  => 'Du hast die neueste Version.',
     'update.uptodate_hint' => 'Das Panel prüft GitHub regelmäßig auf neue Releases.',
+    'update.reinstall' => 'Neueste Version neu installieren',
+    'update.reinstall_hint' => 'Lädt das neueste Release erneut herunter und überschreibt die Panel-Dateien (Konfiguration, Uploads und Datenbank bleiben unverändert). Nützlich, um fehlende oder geänderte Dateien zu reparieren.',
     'update.repo'      => 'Quelle:',
     'update.hud_title'   => 'Panel wird aktualisiert',
     'update.hud_hint'    => 'Lass diesen Tab offen, bis es fertig ist.',

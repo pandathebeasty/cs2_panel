@@ -1834,9 +1834,11 @@ $L = fn(string $k) => View::e(Lang::t($k));
                     <?= $L('update.uptodate') ?><br>
                     <span class="muted"><?= $L('update.uptodate_hint') ?></span>
                 </div>
-                <div style="display:flex;justify-content:center;margin-top:10px">
+                <div style="display:flex;justify-content:center;gap:10px;flex-wrap:wrap;margin-top:10px">
                     <button type="button" class="btn js-update-check"><?= $L('update.recheck') ?></button>
+                    <button type="button" class="btn" id="update-reinstall-btn" data-modal="modal-update-parts" title="<?= $L('update.reinstall_hint') ?>"><?= $L('update.reinstall') ?></button>
                 </div>
+                <p class="hint" style="text-align:center;margin:10px 0 0"><?= $L('update.reinstall_hint') ?></p>
             </div>
         <?php endif; ?>
 
@@ -2124,6 +2126,11 @@ document.addEventListener('DOMContentLoaded', function () {
     var updRunBtn = document.getElementById('update-run-btn');
     var updPartsModal = document.getElementById('modal-update-parts');
     var updPartsStart = document.getElementById('update-parts-start');
+    var updReinstallBtn = document.getElementById('update-reinstall-btn');
+    // Same parts dialog for both buttons; remember which one opened it.
+    var updReinstall = false;
+    if (updRunBtn) { updRunBtn.addEventListener('click', function () { updReinstall = false; }); }
+    if (updReinstallBtn) { updReinstallBtn.addEventListener('click', function () { updReinstall = true; }); }
     if (updRunForm && updRunBtn) {
         updRunForm.addEventListener('submit', function (e) {
             e.preventDefault();
@@ -2132,6 +2139,7 @@ document.addEventListener('DOMContentLoaded', function () {
     if (updPartsStart && updPartsModal) {
         updPartsStart.addEventListener('click', function () {
             if (updRunBtn && updRunBtn.disabled) return;
+            if (updReinstallBtn && updReinstallBtn.disabled) return;
             var parts = Array.prototype.map.call(
                 updPartsModal.querySelectorAll('input[name="update_parts"]:checked'),
                 function (cb) { return cb.value; }
@@ -2155,6 +2163,7 @@ document.addEventListener('DOMContentLoaded', function () {
         var base = (window.CS2_BASE || '');
 
         if (updRunBtn) { updRunBtn.disabled = true; }
+        if (updReinstallBtn) { updReinstallBtn.disabled = true; }
         if (hud) { hud.classList.add('open'); hud.setAttribute('aria-hidden', 'false'); }
         var running = true;
         window.addEventListener('beforeunload', function (e) {
@@ -2181,6 +2190,7 @@ document.addEventListener('DOMContentLoaded', function () {
             running = false;
             if (stepEl) { stepEl.textContent = I18N.hud_failed + (msg ? ': ' + msg : ''); stepEl.classList.add('is-error'); }
             if (updRunBtn) updRunBtn.disabled = false;
+            if (updReinstallBtn) updReinstallBtn.disabled = false;
         }
 
         // A step may outlive a reverse proxy's timeout; the proxy then answers
@@ -2190,7 +2200,10 @@ document.addEventListener('DOMContentLoaded', function () {
         function runStep(id) {
             var body = new URLSearchParams();
             body.set('step', id);
-            if (id === 'prepare') { (parts || []).forEach(function (p) { body.append('parts[]', p); }); }
+            if (id === 'prepare') {
+                (parts || []).forEach(function (p) { body.append('parts[]', p); });
+                if (updReinstall) body.set('reinstall', '1');
+            }
             if (window.CS2_CSRF) body.set('csrf', window.CS2_CSRF);
             fetch(base + '/update/step', {
                 method: 'POST',
