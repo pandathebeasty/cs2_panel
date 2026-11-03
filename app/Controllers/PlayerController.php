@@ -9,6 +9,7 @@ use App\Core\Config;
 use App\Core\Controller;
 use App\Core\Database;
 use App\Core\Logger;
+use App\Core\Paginator;
 use App\Core\Steam;
 use App\Core\Url;
 use App\Models\AdminModel;
@@ -125,19 +126,78 @@ final class PlayerController extends Controller
         ]);
     }
 
-    /** Players page: search by name / any SteamID format, or recently sanctioned players. */
+    /**
+     * Players page: everyone who joined the server (SimpleAdmin's players_ips),
+     * newest first and paginated. Falls back to recently sanctioned players
+     * when that table is missing.
+     */
     public function index(): void
     {
         Auth::requireModerate();
         $q = trim((string) ($this->query('search', '') ?: $this->query('q', '')));
-        $found = mb_strlen($q) >= 2 ? self::lookup($q, 30) : self::recent(30);
+        $searching = mb_strlen($q) >= 2;
+        $pg = null;
+        $seen = [];
+        if (AltModel::available()) {
+            try {
+                $pg = self::joined($searching ? $q : '', max(1, (int) $this->query('page', 1)));
+            } catch (\Throwable $e) {
+                error_log('[CS2Panel] players list failed: ' . $e->getMessage());
+            }
+        }
+        if ($pg !== null) {
+            $found = [];
+            foreach ($pg->items as $r) {
+                $sid = (string) $r['sid'];
+                $found[$sid] = (string) ($r['name'] ?? '');
+                $seen[$sid] = $r['last_seen'] ?? null;
+            }
+            // Sanctioned players who never appear in players_ips can still be found by search.
+            if ($searching && $pg->page === 1) {
+                $found += self::lookup($q, 30);
+            }
+        } else {
+            $found = $searching ? self::lookup($q, 30) : self::recent(30);
+        }
         $sids = array_map('strval', array_keys($found));
         $this->view('players/index', [
             'q'       => $q,
             'players' => $found,
+            'seen'    => $seen,
+            'pg'      => $pg,
             'roles'   => self::roles($sids),
             'avatars' => Steam::avatars($sids),
         ]);
+    }
+
+    /** One page of distinct players from players_ips, with their latest name and last connection. */
+    private static function joined(string $q, int $page): Paginator
+    {
+        $t = self::p() . 'players_ips';
+        $hasName = Database::columnExists($t, 'name');
+        $where = 'pi.steamid IS NOT NULL';
+        $params = [];
+        $steamId = $q !== '' ? Steam::toSteamId64Any($q) : null;
+        if ($steamId !== null) {
+            $where .= ' AND pi.steamid = ?';
+            $params[] = $steamId;
+        } elseif ($q !== '') {
+            if (!$hasName) {
+                return new Paginator();
+            }
+            $where .= ' AND pi.steamid IN (SELECT steamid FROM ' . $t . ' WHERE name LIKE ?)';
+            $params[] = '%' . addcslashes($q, '%_\\') . '%';
+        }
+        // Latest name = first one when ordered by connection time.
+        $name = $hasName ? "SUBSTRING_INDEX(GROUP_CONCAT(pi.name ORDER BY pi.used_at DESC SEPARATOR CHAR(31)), CHAR(31), 1)" : 'NULL';
+        return Paginator::make(
+            "SELECT pi.steamid AS sid, {$name} AS name, MAX(pi.used_at) AS last_seen FROM {$t} pi WHERE {$where} GROUP BY pi.steamid",
+            "SELECT COUNT(DISTINCT pi.steamid) FROM {$t} pi WHERE {$where}",
+            $params,
+            $page,
+            50,
+            'last_seen DESC'
+        );
     }
 
     /**

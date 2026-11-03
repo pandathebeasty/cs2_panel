@@ -2,11 +2,15 @@
 use App\Core\Lang;
 use App\Core\Steam;
 use App\Core\View;
-/** @var string $q @var array<string,string> $players @var array $roles @var array $avatars */
+/** @var string $q @var array<string,string> $players @var array $roles @var array $avatars @var array $seen @var ?\App\Core\Paginator $pg */
 $title = Lang::t('players.title');
 $L = fn(string $k) => View::e(Lang::t($k));
 $liveSearchKey = 'players';
 $roles = $roles ?? [];
+$seen = $seen ?? [];
+$pg = $pg ?? null;
+$searching = mb_strlen($q) >= 2;
+$total = $pg !== null ? max($pg->total, count($players)) : count($players);
 $badge = static function (string $kind, string $group): string {
     $label = strcasecmp($group, $kind) === 0 ? $kind : $kind . ' · ' . $group;
     $cls = $kind === 'VIP' ? 'badge-perm' : 'badge-role-admin';
@@ -30,14 +34,14 @@ $badge = static function (string $kind, string $group): string {
 
 <?php require BASE_PATH . '/app/Views/partials/live-search-status.php'; ?>
 <div class="live-search-results" id="search-results-players" data-live-search-results="players" tabindex="-1">
-<span data-live-search-meta data-total="<?= count($players) ?>" data-page="1" hidden></span>
+<?php if ($pg === null): ?><span data-live-search-meta data-total="<?= count($players) ?>" data-page="1" hidden></span><?php endif; ?>
 <div class="card">
-    <div class="card-title x-title-row"><?= mb_strlen($q) >= 2 ? $L('players.results') : $L('players.recent') ?> <span class="x-count"><?= count($players) ?></span></div>
+    <div class="card-title x-title-row"><?= $searching ? $L('players.results') : ($pg !== null ? $L('players.all') : $L('players.recent')) ?> <span class="x-count"><?= number_format($total) ?></span></div>
     <?php if (!$players): ?>
         <div class="x-empty x-empty-lg"><?= $L('players.none') ?></div>
     <?php else: ?>
         <div class="table-wrap"><table class="x-stack">
-            <thead><tr><th><?= $L('players.player') ?></th><th><?= $L('players.role') ?></th><th>SteamID64</th><th></th></tr></thead>
+            <thead><tr><th><?= $L('players.player') ?></th><th><?= $L('players.role') ?></th><th>SteamID64</th><?php if ($pg !== null): ?><th><?= $L('players.last_seen') ?></th><?php endif; ?><th></th></tr></thead>
             <tbody>
             <?php foreach ($players as $sid => $name): $sid = (string) $sid; $r = $roles[$sid] ?? []; ?>
                 <tr>
@@ -48,6 +52,9 @@ $badge = static function (string $kind, string $group): string {
                         <?php if (!empty($r['vip'])): ?><?= $badge('VIP', (string) $r['vip']) ?><?php endif; ?>
                     </td>
                     <td data-label="SteamID64" class="mono"><?= View::e($sid) ?></td>
+                    <?php if ($pg !== null): ?>
+                    <td data-label="<?= $L('players.last_seen') ?>" class="muted" style="white-space:nowrap"><?= !empty($seen[$sid]) ? View::e(date('Y-m-d H:i', strtotime((string) $seen[$sid]) ?: 0)) : '—' ?></td>
+                    <?php endif; ?>
                     <td style="text-align:right;white-space:nowrap">
                         <a class="btn btn-sm" href="<?= View::e(url('/player/' . $sid)) ?>"><?= $L('players.open') ?></a>
                         <a class="btn btn-sm btn-ghost" href="<?= View::e(Steam::profileUrl($sid)) ?>" target="_blank" rel="noopener">Steam ↗</a>
@@ -58,4 +65,5 @@ $badge = static function (string $kind, string $group): string {
         </table></div>
     <?php endif; ?>
 </div>
+<?php require BASE_PATH . '/app/Views/partials/pagination.php'; ?>
 </div>
