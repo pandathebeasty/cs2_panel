@@ -137,6 +137,8 @@ $router->post('/settings/test-discord', [SettingsController::class, 'testDiscord
 $router->post('/settings/skins-rarity-refresh', [SettingsController::class, 'skinsRarityRefresh']);
 $router->post('/settings/test-mail', [SettingsController::class, 'testMail']);
 $router->post('/settings/theme', [SettingsController::class, 'theme']);
+$router->post('/settings/themes/upload', [SettingsController::class, 'themeUpload']);
+$router->post('/settings/themes/delete', [SettingsController::class, 'themeDelete']);
 
 // Server management + RCON
 $router->get('/servers', [ServerController::class, 'index']);

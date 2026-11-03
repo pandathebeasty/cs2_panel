@@ -34,6 +34,11 @@ db_backups/*
 assets/img/uploads/*
 !assets/img/uploads/.gitkeep
 
+# Personal themes installed from Settings > Themes (kept across updates)
+assets/css/themes/personal/*
+!assets/css/themes/personal/.htaccess
+!assets/css/themes/personal/index.html
+
 # ---- Dependencies & build output ------------------------------------
 node_modules/
 vendor/

@@ -269,6 +269,87 @@ $L = fn(string $k) => View::e(Lang::t($k));
             </div>
             <?php endif; ?>
 
+            <!-- Personal themes: .css files uploaded into assets/css/themes/personal (kept across updates) -->
+            <?php $personalThemes = array_values(array_filter($discovered, static fn(array $t): bool => !empty($t['personal']))); ?>
+            <div class="card" style="margin-bottom:18px" id="personal-themes-card">
+                <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:14px;flex-wrap:wrap">
+                    <div style="min-width:0;flex:1 1 320px">
+                        <div class="card-title"><?= $L('themes.personal_title') ?></div>
+                        <p class="hint" style="margin:-6px 0 0"><?= $L('themes.personal_hint') ?></p>
+                    </div>
+                    <div>
+                        <input type="file" id="personal-theme-file" accept=".css,text/css" hidden>
+                        <button type="button" class="btn btn-primary" id="personal-theme-install"><?= $L('themes.install') ?></button>
+                    </div>
+                </div>
+                <p class="hint mono" style="margin:12px 0 0;font-size:12px">/* @theme id:my-theme | name:My Theme | accent:#ff6a1a | tag:Custom */</p>
+                <?php if ($personalThemes): ?>
+                    <div class="table-wrap" style="margin-top:14px">
+                        <table class="table">
+                            <thead><tr><th><?= $L('settings.theme_name') ?></th><th>ID</th><th><?= $L('themes.file') ?></th><th></th></tr></thead>
+                            <tbody>
+                            <?php foreach ($personalThemes as $pt): ?>
+                                <tr>
+                                    <td><span style="display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:8px;background:<?= View::e($pt['accent']) ?>"></span><?= View::e($pt['name']) ?> <span class="muted">· <?= View::e($pt['tag']) ?></span></td>
+                                    <td class="mono"><?= View::e($pt['id']) ?></td>
+                                    <td class="mono muted"><?= View::e(\App\Core\Themes::PERSONAL_REL_DIR . '/' . $pt['file']) ?></td>
+                                    <td style="text-align:right">
+                                        <button type="button" class="btn btn-sm" data-theme-set="<?= View::e($pt['id']) ?>"><?= $L('themes.use') ?></button>
+                                        <button type="button" class="btn btn-sm btn-danger js-personal-theme-delete" data-id="<?= View::e($pt['id']) ?>" data-name="<?= View::e($pt['name']) ?>"><?= $L('common.delete') ?></button>
+                                    </td>
+                                </tr>
+                            <?php endforeach; ?>
+                            </tbody>
+                        </table>
+                    </div>
+                <?php else: ?>
+                    <p class="muted" style="margin:14px 0 0"><?= $L('themes.personal_empty') ?></p>
+                <?php endif; ?>
+            </div>
+            <script>
+            (function () {
+                var base = window.CS2_BASE || '';
+                var I = <?= json_encode([
+                    'confirm' => Lang::t('themes.delete_confirm'),
+                    'failed'  => Lang::t('themes.err_upload'),
+                    'busy'    => Lang::t('themes.installing'),
+                ]) ?>;
+                function post(url, body) {
+                    if (window.CS2_CSRF) body.append('csrf', window.CS2_CSRF);
+                    return fetch(base + url, { method: 'POST', body: body, credentials: 'same-origin', headers: { 'X-Requested-With': 'fetch' } })
+                        .then(function (r) { return r.json().catch(function () { return { ok: false }; }); });
+                }
+                function done(d) {
+                    if (d && d.ok) { window.location.href = base + '/settings#themes'; window.location.reload(); return; }
+                    alert((d && d.error) || I.failed);
+                }
+                var file = document.getElementById('personal-theme-file');
+                var btn = document.getElementById('personal-theme-install');
+                if (file && btn) {
+                    btn.addEventListener('click', function () { file.click(); });
+                    file.addEventListener('change', function () {
+                        if (!file.files || !file.files[0]) return;
+                        var orig = btn.textContent;
+                        btn.disabled = true; btn.textContent = I.busy;
+                        var fd = new FormData();
+                        fd.append('theme_file', file.files[0]);
+                        post('/settings/themes/upload', fd).then(done, function () { done(null); }).finally(function () {
+                            btn.disabled = false; btn.textContent = orig; file.value = '';
+                        });
+                    });
+                }
+                document.querySelectorAll('.js-personal-theme-delete').forEach(function (b) {
+                    b.addEventListener('click', function () {
+                        if (!confirm(I.confirm.replace('{name}', b.getAttribute('data-name') || ''))) return;
+                        var fd = new FormData();
+                        fd.append('id', b.getAttribute('data-id'));
+                        b.disabled = true;
+                        post('/settings/themes/delete', fd).then(done, function () { done(null); }).finally(function () { b.disabled = false; });
+                    });
+                });
+            })();
+            </script>
+
             <!-- Accent color only for the Default theme -->
             <div class="card" style="margin-bottom:18px" id="accent-card">
                 <div class="accent-row" data-accent-sync>

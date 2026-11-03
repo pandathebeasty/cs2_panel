@@ -1,0 +1,13 @@
+# Personal themes: only CSS files are served.
+<IfModule mod_authz_core.c>
+    Require all denied
+    <FilesMatch "\.css$">
+        Require all granted
+    </FilesMatch>
+</IfModule>
+<IfModule !mod_authz_core.c>
+    Order allow,deny
+    <FilesMatch "\.css$">
+        Allow from all
+    </FilesMatch>
+</IfModule>

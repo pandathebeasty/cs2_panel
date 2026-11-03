@@ -832,6 +832,43 @@ final class SettingsController extends Controller
     }
 
     /**
+     * Upload a personal theme CSS (Settings > Themes). AJAX JSON.
+     */
+    public function themeUpload(): void
+    {
+        Auth::requireManage();
+        $this->verifyCsrf();
+        $file = $_FILES['theme_file'] ?? null;
+        if (!is_array($file) || ($file['error'] ?? UPLOAD_ERR_NO_FILE) !== UPLOAD_ERR_OK || !is_uploaded_file((string) $file['tmp_name'])) {
+            $this->json(['ok' => false, 'error' => Lang::t('themes.err_upload')], 422);
+        }
+        $result = \App\Core\Themes::installPersonal((string) $file['tmp_name'], (string) $file['name']);
+        if (!$result['ok']) {
+            $this->json(['ok' => false, 'error' => $result['message']], 422);
+        }
+        \App\Core\Logger::log('theme.upload', (string) $result['id'], 'Personal theme installed: ' . $result['id']);
+        $this->flash('success', $result['message']);
+        $this->json(['ok' => true, 'id' => $result['id'], 'message' => $result['message']]);
+    }
+
+    /** Delete a personal theme; falls back to Default when it was active. AJAX JSON. */
+    public function themeDelete(): void
+    {
+        Auth::requireManage();
+        $this->verifyCsrf();
+        $id = (string) $this->input('id', '');
+        if (!preg_match('/^[a-z0-9\-]+$/', $id) || !\App\Core\Themes::removePersonal($id)) {
+            $this->json(['ok' => false, 'error' => Lang::t('themes.err_delete')], 422);
+        }
+        if (Settings::get('theme_name', 'default') === $id) {
+            Settings::set('theme_name', 'default');
+        }
+        \App\Core\Logger::log('theme.delete', $id, 'Personal theme deleted: ' . $id);
+        $this->flash('success', Lang::t('themes.deleted'));
+        $this->json(['ok' => true]);
+    }
+
+    /**
      * Re-download the skin rarity-colour map (ByMykel/CSGO-API) on demand, from
      * the Settings "Check for updates" button next to Enable Skins. AJAX JSON.
      */
