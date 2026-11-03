@@ -190,6 +190,9 @@ $L = fn(string $k) => View::e(Lang::t($k));
             $animated = [];
             $staticThemes = [];
             foreach ($discovered as $dt) {
+                if (!empty($dt['personal'])) {
+                    continue;
+                }
                 if (in_array(strtolower((string) $dt['tag']), $staticTags, true)) {
                     $staticThemes[] = $dt;
                 } else {
@@ -284,23 +287,29 @@ $L = fn(string $k) => View::e(Lang::t($k));
                 </div>
                 <p class="hint mono" style="margin:12px 0 0;font-size:12px">/* @theme id:my-theme | name:My Theme | accent:#ff6a1a | tag:Custom */</p>
                 <?php if ($personalThemes): ?>
-                    <div class="table-wrap" style="margin-top:14px">
-                        <table class="table">
-                            <thead><tr><th><?= $L('settings.theme_name') ?></th><th>ID</th><th><?= $L('themes.file') ?></th><th></th></tr></thead>
-                            <tbody>
-                            <?php foreach ($personalThemes as $pt): ?>
-                                <tr>
-                                    <td><span style="display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:8px;background:<?= View::e($pt['accent']) ?>"></span><?= View::e($pt['name']) ?> <span class="muted">· <?= View::e($pt['tag']) ?></span></td>
-                                    <td class="mono"><?= View::e($pt['id']) ?></td>
-                                    <td class="mono muted"><?= View::e(\App\Core\Themes::PERSONAL_REL_DIR . '/' . $pt['file']) ?></td>
-                                    <td style="text-align:right">
-                                        <button type="button" class="btn btn-sm" data-theme-set="<?= View::e($pt['id']) ?>"><?= $L('themes.use') ?></button>
-                                        <button type="button" class="btn btn-sm btn-danger js-personal-theme-delete" data-id="<?= View::e($pt['id']) ?>" data-name="<?= View::e($pt['name']) ?>"><?= $L('common.delete') ?></button>
-                                    </td>
-                                </tr>
-                            <?php endforeach; ?>
-                            </tbody>
-                        </table>
+                    <div class="theme-grid" style="margin-top:16px">
+                        <?php foreach ($personalThemes as $pt): ?>
+                            <button type="button" class="theme-card theme-card-anim" data-theme-set="<?= View::e($pt['id']) ?>"
+                                    data-preview="<?= View::e($pt['id']) ?>"
+                                    title="<?= View::e(\App\Core\Themes::PERSONAL_REL_DIR . '/' . $pt['file']) ?>"
+                                    style="--tp-accent:<?= View::e($pt['accent']) ?>;">
+                                <span class="theme-check">&check;</span>
+                                <span class="theme-preview anim">
+                                    <span class="tp-anim-glow"></span>
+                                    <span class="tp-pattern" aria-hidden="true"></span>
+                                    <span class="tp-line on"></span><span class="tp-line"></span>
+                                </span>
+                                <span class="theme-meta">
+                                    <span class="theme-name"><?= View::e($pt['name']) ?></span>
+                                    <span class="theme-tag"><?= View::e($pt['tag']) ?></span>
+                                </span>
+                                <span class="theme-actions">
+                                    <span class="theme-act del js-personal-theme-delete" role="button" tabindex="0"
+                                          data-id="<?= View::e($pt['id']) ?>" data-name="<?= View::e($pt['name']) ?>"
+                                          title="<?= $L('common.delete') ?>"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" width="15" height="15"><path d="M6 6l12 12M18 6L6 18"/></svg></span>
+                                </span>
+                            </button>
+                        <?php endforeach; ?>
                     </div>
                 <?php else: ?>
                     <p class="muted" style="margin:14px 0 0"><?= $L('themes.personal_empty') ?></p>
@@ -339,12 +348,13 @@ $L = fn(string $k) => View::e(Lang::t($k));
                     });
                 }
                 document.querySelectorAll('.js-personal-theme-delete').forEach(function (b) {
-                    b.addEventListener('click', function () {
+                    // The delete icon sits inside the card button: don't also select the theme.
+                    b.addEventListener('click', function (e) {
+                        e.preventDefault(); e.stopPropagation();
                         if (!confirm(I.confirm.replace('{name}', b.getAttribute('data-name') || ''))) return;
                         var fd = new FormData();
                         fd.append('id', b.getAttribute('data-id'));
-                        b.disabled = true;
-                        post('/settings/themes/delete', fd).then(done, function () { done(null); }).finally(function () { b.disabled = false; });
+                        post('/settings/themes/delete', fd).then(done, function () { done(null); });
                     });
                 });
             })();
