@@ -4,7 +4,7 @@ use App\Core\Steam;
 use App\Core\View;
 use App\Models\K4ExtrasModel;
 /**
- * @var ?array $mine @var array $overview @var array $popular @var array $streaks @var array $countdowns
+ * @var ?array $mine @var array $active @var array $overview @var array $popular @var array $streaks @var array $countdowns
  * @var ?string $steamId @var ?array $player @var bool $isSelf
  */
 $title = Lang::t('nav.k4_missions');
@@ -26,8 +26,13 @@ $card = function (array $m, int $n) use ($L, $icon): string {
         <h3 class="k4x-mission-title"><?= View::e($m['title']) ?></h3>
         <div class="k4x-bar"><span></span></div>
         <div class="k4x-mission-foot">
-            <span><?= number_format((int) $m['progress']) ?> / <?= number_format((int) $m['target']) ?></span>
-            <span><?= $m['completed'] ? $L('k4x.completed') : (int) $m['percent'] . '%' ?></span>
+            <?php if (isset($m['assigned'])): ?>
+                <span title="<?= $L('k4x.players_done_hint') ?>"><?= $icon(K4ExtrasModel::uiIcon('check'), 'k4x-icon-xs') ?><?= number_format((int) $m['done']) ?> / <?= number_format((int) $m['assigned']) ?></span>
+                <span><?= $L('k4x.target') ?> <?= number_format((int) $m['target']) ?></span>
+            <?php else: ?>
+                <span><?= number_format((int) $m['progress']) ?> / <?= number_format((int) $m['target']) ?></span>
+                <span><?= $m['completed'] ? $L('k4x.completed') : (int) $m['percent'] . '%' ?></span>
+            <?php endif; ?>
         </div>
     </article>
     <?php return (string) ob_get_clean();
@@ -50,8 +55,13 @@ $card = function (array $m, int $n) use ($L, $icon): string {
             <?php endif; ?>
         </div>
 
-        <?php if (!$steamId): ?>
-            <div class="card k4x-empty"><?= $icon(K4ExtrasModel::uiIcon('mission_star'), 'k4x-icon-xl') ?><p><?= $L('k4x.pick_player_hint') ?></p></div>
+        <?php if (!$steamId && $active): ?>
+            <p class="muted k4x-active-note"><?= $L('k4x.active_today_hint') ?></p>
+            <div class="k4x-missions">
+                <?php foreach ($active as $i => $m): ?><?= $card($m, min($i, 8)) ?><?php endforeach; ?>
+            </div>
+        <?php elseif (!$steamId): ?>
+            <div class="card k4x-empty"><?= $icon(K4ExtrasModel::uiIcon('mission_star'), 'k4x-icon-xl') ?><p><?= $L('k4x.no_active_missions') ?></p></div>
         <?php elseif (!$mine['daily'] && !$mine['weekly']): ?>
             <div class="card k4x-empty"><?= $icon(K4ExtrasModel::uiIcon('mission_star'), 'k4x-icon-xl') ?><p><?= $isSelf ? $L('k4x.no_missions_self') : $L('k4x.no_missions') ?></p></div>
         <?php else: ?>
@@ -78,7 +88,7 @@ $card = function (array $m, int $n) use ($L, $icon): string {
             <?php endif; ?>
         <?php endif; ?>
 
-        <?php if ($popular): ?>
+        <?php if ($popular && $steamId): ?>
             <div class="k4x-section-head" style="margin-top:28px">
                 <h2><?= $icon(K4ExtrasModel::uiIcon('stats')) ?><?= $L('k4x.today_on_server') ?></h2>
                 <input type="search" class="k4x-find" data-k4x-find="#k4x-popular" placeholder="<?= $L('search.filter_ph') ?>" aria-label="<?= $L('common.search') ?>" autocomplete="off">

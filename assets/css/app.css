@@ -2446,6 +2446,9 @@ body.theme-anim .skins-app * { transition: none !important; }
 .k4x-bar-sm { height: 6px; }
 .k4x-bar-lg { height: 12px; }
 .k4x-mission-foot { display: flex; justify-content: space-between; width: 100%; font-size: 12.5px; color: var(--text-dim); font-variant-numeric: tabular-nums; }
+.k4x-mission-foot > span { display: inline-flex; align-items: center; gap: 5px; }
+.k4x-icon-xs { width: 13px; height: 13px; color: var(--green); }
+.k4x-active-note { margin: -6px 0 14px; font-size: 13px; }
 .k4x-mission.is-done { border-color: color-mix(in srgb, var(--green) 45%, var(--border)); }
 .k4x-mission.is-done .k4x-mission-title { color: var(--text-dim); }
 
