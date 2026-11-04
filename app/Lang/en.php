@@ -1834,6 +1834,7 @@ return [
     'k4x.pick_player_hint' => 'Search for a player to see their progress.',
     'k4x.target' => 'Target',
     'k4x.players_done_hint' => 'Players who finished it / players who got it',
+    'k4x.players_finished' => '{done} / {total} players finished',
     'k4x.active_today_hint' => 'Missions given out on the server today. Search a player to see their own progress.',
     'k4x.no_active_missions' => 'No missions have been given out today yet.',
     'k4x.no_missions_self' => 'You have no missions today. Join the server to receive them.',

@@ -27,7 +27,7 @@ $card = function (array $m, int $n) use ($L, $icon): string {
         <div class="k4x-bar"><span></span></div>
         <div class="k4x-mission-foot">
             <?php if (isset($m['assigned'])): ?>
-                <span title="<?= $L('k4x.players_done_hint') ?>"><?= $icon(K4ExtrasModel::uiIcon('check'), 'k4x-icon-xs') ?><?= number_format((int) $m['done']) ?> / <?= number_format((int) $m['assigned']) ?></span>
+                <span title="<?= $L('k4x.players_done_hint') ?>"><?= $icon(K4ExtrasModel::uiIcon('profile'), 'k4x-icon-xs') ?><?= View::e(Lang::t('k4x.players_finished', ['done' => number_format((int) $m['done']), 'total' => number_format((int) $m['assigned'])])) ?></span>
                 <span><?= $L('k4x.target') ?> <?= number_format((int) $m['target']) ?></span>
             <?php else: ?>
                 <span><?= number_format((int) $m['progress']) ?> / <?= number_format((int) $m['target']) ?></span>

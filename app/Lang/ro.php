@@ -1814,6 +1814,7 @@ return [
     'k4x.pick_player_hint' => 'Caută un jucător pentru a-i vedea progresul.',
     'k4x.target' => 'Țintă',
     'k4x.players_done_hint' => 'Jucători care au terminat-o / jucători care au primit-o',
+    'k4x.players_finished' => '{done} / {total} jucători au terminat-o',
     'k4x.active_today_hint' => 'Misiunile primite azi pe server. Caută un jucător ca să vezi progresul lui.',
     'k4x.no_active_missions' => 'Nu s-au primit încă misiuni azi.',
     'k4x.no_missions_self' => 'Nu ai misiuni azi. Intră pe server pentru a le primi.',

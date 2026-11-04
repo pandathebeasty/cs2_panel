@@ -1815,6 +1815,7 @@ return [
     'k4x.pick_player_hint' => 'Suche einen Spieler, um seinen Fortschritt zu sehen.',
     'k4x.target' => 'Ziel',
     'k4x.players_done_hint' => 'Spieler, die sie abgeschlossen haben / Spieler, die sie erhalten haben',
+    'k4x.players_finished' => '{done} / {total} Spieler fertig',
     'k4x.active_today_hint' => 'Heute auf dem Server vergebene Missionen. Suche einen Spieler, um seinen Fortschritt zu sehen.',
     'k4x.no_active_missions' => 'Heute wurden noch keine Missionen vergeben.',
     'k4x.no_missions_self' => 'Du hast heute keine Missionen. Betritt den Server, um sie zu erhalten.',
