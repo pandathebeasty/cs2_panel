@@ -1,0 +1,77 @@
+// K4-System missions.
+// Every day each player gets one Easy, one Medium, and one Hard mission from this list, and every week one Weekly mission.
+// K4 checks each map and only gives missions that can be done there. A mission that does not fit the map is swapped
+// for free while it is untouched; a started one waits and can be finished on another map.
+// The key (for example "kills-15") is stored in the database. Do not rename keys that players may have today.
+//
+// Types:
+//   Kills, Headshots, KnifeKills, GrenadeKills (HE or fire), NoscopeKills, ZeusKills, Assists, FlashAssists
+//   WeaponKills (needs "Weapon"), PistolKills, SmgKills, ShotgunKills, RifleKills, SniperKills
+//   WallbangKills, SmokeKills (through smoke), JumpKills (in the air), BlindKills (while flashed), RevengeKills
+//   LongRangeKills ("Distance" in meters, 30 if left out)
+//   OpeningKills (first kill of the round), ClutchWins (win a round as the last one alive), SurviveRounds
+//   RoundKills (that many kills in one round), LifeKills (that many kills in one life), Damage
+//   Mvps, RoundWins, BombPlants, BombDefuses, HostageRescues, PlaytimeMinutes, MatchesPlayed, MatchWins
+// Difficulty: Easy, Medium, Hard, or Weekly. Rewards per difficulty are set in k4-system.jsonc (missions.rewards).
+// Remove every Weekly mission to turn the weekly mission off.
+// Optional "Reward": points for this one mission instead of the difficulty's reward.
+// WeaponKills needs "Weapon": part of the CS2 weapon name, such as "ak47", "m4a1" (both M4s), "awp", "deagle".
+{
+  "kills-15": { "Type": "Kills", "Difficulty": "Easy", "Target": 15 },
+  "headshots-5": { "Type": "Headshots", "Difficulty": "Easy", "Target": 5 },
+  "assists-5": { "Type": "Assists", "Difficulty": "Easy", "Target": 5 },
+  "round-wins-6": { "Type": "RoundWins", "Difficulty": "Easy", "Target": 6 },
+  "playtime-20": { "Type": "PlaytimeMinutes", "Difficulty": "Easy", "Target": 20 },
+  "ak47-kills-5": { "Type": "WeaponKills", "Weapon": "ak47", "Difficulty": "Easy", "Target": 5 },
+  "pistol-kills-5": { "Type": "PistolKills", "Difficulty": "Easy", "Target": 5 },
+  "rifle-kills-10": { "Type": "RifleKills", "Difficulty": "Easy", "Target": 10 },
+  "damage-1500": { "Type": "Damage", "Difficulty": "Easy", "Target": 1500 },
+  "survive-rounds-5": { "Type": "SurviveRounds", "Difficulty": "Easy", "Target": 5 },
+  "life-kills-3": { "Type": "LifeKills", "Difficulty": "Easy", "Target": 3 },
+  "opening-kills-2": { "Type": "OpeningKills", "Difficulty": "Easy", "Target": 2 },
+
+  "kills-40": { "Type": "Kills", "Difficulty": "Medium", "Target": 40 },
+  "headshots-15": { "Type": "Headshots", "Difficulty": "Medium", "Target": 15 },
+  "flash-assists-3": { "Type": "FlashAssists", "Difficulty": "Medium", "Target": 3 },
+  "mvps-3": { "Type": "Mvps", "Difficulty": "Medium", "Target": 3 },
+  "round-wins-15": { "Type": "RoundWins", "Difficulty": "Medium", "Target": 15 },
+  "bomb-plants-3": { "Type": "BombPlants", "Difficulty": "Medium", "Target": 3 },
+  "matches-played-2": { "Type": "MatchesPlayed", "Difficulty": "Medium", "Target": 2 },
+  "m4-kills-12": { "Type": "WeaponKills", "Weapon": "m4a1", "Difficulty": "Medium", "Target": 12 },
+  "playtime-60": { "Type": "PlaytimeMinutes", "Difficulty": "Medium", "Target": 60 },
+  "smg-kills-8": { "Type": "SmgKills", "Difficulty": "Medium", "Target": 8 },
+  "sniper-kills-5": { "Type": "SniperKills", "Difficulty": "Medium", "Target": 5 },
+  "wallbang-kills-2": { "Type": "WallbangKills", "Difficulty": "Medium", "Target": 2 },
+  "jump-kills-2": { "Type": "JumpKills", "Difficulty": "Medium", "Target": 2 },
+  "long-range-kills-5": { "Type": "LongRangeKills", "Distance": 30, "Difficulty": "Medium", "Target": 5 },
+  "round-kills-3": { "Type": "RoundKills", "Difficulty": "Medium", "Target": 3 },
+  "damage-4000": { "Type": "Damage", "Difficulty": "Medium", "Target": 4000 },
+  "revenge-kills-3": { "Type": "RevengeKills", "Difficulty": "Medium", "Target": 3 },
+
+  "kills-80": { "Type": "Kills", "Difficulty": "Hard", "Target": 80 },
+  "headshots-30": { "Type": "Headshots", "Difficulty": "Hard", "Target": 30 },
+  "knife-kills-1": { "Type": "KnifeKills", "Difficulty": "Hard", "Target": 1 },
+  "grenade-kills-2": { "Type": "GrenadeKills", "Difficulty": "Hard", "Target": 2 },
+  "noscope-kills-2": { "Type": "NoscopeKills", "Difficulty": "Hard", "Target": 2 },
+  "awp-kills-10": { "Type": "WeaponKills", "Weapon": "awp", "Difficulty": "Hard", "Target": 10 },
+  "bomb-defuses-3": { "Type": "BombDefuses", "Difficulty": "Hard", "Target": 3 },
+  "mvps-6": { "Type": "Mvps", "Difficulty": "Hard", "Target": 6 },
+  "match-wins-2": { "Type": "MatchWins", "Difficulty": "Hard", "Target": 2 },
+  "clutch-wins-1": { "Type": "ClutchWins", "Difficulty": "Hard", "Target": 1 },
+  "round-kills-4": { "Type": "RoundKills", "Difficulty": "Hard", "Target": 4 },
+  "life-kills-7": { "Type": "LifeKills", "Difficulty": "Hard", "Target": 7 },
+  "smoke-kills-2": { "Type": "SmokeKills", "Difficulty": "Hard", "Target": 2 },
+  "blind-kills-1": { "Type": "BlindKills", "Difficulty": "Hard", "Target": 1 },
+  "zeus-kills-1": { "Type": "ZeusKills", "Difficulty": "Hard", "Target": 1 },
+  "shotgun-kills-8": { "Type": "ShotgunKills", "Difficulty": "Hard", "Target": 8 },
+  "damage-8000": { "Type": "Damage", "Difficulty": "Hard", "Target": 8000 },
+
+  "weekly-kills-300": { "Type": "Kills", "Difficulty": "Weekly", "Target": 300 },
+  "weekly-headshots-120": { "Type": "Headshots", "Difficulty": "Weekly", "Target": 120 },
+  "weekly-damage-30000": { "Type": "Damage", "Difficulty": "Weekly", "Target": 30000 },
+  "weekly-round-wins-60": { "Type": "RoundWins", "Difficulty": "Weekly", "Target": 60 },
+  "weekly-match-wins-6": { "Type": "MatchWins", "Difficulty": "Weekly", "Target": 6 },
+  "weekly-mvps-15": { "Type": "Mvps", "Difficulty": "Weekly", "Target": 15 },
+  "weekly-clutch-wins-5": { "Type": "ClutchWins", "Difficulty": "Weekly", "Target": 5 },
+  "weekly-playtime-600": { "Type": "PlaytimeMinutes", "Difficulty": "Weekly", "Target": 600 }
+}

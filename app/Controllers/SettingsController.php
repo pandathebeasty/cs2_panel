@@ -185,6 +185,20 @@ final class SettingsController extends Controller
                 'k4_times_table'  => Settings::get('k4_times_table', \App\Core\Config::get('k4system.times_table', 'k4times')),
                 'k4_steam'        => Settings::get('k4_steam', \App\Core\Config::get('k4system.steam_column', 'steam_id')),
                 'k4_rank_type'    => Settings::get('k4_rank_type', \App\Core\Config::get('k4system.rank_type', 'competitive')),
+                'k4x' => [
+                    'missions'     => Settings::bool('k4_missions_enabled', false),
+                    'achievements' => Settings::bool('k4_achievements_enabled', false),
+                    'seasons'      => Settings::bool('k4_seasons_enabled', false),
+                    'tz'           => (string) Settings::get('k4_missions_tz', \App\Models\K4ExtrasModel::DEFAULT_TIMEZONE),
+                    'rewards'      => array_map(
+                        static fn(string $d): int => (int) Settings::get('k4_reward_' . $d, (string) \App\Models\K4ExtrasModel::DEFAULT_REWARDS[$d]),
+                        array_combine(array_keys(\App\Models\K4ExtrasModel::DEFAULT_REWARDS), array_keys(\App\Models\K4ExtrasModel::DEFAULT_REWARDS))
+                    ),
+                    'files'        => [
+                        'missions'     => ['custom' => \App\Models\K4ExtrasModel::isCustom('missions'), 'count' => count(\App\Models\K4ExtrasModel::missions())],
+                        'achievements' => ['custom' => \App\Models\K4ExtrasModel::isCustom('achievements'), 'count' => count(\App\Models\K4ExtrasModel::achievements())],
+                    ],
+                ],
                 // WeaponPaints "Skins" module.
                 'skins_enabled'   => Settings::bool('skins_enabled', false),
                 'wp_prefix'       => Settings::get('wp_prefix', \App\Core\Config::get('weaponpaints.prefix', 'wp_')),
@@ -407,6 +421,7 @@ final class SettingsController extends Controller
         Settings::set('k4_times_table', trim((string) $this->input('k4_times_table', 'k4times')) ?: 'k4times');
         Settings::set('k4_steam', trim((string) $this->input('k4_steam', 'steam_id')) ?: 'steam_id');
         Settings::set('k4_rank_type', $this->input('k4_rank_type') === 'premier' ? 'premier' : 'competitive');
+        $this->saveK4Extras();
 
         // WeaponPaints "Skins" module (standalone toggle + configurable table prefix).
         Settings::set('skins_enabled', $this->input('skins_enabled') ? '1' : '0');
@@ -484,6 +499,10 @@ final class SettingsController extends Controller
             'stats_backend' => 'Stats plugin', 'k4_rank_type' => 'Rank style',
             'k4_prefix' => 'K4-System tables', 'k4_ranks_table' => 'K4-System tables', 'k4_stats_table' => 'K4-System tables',
             'k4_times_table' => 'K4-System tables', 'k4_steam' => 'K4-System tables',
+            'k4_missions_enabled' => 'K4 missions', 'k4_achievements_enabled' => 'K4 achievements', 'k4_seasons_enabled' => 'K4 seasons',
+            'k4_missions_def' => 'Missions file', 'k4_achievements_def' => 'Achievements file', 'k4_missions_tz' => 'Missions timezone',
+            'k4_reward_easy' => 'Mission rewards', 'k4_reward_medium' => 'Mission rewards',
+            'k4_reward_hard' => 'Mission rewards', 'k4_reward_weekly' => 'Mission rewards',
             'skins_enabled' => 'Skins enabled', 'wp_prefix' => 'Skins table prefix',
             'chat_logs_enabled' => 'Chat logs enabled', 'chat_logs_table' => 'Chat Logger table',
             'benefits_enabled' => 'Benefits page enabled',
@@ -1175,6 +1194,55 @@ final class SettingsController extends Controller
             }
         }
         Settings::set($settingKey, '');
+    }
+
+    /** K4-System missions / achievements / seasons pages and their definition files. */
+    private function saveK4Extras(): void
+    {
+        foreach (['missions', 'achievements', 'seasons'] as $page) {
+            Settings::set('k4_' . $page . '_enabled', $this->input('k4_' . $page . '_enabled') ? '1' : '0');
+        }
+
+        $tz = trim((string) $this->input('k4_missions_tz', ''));
+        if ($tz === '' || !in_array($tz, \DateTimeZone::listIdentifiers(), true)) {
+            $tz = \App\Models\K4ExtrasModel::DEFAULT_TIMEZONE;
+        }
+        Settings::set('k4_missions_tz', $tz);
+
+        foreach (\App\Models\K4ExtrasModel::DEFAULT_REWARDS as $d => $def) {
+            $v = $this->input('k4_reward_' . $d, '');
+            Settings::set('k4_reward_' . $d, (string) (is_numeric($v) ? max(0, min(1000000, (int) $v)) : $def));
+        }
+
+        foreach (['missions', 'achievements'] as $kind) {
+            $field = 'k4_' . $kind . '_file';
+            $file = $_FILES[$field] ?? null;
+            if (is_array($file) && ($file['error'] ?? UPLOAD_ERR_NO_FILE) !== UPLOAD_ERR_NO_FILE) {
+                $norm = null;
+                $ext = strtolower(pathinfo((string) ($file['name'] ?? ''), PATHINFO_EXTENSION));
+                if ($file['error'] === UPLOAD_ERR_OK && in_array($ext, ['jsonc', 'json'], true)
+                    && $file['size'] > 0 && $file['size'] <= 256 * 1024 && is_uploaded_file($file['tmp_name'])) {
+                    $raw = \App\Models\K4ExtrasModel::parseJsonc((string) file_get_contents($file['tmp_name']));
+                    if ($raw !== null) {
+                        $normalise = $kind === 'missions' ? 'normaliseMissions' : 'normaliseAchievements';
+                        $norm = \App\Models\K4ExtrasModel::$normalise($raw);
+                        // Tolerate a single wrapping object, e.g. { "Missions": { ... } }.
+                        if ($norm === null && count($raw) === 1 && is_array(reset($raw))) {
+                            $norm = \App\Models\K4ExtrasModel::$normalise(reset($raw));
+                        }
+                    }
+                }
+                if ($norm === null) {
+                    $this->flash('error', Lang::t('settings.k4x_file_invalid', ['file' => (string) ($file['name'] ?? $kind)]));
+                } else {
+                    Settings::set('k4_' . $kind . '_def', (string) json_encode($norm, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
+                }
+                continue;
+            }
+            if ($this->input('k4_' . $kind . '_reset')) {
+                Settings::set('k4_' . $kind . '_def', '');
+            }
+        }
     }
 
     private function handleUpload(string $field, string $settingKey, array $allowedExt): void

@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 300" width="960" height="300" font-family="Segoe UI, Helvetica, Arial, sans-serif">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0f1420"/>
+      <stop offset="1" stop-color="#161d2e"/>
+    </linearGradient>
+    <linearGradient id="acc" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#ff7a1a"/>
+      <stop offset="1" stop-color="#ffb347"/>
+    </linearGradient>
+    <symbol id="db" viewBox="0 0 120 130">
+      <ellipse cx="60" cy="14" rx="58" ry="13" fill="#26314b" stroke="#3a4766"/>
+      <path d="M2 14v100c0 7 26 13 58 13s58-6 58-13V14" fill="#1b2335" stroke="#3a4766"/>
+      <ellipse cx="60" cy="14" rx="58" ry="13" fill="#26314b" stroke="#3a4766"/>
+    </symbol>
+  </defs>
+  <rect width="960" height="300" rx="18" fill="url(#bg)"/>
+  <text x="40" y="44" fill="#e8ecf4" font-size="20" font-weight="700">Databases</text>
+  <text x="40" y="68" fill="#8892a6" font-size="13">Every integration uses the panel database by default. Tick “Dedicated Database” only where a plugin lives elsewhere.</text>
+
+  <!-- default -->
+  <text x="40" y="108" fill="#ffb347" font-size="13" font-weight="700">Default</text>
+  <use href="#db" x="70" y="122" width="150" height="150"/>
+  <text x="145" y="190" text-anchor="middle" fill="#e8ecf4" font-size="13" font-weight="700">cs2</text>
+  <text x="145" y="210" text-anchor="middle" fill="#8892a6" font-size="11">panel_* · sa_* · vip_*</text>
+  <text x="145" y="226" text-anchor="middle" fill="#8892a6" font-size="11">k4* / zenith_* · wp_*</text>
+
+  <path d="M300 100V280" stroke="#2c3650" stroke-width="2" stroke-dasharray="6 6"/>
+
+  <!-- dedicated -->
+  <text x="340" y="108" fill="#ffb347" font-size="13" font-weight="700">With dedicated databases</text>
+  <use href="#db" x="350" y="122" width="150" height="150"/>
+  <text x="425" y="190" text-anchor="middle" fill="#e8ecf4" font-size="13" font-weight="700">panel</text>
+  <text x="425" y="210" text-anchor="middle" fill="#8892a6" font-size="11">panel_* · sa_*</text>
+
+  <g font-size="12">
+    <rect x="540" y="130" width="380" height="36" rx="9" fill="#1b2335" stroke="#2c3650"/>
+    <text x="556" y="153" fill="#e8ecf4">VIPCore</text><text x="904" y="153" text-anchor="end" fill="#8892a6">host · port · db · user · password</text>
+    <rect x="540" y="174" width="380" height="36" rx="9" fill="#1b2335" stroke="url(#acc)"/>
+    <text x="556" y="197" fill="#e8ecf4">K4-System</text><text x="904" y="197" text-anchor="end" fill="#8892a6">other server, own credentials</text>
+    <rect x="540" y="218" width="380" height="36" rx="9" fill="#1b2335" stroke="#2c3650"/>
+    <text x="556" y="241" fill="#e8ecf4">WeaponPaints</text><text x="904" y="241" text-anchor="end" fill="#8892a6">blank host/user = main DB values</text>
+  </g>
+  <path d="M502 197H532" stroke="#ffb347" stroke-width="2"/>
+  <text x="540" y="278" fill="#5b6b8f" font-size="11">CS2-SimpleAdmin on a dedicated database needs XA transactions (MySQL / MariaDB InnoDB).</text>
+</svg>

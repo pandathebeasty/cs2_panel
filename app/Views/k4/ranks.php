@@ -41,6 +41,7 @@ $ago = function (?string $dt): string {
 <div class="subtabs">
     <a class="subtab active" href="/k4/ranks"><?= $L('ranks.subtab_ranks') ?></a>
     <a class="subtab" href="/k4/playtime"><?= $L('ranks.subtab_playtime') ?></a>
+    <?php $k4Active = ''; require __DIR__ . '/_extras_tabs.php'; ?>
     <?php if ($isRoot): ?>
         <div class="subtab-actions subtab-action">
             <button class="btn btn-sm btn-danger" data-modal="modal-reset-all-ranks"><?= $L('ranks.reset_all_ranks') ?></button>

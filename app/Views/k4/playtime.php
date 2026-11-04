@@ -42,6 +42,7 @@ $sortH = function (string $col, string $label) use ($sort, $dir): string {
 <div class="subtabs">
     <a class="subtab" href="/k4/ranks"><?= $L('ranks.subtab_ranks') ?></a>
     <a class="subtab active" href="/k4/playtime"><?= $L('ranks.subtab_playtime') ?></a>
+    <?php $k4Active = ''; require __DIR__ . '/_extras_tabs.php'; ?>
     <?php if ($isRoot): ?>
         <button class="btn btn-sm btn-danger subtab-action" data-modal="modal-reset-all-playtime"><?= $L('playtime.reset_all') ?></button>
     <?php endif; ?>

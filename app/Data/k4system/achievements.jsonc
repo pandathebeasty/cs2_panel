@@ -1,0 +1,37 @@
+// K4-System achievements.
+// Each one unlocks once, for good, when a player reaches its Goal, and gives its Points once.
+// Progress comes from the stats, playtime and missions K4 already stores, so it counts from a player's first game.
+// The key (for example "kills-100") is stored in the database. Do not rename keys players may have unlocked.
+//
+// Types:
+//   Kills, Headshots, Assists, Mvps, RoundWins, MatchWins, OpeningKills (first kill of a round),
+//   BombPlants, BombDefuses, HostageRescues, NoscopeKills, WallbangKills, SmokeKills (through smoke),
+//   BlindKills (while flashed), RevengeKills, PlaytimeHours, MissionStreak (all daily missions, days in a row)
+// Optional "Name": the shown name. The shipped achievements have names in every language; your own need a Name.
+// Optional "Command": a server command run once on unlock, such as "css_addvip {steamid} 7".
+//   Placeholders: {steamid}, {userid}, {name}, {rank}, {rankid}, {points}
+// An achievement a player has already reached when it is added (or when K4 first loads it) unlocks without
+// its Points or Command; they are for reaching it while playing.
+{
+  "kills-100": { "Type": "Kills", "Goal": 100, "Points": 100 },
+  "kills-1000": { "Type": "Kills", "Goal": 1000, "Points": 500 },
+  "kills-10000": { "Type": "Kills", "Goal": 10000, "Points": 2500 },
+  "headshots-100": { "Type": "Headshots", "Goal": 100, "Points": 150 },
+  "headshots-1000": { "Type": "Headshots", "Goal": 1000, "Points": 750 },
+  "assists-500": { "Type": "Assists", "Goal": 500, "Points": 300 },
+  "mvps-50": { "Type": "Mvps", "Goal": 50, "Points": 300 },
+  "round-wins-500": { "Type": "RoundWins", "Goal": 500, "Points": 400 },
+  "match-wins-50": { "Type": "MatchWins", "Goal": 50, "Points": 500 },
+  "opening-kills-100": { "Type": "OpeningKills", "Goal": 100, "Points": 300 },
+  "bomb-plants-100": { "Type": "BombPlants", "Goal": 100, "Points": 300 },
+  "bomb-defuses-50": { "Type": "BombDefuses", "Goal": 50, "Points": 300 },
+  "noscope-kills-25": { "Type": "NoscopeKills", "Goal": 25, "Points": 250 },
+  "wallbang-kills-50": { "Type": "WallbangKills", "Goal": 50, "Points": 250 },
+  "smoke-kills-25": { "Type": "SmokeKills", "Goal": 25, "Points": 250 },
+  "blind-kills-25": { "Type": "BlindKills", "Goal": 25, "Points": 250 },
+  "revenge-kills-100": { "Type": "RevengeKills", "Goal": 100, "Points": 200 },
+  "playtime-10": { "Type": "PlaytimeHours", "Goal": 10, "Points": 200 },
+  "playtime-100": { "Type": "PlaytimeHours", "Goal": 100, "Points": 1000 },
+  "mission-streak-7": { "Type": "MissionStreak", "Goal": 7, "Points": 500 },
+  "mission-streak-30": { "Type": "MissionStreak", "Goal": 30, "Points": 2000 }
+}

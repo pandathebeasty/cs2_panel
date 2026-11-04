@@ -524,6 +524,51 @@ $L = fn(string $k) => View::e(Lang::t($k));
                             </select>
                         </div>
                     </div>
+                    <?php
+                    $k4x = $s['k4x'];
+                    $k4xFile = static function (string $kind) use ($k4x, $L): void {
+                        $f = $k4x['files'][$kind];
+                    ?>
+                        <div class="field" data-k4x-need="<?= $kind ?>"<?= $k4x[$kind] ? '' : ' hidden' ?>>
+                            <label><?= $L('settings.k4x_file_' . $kind) ?></label>
+                            <div class="file-drop">
+                                <span class="file-btn"><?= $L('settings.choose_file') ?></span>
+                                <span class="file-name" data-placeholder="<?= $L('settings.no_file') ?>"><?= $L('settings.no_file') ?></span>
+                                <input type="file" name="k4_<?= $kind ?>_file" accept=".jsonc,.json">
+                            </div>
+                            <div style="margin-top:8px;display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+                                <span class="badge <?= $f['custom'] ? 'badge-active' : '' ?>" style="font-size:10px"><?= $L($f['custom'] ? 'settings.k4x_custom' : 'settings.k4x_default') ?> · <?= (int) $f['count'] ?></span>
+                                <?php if ($f['custom']): ?>
+                                    <label class="reset-toggle"><input type="checkbox" name="k4_<?= $kind ?>_reset" value="1"><span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 2v6h6"/><path d="M3.5 8a9 9 0 1 0 2.1-3.4L3 8"/></svg><?= $L('settings.reset_default') ?></span></label>
+                                <?php endif; ?>
+                            </div>
+                        </div>
+                    <?php }; ?>
+                    <div class="k4x-settings" style="border-top:1px dashed var(--border);margin-top:16px;padding-top:14px">
+                        <label style="display:block;font-weight:600;margin-bottom:10px"><?= $L('settings.k4x_title') ?></label>
+                        <div style="display:flex;gap:18px;flex-wrap:wrap;margin-bottom:4px">
+                            <?php foreach (['missions', 'achievements', 'seasons'] as $pg): ?>
+                                <div class="check" style="margin:0"><input type="checkbox" class="js-k4x-page" data-page="<?= $pg ?>" name="k4_<?= $pg ?>_enabled" id="k4x_<?= $pg ?>" <?= $k4x[$pg] ? 'checked' : '' ?>><label for="k4x_<?= $pg ?>"><?= $L('nav.k4_' . $pg) ?></label></div>
+                            <?php endforeach; ?>
+                        </div>
+                        <div class="form-row" style="margin-top:14px">
+                            <?php $k4xFile('missions'); $k4xFile('achievements'); ?>
+                        </div>
+                        <div data-k4x-need="missions"<?= $k4x['missions'] ? '' : ' hidden' ?>>
+                            <div class="form-row" style="margin-top:4px">
+                                <div class="field">
+                                    <label><?= $L('settings.k4x_timezone') ?></label>
+                                    <input type="text" name="k4_missions_tz" value="<?= View::e($k4x['tz']) ?>" list="k4x-tz-list" placeholder="Europe/Istanbul" autocomplete="off">
+                                    <datalist id="k4x-tz-list"><?php foreach (\DateTimeZone::listIdentifiers() as $tzId): ?><option value="<?= View::e($tzId) ?>"><?php endforeach; ?></datalist>
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <?php foreach ($k4x['rewards'] as $rk => $rv): ?>
+                                    <div class="field"><label><?= $L('settings.k4x_reward_' . $rk) ?></label><input type="number" name="k4_reward_<?= $rk ?>" value="<?= (int) $rv ?>" min="0" max="1000000"></div>
+                                <?php endforeach; ?>
+                            </div>
+                        </div>
+                    </div>
                     <?php $extdbBlock('k4system'); ?>
                 </div>
                 </div>
@@ -542,6 +587,13 @@ $L = fn(string $k) => View::e(Lang::t($k));
                     }
                     document.querySelectorAll('input[name="stats_backend"]').forEach(function (r) { r.addEventListener('change', sync); });
                     sync();
+                    function k4xSync() {
+                        document.querySelectorAll('[data-k4x-need]').forEach(function (el) {
+                            var cb = document.getElementById('k4x_' + el.getAttribute('data-k4x-need'));
+                            el.hidden = !(cb && cb.checked);
+                        });
+                    }
+                    document.querySelectorAll('.js-k4x-page').forEach(function (c) { c.addEventListener('change', k4xSync); });
                 })();
                 </script>
             </div>

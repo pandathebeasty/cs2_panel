@@ -288,6 +288,17 @@ final class Settings
             'k4_steam'            => (string) Config::get('k4system.steam_column', 'steam_id'),
             // Rank display style for K4-System: 'competitive' (CS:GO skillgroups) or 'premier'.
             'k4_rank_type'        => (string) Config::get('k4system.rank_type', 'competitive'),
+            // K4-System player progress pages; *_def hold an uploaded missions/achievements file (empty = bundled default).
+            'k4_missions_enabled'     => Config::get('k4system.missions', false) ? '1' : '0',
+            'k4_achievements_enabled' => Config::get('k4system.achievements', false) ? '1' : '0',
+            'k4_seasons_enabled'      => Config::get('k4system.seasons', false) ? '1' : '0',
+            'k4_missions_tz'          => (string) Config::get('k4system.missions_timezone', 'Europe/Istanbul'),
+            'k4_reward_easy'          => '150',
+            'k4_reward_medium'        => '300',
+            'k4_reward_hard'          => '600',
+            'k4_reward_weekly'        => '2500',
+            'k4_missions_def'         => '',
+            'k4_achievements_def'     => '',
                        
             'contests_enabled'       => '1',
             'contest_webhook'        => '',

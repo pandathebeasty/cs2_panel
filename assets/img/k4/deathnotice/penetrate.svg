@@ -1,0 +1,19 @@
+<svg width="256px" height="256px" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+	 viewBox="0 0 32 32" enable-background="new 0 0 32 32" xml:space="preserve">
+<g id="Layer_2">
+	<path fill="#FFFFFF" d="M2.416,3.535v24.786l11.387,2.847V0.604L2.416,3.535z M7.73,15.129c-1.271,0-2.302-1.855-2.302-4.144
+		c0-2.289,1.031-4.144,2.302-4.144c1.271,0,2.301,1.855,2.301,4.144C10.031,13.273,9,15.129,7.73,15.129z"/>
+	<g>
+		<rect x="27.349" y="10.765" fill="#FFFFFF" width="2.591" height="0.709"/>
+		
+			<rect x="26.598" y="9.023" transform="matrix(0.7026 -0.7116 0.7116 0.7026 1.5438 22.4478)" fill="#FFFFFF" width="2.057" height="0.707"/>
+		
+			<rect x="27.492" y="11.916" transform="matrix(0.7032 -0.711 0.711 0.7032 -0.9388 23.6404)" fill="#FFFFFF" width="0.707" height="2.058"/>
+		
+			<rect x="26.058" y="12.806" transform="matrix(0.9028 -0.43 0.43 0.9028 -3.2349 12.6689)" fill="#FFFFFF" width="0.708" height="1.371"/>
+		
+			<rect x="25.674" y="8.355" transform="matrix(0.5382 -0.8428 0.8428 0.5382 4.8332 26.2376)" fill="#FFFFFF" width="1.371" height="0.707"/>
+		<path fill="#FFFFFF" d="M16.362,12.138l7.997,0.004l2.054-1.137l-2.164-1.042h-7.887V12.138z"/>
+	</g>
+</g>
+</svg>

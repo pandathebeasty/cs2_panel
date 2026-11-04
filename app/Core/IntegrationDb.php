@@ -91,6 +91,13 @@ final class IntegrationDb
                     $p . $S('k4_stats_table', 'k4stats'),
                     $p . $S('k4_times_table', 'k4times'),
                 ];
+                foreach (['missions' => ['k4missions', 'k4missionstate'], 'achievements' => ['k4achievements'], 'seasons' => ['k4seasons', 'k4seasonstate']] as $page => $extra) {
+                    if ($S('k4_' . $page . '_enabled', '0') === '1') {
+                        foreach ($extra as $t) {
+                            $tables[] = $p . $t;
+                        }
+                    }
+                }
                 break;
             case 'weaponpaints':
                 $p = $S('wp_prefix', (string) Config::get('weaponpaints.prefix', 'wp_'));

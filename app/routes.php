@@ -29,6 +29,7 @@ use App\Controllers\VipController;
 use App\Controllers\WarnController;
 use App\Controllers\ZenithController;
 use App\Controllers\K4Controller;
+use App\Controllers\K4ExtrasController;
 use App\Controllers\CreditsController;
 use App\Controllers\SkinsController;
 use App\Controllers\BenefitController;
@@ -231,6 +232,9 @@ $router->get('/k4/playtime', [K4Controller::class, 'playtime']);
 $router->post('/k4/playtime/reset', [K4Controller::class, 'resetPlaytime']);
 $router->post('/k4/playtime/reset-all', [K4Controller::class, 'resetAllPlaytime']);
 $router->post('/k4/playtime/edit', [K4Controller::class, 'editPlaytime']);
+$router->get('/k4/missions', [K4ExtrasController::class, 'missions']);
+$router->get('/k4/achievements', [K4ExtrasController::class, 'achievements']);
+$router->get('/k4/seasons', [K4ExtrasController::class, 'seasons']);
 
 // Store credits (Statistics group). View = any logged-in user; writes = root.
 $router->get('/credits', [CreditsController::class, 'index']);

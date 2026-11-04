@@ -131,6 +131,10 @@ final class Installer
                 'times_table'  => $input['k4_times_table'] ?: 'k4times',
                 'steam_column' => $input['k4_steam'] ?: 'steam_id',
                 'rank_type'    => (($input['k4_rank_type'] ?? 'competitive') === 'premier') ? 'premier' : 'competitive',
+                'missions'          => false,
+                'achievements'      => false,
+                'seasons'           => false,
+                'missions_timezone' => 'Europe/Istanbul',
             ],
             'vipcore' => [
                 'enabled'       => !empty($input['vip_enabled']),

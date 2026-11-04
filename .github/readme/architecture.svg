@@ -1,0 +1,57 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 360" width="960" height="360" font-family="Segoe UI, Helvetica, Arial, sans-serif">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0f1420"/>
+      <stop offset="1" stop-color="#161d2e"/>
+    </linearGradient>
+    <linearGradient id="acc" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#ff7a1a"/>
+      <stop offset="1" stop-color="#ffb347"/>
+    </linearGradient>
+    <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M0 0L10 5L0 10z" fill="#ffb347"/>
+    </marker>
+  </defs>
+  <rect width="960" height="360" rx="18" fill="url(#bg)"/>
+  <text x="40" y="44" fill="#e8ecf4" font-size="20" font-weight="700">How CS2 Panel fits in</text>
+  <text x="40" y="68" fill="#8892a6" font-size="13">No game-side component: the panel works on the tables the plugins already write.</text>
+
+  <!-- game server -->
+  <rect x="40" y="100" width="260" height="220" rx="14" fill="#1b2335" stroke="#2c3650"/>
+  <text x="60" y="130" fill="#e8ecf4" font-size="15" font-weight="700">CS2 game server</text>
+  <text x="60" y="150" fill="#8892a6" font-size="12">CounterStrikeSharp plugins</text>
+  <g font-size="12.5" fill="#cfd6e4">
+    <rect x="60" y="164" width="220" height="26" rx="7" fill="#232d44"/><text x="72" y="182">CS2-SimpleAdmin</text>
+    <rect x="60" y="196" width="220" height="26" rx="7" fill="#232d44"/><text x="72" y="214">VIPCore</text>
+    <rect x="60" y="228" width="220" height="26" rx="7" fill="#232d44"/><text x="72" y="246">K4-Zenith  /  K4-System</text>
+    <rect x="60" y="260" width="220" height="26" rx="7" fill="#232d44"/><text x="72" y="278">WeaponPaints · Store · Chat Logger</text>
+  </g>
+
+  <!-- database -->
+  <g transform="translate(380 120)">
+    <ellipse cx="100" cy="20" rx="100" ry="20" fill="#232d44" stroke="#3a4766"/>
+    <path d="M0 20v140c0 11 45 20 100 20s100-9 100-20V20" fill="#1b2335" stroke="#3a4766"/>
+    <ellipse cx="100" cy="20" rx="100" ry="20" fill="#26314b" stroke="#3a4766"/>
+    <text x="100" y="80" text-anchor="middle" fill="#e8ecf4" font-size="15" font-weight="700">MySQL / MariaDB</text>
+    <text x="100" y="104" text-anchor="middle" fill="#8892a6" font-size="12">plugin tables</text>
+    <text x="100" y="122" text-anchor="middle" fill="#8892a6" font-size="12">+ panel_* tables</text>
+    <text x="100" y="152" text-anchor="middle" fill="#ffb347" font-size="11.5">one DB or one per integration</text>
+  </g>
+
+  <!-- panel -->
+  <rect x="660" y="100" width="260" height="220" rx="14" fill="#1b2335" stroke="url(#acc)" stroke-width="2"/>
+  <text x="680" y="130" fill="#e8ecf4" font-size="15" font-weight="700">CS2 Panel (PHP 8.1+)</text>
+  <text x="680" y="150" fill="#8892a6" font-size="12">Apache + mod_rewrite</text>
+  <g font-size="12.5" fill="#cfd6e4">
+    <rect x="680" y="164" width="220" height="26" rx="7" fill="#232d44"/><text x="692" y="182">Bans · Mutes · Admins · VIP</text>
+    <rect x="680" y="196" width="220" height="26" rx="7" fill="#232d44"/><text x="692" y="214">Ranks · Stats · Missions</text>
+    <rect x="680" y="228" width="220" height="26" rx="7" fill="#232d44"/><text x="692" y="246">Store · Contests · Skins</text>
+    <rect x="680" y="260" width="220" height="26" rx="7" fill="#232d44"/><text x="692" y="278">Steam login · Discord · SMTP</text>
+  </g>
+
+  <path d="M300 210H372" stroke="#ffb347" stroke-width="2.5" fill="none" marker-end="url(#arr)"/>
+  <path d="M588 210H652" stroke="#ffb347" stroke-width="2.5" fill="none" marker-start="url(#arr)" marker-end="url(#arr)"/>
+  <path d="M790 100V84H170V100" stroke="#5b6b8f" stroke-width="1.6" stroke-dasharray="5 5" fill="none" marker-end="url(#arr)"/>
+  <rect x="402" y="72" width="156" height="24" rx="12" fill="#0f1420" stroke="#5b6b8f"/>
+  <text x="480" y="89" text-anchor="middle" fill="#cfd6e4" font-size="12">RCON · A2S query</text>
+</svg>

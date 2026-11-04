@@ -172,6 +172,17 @@ final class Config
             }
         }
 
+        foreach (['missions', 'achievements', 'seasons'] as $page) {
+            $v = $S('k4_' . $page . '_enabled', null);
+            if ($v !== null) {
+                $map['k4system.' . $page] = ($v === '1' || $v === 1 || $v === true);
+            }
+        }
+        $k4Tz = (string) $S('k4_missions_tz', '');
+        if ($k4Tz !== '' && in_array($k4Tz, timezone_identifiers_list(), true)) {
+            $map['k4system.missions_timezone'] = $k4Tz;
+        }
+
         $skinsEnabled = $S('skins_enabled', null);
         if ($skinsEnabled !== null) {
             $map['weaponpaints.enabled'] = ($skinsEnabled === '1' || $skinsEnabled === 1 || $skinsEnabled === true);

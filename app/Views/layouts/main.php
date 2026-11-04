@@ -84,6 +84,9 @@ $icon = function (string $name): string {
         'lock'    => '<rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 018 0v4"/>',
         'search'  => '<circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/>',
         'player'  => '<circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0116 0"/>',
+        'k4missions'     => '<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1"/>',
+        'k4achievements' => '<circle cx="12" cy="9" r="6"/><path d="M8.2 13.6L7 22l5-3 5 3-1.2-8.4"/><path d="M12 6.5l.8 1.6 1.7.2-1.2 1.2.3 1.7-1.6-.8-1.6.8.3-1.7-1.2-1.2 1.7-.2z"/>',
+        'k4seasons'      => '<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4M8 15h3"/>',
     ];
     return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' . ($icons[$name] ?? '') . '</svg>';
 };
@@ -130,6 +133,11 @@ if ($statsOn) {
         ['path' => $statsBase . '/ranks', 'icon' => 'rank', 'label' => 'nav.ranks'],
         ['path' => $statsBase . '/playtime', 'icon' => 'stats', 'label' => 'nav.playtime'],
     ]];
+    if ($statsBase === '/k4') {
+        foreach (\App\Models\K4ExtrasModel::pages() as $extraPage) {
+            $navigationSections['stats']['items'][] = ['path' => '/k4/' . $extraPage, 'icon' => 'k4' . $extraPage, 'label' => 'nav.k4_' . $extraPage];
+        }
+    }
 }
 // Store credits (cs2-store) sit under Statistics. They can be enabled
 // independently of the ranks/playtime backend, so create the group if needed.

@@ -1,0 +1,78 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 600" width="960" height="600" font-family="Segoe UI, Helvetica, Arial, sans-serif">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0f1420"/>
+      <stop offset="1" stop-color="#161d2e"/>
+    </linearGradient>
+    <linearGradient id="hero" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#2a1a10"/>
+      <stop offset="1" stop-color="#141a28"/>
+    </linearGradient>
+    <linearGradient id="acc" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#ff7a1a"/>
+      <stop offset="1" stop-color="#ffb347"/>
+    </linearGradient>
+  </defs>
+  <rect width="960" height="600" rx="18" fill="url(#bg)"/>
+
+  <!-- window chrome -->
+  <rect x="24" y="20" width="912" height="560" rx="12" fill="#121827" stroke="#2c3650"/>
+  <circle cx="46" cy="40" r="5" fill="#ff5f57"/><circle cx="62" cy="40" r="5" fill="#febc2e"/><circle cx="78" cy="40" r="5" fill="#28c840"/>
+  <rect x="300" y="30" width="360" height="20" rx="10" fill="#1b2335"/>
+  <text x="480" y="44" text-anchor="middle" fill="#8892a6" font-size="11.5">https://panel.example.com/install</text>
+
+  <!-- left hero -->
+  <rect x="24" y="60" width="300" height="520" fill="url(#hero)"/>
+  <text x="52" y="120" fill="#e8ecf4" font-size="26" font-weight="800">CS2 Panel</text>
+  <rect x="52" y="136" width="70" height="4" rx="2" fill="url(#acc)"/>
+  <text x="52" y="170" fill="#aab3c5" font-size="12.5">Setup wizard · one page</text>
+  <text x="52" y="530" fill="#5b6b8f" font-size="11">Language · effects · theme toggles (top right)</text>
+
+  <!-- right form -->
+  <g font-size="12">
+    <text x="356" y="96" fill="#e8ecf4" font-size="17" font-weight="700">Install</text>
+
+    <g transform="translate(356 116)">
+      <circle cx="9" cy="9" r="9" fill="url(#acc)"/><text x="9" y="13" text-anchor="middle" fill="#0f1420" font-weight="800" font-size="11">1</text>
+      <text x="26" y="13" fill="#ffb347" font-weight="700">Database</text>
+      <rect x="0" y="24" width="250" height="26" rx="6" fill="#1b2335" stroke="#2c3650"/><text x="10" y="41" fill="#8892a6">Host *  127.0.0.1</text>
+      <rect x="262" y="24" width="250" height="26" rx="6" fill="#1b2335" stroke="#2c3650"/><text x="272" y="41" fill="#8892a6">Port  3306</text>
+      <rect x="0" y="56" width="250" height="26" rx="6" fill="#1b2335" stroke="#2c3650"/><text x="10" y="73" fill="#8892a6">Database *</text>
+      <rect x="262" y="56" width="250" height="26" rx="6" fill="#1b2335" stroke="#2c3650"/><text x="272" y="73" fill="#8892a6">SimpleAdmin prefix  sa_</text>
+      <rect x="0" y="88" width="250" height="26" rx="6" fill="#1b2335" stroke="#2c3650"/><text x="10" y="105" fill="#8892a6">User *</text>
+      <rect x="262" y="88" width="250" height="26" rx="6" fill="#1b2335" stroke="#2c3650"/><text x="272" y="105" fill="#8892a6">Password</text>
+    </g>
+
+    <g transform="translate(356 248)">
+      <circle cx="9" cy="9" r="9" fill="url(#acc)"/><text x="9" y="13" text-anchor="middle" fill="#0f1420" font-weight="800" font-size="11">2</text>
+      <text x="26" y="13" fill="#ffb347" font-weight="700">Site</text>
+      <rect x="0" y="24" width="250" height="26" rx="6" fill="#1b2335" stroke="#2c3650"/><text x="10" y="41" fill="#8892a6">Site name</text>
+      <rect x="262" y="24" width="250" height="26" rx="6" fill="#1b2335" stroke="#2c3650"/><text x="272" y="41" fill="#8892a6">Timezone  Europe/Bucharest</text>
+      <rect x="0" y="56" width="512" height="26" rx="6" fill="#1b2335" stroke="#2c3650"/><text x="10" y="73" fill="#8892a6">Site URL *  https://panel.example.com</text>
+      <rect x="0" y="88" width="512" height="26" rx="6" fill="#1b2335" stroke="#2c3650"/><text x="10" y="105" fill="#8892a6">Steam Web API key</text>
+    </g>
+
+    <g transform="translate(356 380)">
+      <circle cx="9" cy="9" r="9" fill="url(#acc)"/><text x="9" y="13" text-anchor="middle" fill="#0f1420" font-weight="800" font-size="11">3</text>
+      <text x="26" y="13" fill="#ffb347" font-weight="700">Owner</text>
+      <rect x="0" y="24" width="250" height="26" rx="6" fill="#1b2335" stroke="#2c3650"/><text x="10" y="41" fill="#8892a6">Root SteamID64 *  7656119…</text>
+      <rect x="262" y="24" width="250" height="26" rx="6" fill="#1b2335" stroke="#2c3650"/><text x="272" y="41" fill="#8892a6">Display name</text>
+    </g>
+
+    <g transform="translate(356 446)">
+      <circle cx="9" cy="9" r="9" fill="url(#acc)"/><text x="9" y="13" text-anchor="middle" fill="#0f1420" font-weight="800" font-size="11">4</text>
+      <text x="26" y="13" fill="#ffb347" font-weight="700">Integrations</text>
+      <rect x="0" y="24" width="512" height="40" rx="8" fill="#1b2335" stroke="#2c3650"/>
+      <rect x="10" y="36" width="14" height="14" rx="3" fill="url(#acc)"/>
+      <text x="32" y="48" fill="#cfd6e4">SimpleAdmin · VIPCore · Zenith / K4-System · Skins · Chat · Store</text>
+      <text x="0" y="82" fill="#5b6b8f" font-size="11">each block: tables + optional “Dedicated Database”</text>
+    </g>
+
+    <g transform="translate(356 538)">
+      <circle cx="9" cy="9" r="9" fill="url(#acc)"/><text x="9" y="13" text-anchor="middle" fill="#0f1420" font-weight="800" font-size="11">5</text>
+      <text x="26" y="13" fill="#ffb347" font-weight="700">Discord (optional)</text>
+    </g>
+    <rect x="740" y="530" width="128" height="30" rx="8" fill="url(#acc)"/>
+    <text x="804" y="550" text-anchor="middle" fill="#0f1420" font-weight="800">Install</text>
+  </g>
+</svg>
