@@ -155,6 +155,27 @@ final class SystemController extends Controller
         $this->redirect('/settings#sys-backups');
     }
 
+    public function deleteBackups(): void
+    {
+        Auth::requireRoot();
+        $this->verifyCsrf();
+        $files = $this->input('files', []);
+        $deleted = [];
+        foreach (is_array($files) ? array_slice(array_unique($files), 0, 500) : [] as $file) {
+            $path = is_string($file) ? Backup::path($file) : null;
+            if ($path !== null && @unlink($path)) {
+                $deleted[] = basename($path);
+            }
+        }
+        if ($deleted) {
+            Logger::log('system.backup_delete', implode(', ', $deleted));
+            $this->flash('success', Lang::t('system.backups_deleted', ['n' => count($deleted)]));
+        } else {
+            $this->flash('error', Lang::t('system.backup_missing'));
+        }
+        $this->redirect('/settings#sys-backups');
+    }
+
     public function restoreBackup(): void
     {
         Auth::requireRoot();

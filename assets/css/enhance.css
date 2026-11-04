@@ -360,8 +360,22 @@ html[data-effects="reduced"] .x-score-fg { animation: none; }
 .x-expire .field { margin: 10px 0 0; max-width: 220px; }
 .x-expire p { margin: 8px 0 0; }
 
-.x-file-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; max-height: 560px; overflow-y: auto; }
-.x-file-list li { display: grid; grid-template-columns: auto 1fr auto; gap: 12px; align-items: center; padding: 10px; border-radius: var(--radius-sm); background: var(--bg-3); }
+.x-file-list { list-style: none; margin: 0; padding: 0 6px 0 0; display: grid; gap: 6px; max-height: 560px; overflow-y: auto; overscroll-behavior: contain; scrollbar-gutter: stable; }
+/* Chromium ignores ::-webkit-scrollbar while scrollbar-width/color are set, and its thin Windows scrollbar keeps arrow buttons. */
+@supports selector(::-webkit-scrollbar) {
+    .x-file-list { scrollbar-width: auto; scrollbar-color: auto; }
+    .x-file-list::-webkit-scrollbar { width: 6px; }
+    .x-file-list::-webkit-scrollbar-button { display: none; height: 0; }
+    .x-file-list::-webkit-scrollbar-track { background: color-mix(in srgb, var(--scroll) 35%, transparent); border-radius: 10px; }
+    .x-file-list::-webkit-scrollbar-thumb { background: var(--scroll); border: 0; border-radius: 10px; }
+    .x-file-list::-webkit-scrollbar-thumb:hover { background: var(--accent); }
+}
+.x-file-list li { display: grid; grid-template-columns: auto auto 1fr auto; gap: 12px; align-items: center; padding: 10px; border-radius: var(--radius-sm); background: var(--bg-3); border: 1px solid transparent; transition: border-color var(--tr), background var(--tr); }
+.x-file-list li.is-selected { border-color: color-mix(in srgb, var(--red, #ef4444) 55%, transparent); background: color-mix(in srgb, var(--red, #ef4444) 8%, var(--bg-3)); }
+.x-file-check { width: 16px; height: 16px; margin: 0; accent-color: var(--accent); cursor: pointer; }
+.x-file-bulk { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin: 0 6px 10px 0; padding: 0 10px; }
+.x-file-bulk .inline-check { display: inline-flex; align-items: center; gap: 8px; cursor: pointer; font-size: 13px; }
+.x-file-bulk input[type="checkbox"] { width: 16px; height: 16px; margin: 0; accent-color: var(--accent); }
 .x-file-type {
     --x-tone: var(--accent); font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em;
     padding: 4px 8px; border-radius: 6px; color: var(--x-tone); background: color-mix(in srgb, var(--x-tone) 14%, transparent); min-width: 54px; text-align: center;
@@ -376,7 +390,9 @@ html[data-effects="reduced"] .x-score-fg { animation: none; }
 .x-file-actions { display: flex; gap: 6px; align-items: center; }
 .x-file-actions form { margin: 0; }
 @media (max-width: 560px) {
-    .x-file-list li { grid-template-columns: 1fr; }
+    .x-file-list li { grid-template-columns: auto 1fr; }
+    .x-file-list li > :not(.x-file-check) { grid-column: 2; }
+    .x-file-check { grid-row: 1 / span 3; align-self: start; margin-top: 4px; }
     .x-file-type { justify-self: start; }
 }
 .x-rollback { display: flex; align-items: center; gap: 14px; margin: 6px 0 12px; }

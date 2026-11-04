@@ -103,9 +103,15 @@ $autoStatus = explode('|', $s['backup_auto_status']);
                 <?php if (!$backups): ?>
                     <div class="x-empty"><?= $L('system.no_backups') ?></div>
                 <?php else: ?>
+                    <form class="x-file-bulk" id="backup-bulk" method="post" action="<?= View::e(url('/system/backups/delete-many')) ?>" data-confirm="<?= $L('system.delete_many_confirm') ?>" data-confirm-danger data-bk-bulk>
+                        <?= $csrfField ?>
+                        <label class="inline-check"><input type="checkbox" data-bk-all> <?= $L('system.select_all') ?></label>
+                        <button class="btn btn-sm btn-danger" type="submit" data-bk-delete disabled><?= $L('system.delete_selected') ?> (<span data-bk-count>0</span>)</button>
+                    </form>
                     <ul class="x-file-list">
                         <?php foreach ($backups as $b): ?>
                             <li>
+                                <input type="checkbox" class="x-file-check" name="files[]" value="<?= View::e($b['name']) ?>" form="backup-bulk" data-bk-row aria-label="<?= View::e($b['name']) ?>">
                                 <span class="x-file-type is-<?= View::e($b['type']) ?>"><?= $L('system.type_' . $b['type']) ?></span>
                                 <div class="x-file-name">
                                     <b class="mono" title="<?= View::e($b['name']) ?>"><?= View::e($b['name']) ?></b>
@@ -231,5 +237,27 @@ $autoStatus = explode('|', $s['backup_auto_status']);
         exp.addEventListener('change', syncExp);
         syncExp();
     }
+})();
+(function () {
+    var form = document.querySelector('[data-bk-bulk]');
+    if (!form) return;
+    var all = form.querySelector('[data-bk-all]');
+    var btn = form.querySelector('[data-bk-delete]');
+    var count = form.querySelector('[data-bk-count]');
+    var rows = Array.from(document.querySelectorAll('[data-bk-row]'));
+    function sync() {
+        var n = rows.filter(function (r) { return r.checked; }).length;
+        count.textContent = n;
+        btn.disabled = n === 0;
+        all.checked = n > 0 && n === rows.length;
+        all.indeterminate = n > 0 && n < rows.length;
+        rows.forEach(function (r) { r.closest('li').classList.toggle('is-selected', r.checked); });
+    }
+    all.addEventListener('change', function () {
+        rows.forEach(function (r) { r.checked = all.checked; });
+        sync();
+    });
+    rows.forEach(function (r) { r.addEventListener('change', sync); });
+    sync();
 })();
 </script>

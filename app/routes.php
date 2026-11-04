@@ -277,6 +277,7 @@ $router->post('/system/backups/schedule', [SystemController::class, 'saveBackups
 $router->post('/system/backups/create', [SystemController::class, 'backupNow']);
 $router->get('/system/backups/download', [SystemController::class, 'download']);
 $router->post('/system/backups/delete', [SystemController::class, 'deleteBackup']);
+$router->post('/system/backups/delete-many', [SystemController::class, 'deleteBackups']);
 $router->post('/system/backups/restore', [SystemController::class, 'restoreBackup']);
 $router->post('/system/monitoring', [SystemController::class, 'saveMonitor']);
 $router->post('/system/security', [SystemController::class, 'saveSecurity']);
