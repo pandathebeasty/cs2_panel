@@ -15,6 +15,9 @@ use PDO;
  */
 final class Backup
 {
+    /** Line that starts a section restored into an integration's own database. */
+    private const CONNECTION_MARKER = '-- @connection: ';
+
     /** Absolute path to the backups directory (next to the app). */
     public static function dir(): string
     {
@@ -71,6 +74,26 @@ final class Backup
             $tables = $pdo->query('SHOW TABLES')->fetchAll(PDO::FETCH_COLUMN);
             foreach ($tables as $table) {
                 self::dumpTable($pdo, $handle, (string) $table);
+            }
+
+            // Integrations on their own database: dump only the tables they own,
+            // in a section restore() sends back to that same database.
+            foreach (Database::separateConfigs() as $key => $cfg) {
+                $xpdo = Database::connection($key);
+                $owned = array_map('strtolower', (array) ($cfg['tables'] ?? []));
+                $prefixes = array_map('strtolower', (array) ($cfg['prefixes'] ?? []));
+                self::write($handle, "\nSET FOREIGN_KEY_CHECKS=1;\n" . self::CONNECTION_MARKER . $key . "\n"
+                    . '-- Database: ' . (string) ($cfg['name'] ?? '') . "\nSET FOREIGN_KEY_CHECKS=0;\n");
+                foreach ($xpdo->query('SHOW TABLES')->fetchAll(PDO::FETCH_COLUMN) as $table) {
+                    $lower = strtolower((string) $table);
+                    $mine = in_array($lower, $owned, true);
+                    foreach ($prefixes as $p) {
+                        $mine = $mine || ($p !== '' && str_starts_with($lower, $p));
+                    }
+                    if ($mine) {
+                        self::dumpTable($xpdo, $handle, (string) $table);
+                    }
+                }
             }
 
             self::write($handle, "SET FOREIGN_KEY_CHECKS=1;\n");
@@ -276,6 +299,13 @@ final class Backup
             $pdo = Database::connection();
             $pdo->exec('SET FOREIGN_KEY_CHECKS=0');
             while (($line = $gz ? gzgets($handle) : fgets($handle)) !== false) {
+                if ($buffer === '' && str_starts_with($line, self::CONNECTION_MARKER)) {
+                    // Following tables belong to an integration database. If that
+                    // integration no longer has its own database, connection()
+                    // returns the main one, where its tables now live.
+                    $pdo = Database::connection(trim(substr($line, strlen(self::CONNECTION_MARKER))));
+                    continue;
+                }
                 if ($buffer === '' && (str_starts_with($line, '--') || trim($line) === '')) {
                     continue;
                 }
@@ -293,6 +323,9 @@ final class Backup
             $pdo->exec('SET FOREIGN_KEY_CHECKS=1');
         } catch (\Throwable $e) {
             try {
+                if (isset($pdo)) {
+                    $pdo->exec('SET FOREIGN_KEY_CHECKS=1');
+                }
                 Database::connection()->exec('SET FOREIGN_KEY_CHECKS=1');
             } catch (\Throwable $ignored) {
             }

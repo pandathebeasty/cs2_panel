@@ -28,11 +28,12 @@ final class Paginator
         array $params,
         int $page,
         int $perPage,
-        string $orderBy = ''
+        string $orderBy = '',
+        ?string $connection = null
     ): self {
         $p = new self();
         $p->perPage = max(1, min(200, $perPage));
-        $p->total   = self::count($countSql, $params);
+        $p->total   = self::count($countSql, $params, $connection);
         $p->lastPage = max(1, (int) ceil($p->total / $p->perPage));
         $p->page    = max(1, min($page, $p->lastPage));
 
@@ -41,7 +42,7 @@ final class Paginator
         // LIMIT/OFFSET interpolated as int (cannot be bound as a parameter on all drivers)
         $sql = $baseSql . $order . ' LIMIT ' . $p->perPage . ' OFFSET ' . $offset;
 
-        $p->items = Database::all($sql, $params);
+        $p->items = Database::all($sql, $params, $connection);
         return $p;
     }
 
@@ -49,14 +50,14 @@ final class Paginator
      * COUNT(*) on large tables is the slowest part of a list page. Totals of
      * 5 000+ rows are reused for 30 seconds; smaller ones are always exact.
      */
-    private static function count(string $countSql, array $params): int
+    private static function count(string $countSql, array $params, ?string $connection = null): int
     {
-        $key = 'count:' . sha1($countSql . "\0" . serialize($params));
+        $key = 'count:' . sha1(($connection ?? '') . "\0" . $countSql . "\0" . serialize($params));
         $cached = Cache::get($key);
         if (is_int($cached)) {
             return $cached;
         }
-        $total = (int) Database::scalar($countSql, $params);
+        $total = (int) Database::scalar($countSql, $params, $connection);
         if ($total >= 5000) {
             Cache::set($key, $total, 30);
         }

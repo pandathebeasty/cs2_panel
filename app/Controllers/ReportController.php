@@ -166,63 +166,57 @@ final class ReportController extends Controller
         }
 
         $appliedAction = '';
-        $pdo = \App\Core\Database::connection();
-        $ownTransaction = !$pdo->inTransaction();
-        if ($ownTransaction) {
-            $pdo->beginTransaction();
-        }
         try {
-            if ($applyAction) {
-                $actorSteamId = (string) (Auth::steamId() ?? '0');
-                $actorName = (string) (Auth::user()['name'] ?? 'Web');
-                $serverId = !empty($report['server_id']) ? (int) $report['server_id'] : null;
+            // The sanction (SimpleAdmin) and the report status (panel) commit together,
+            // even when SimpleAdmin lives in a separate database.
+            \App\Core\Database::atomic(['default', 'simpleadmin'], function () use ($applyAction, $report, $requestedType, $actionReason, $duration, $id, $status, $reply, &$appliedAction): void {
+                if ($applyAction) {
+                    $actorSteamId = (string) (Auth::steamId() ?? '0');
+                    $actorName = (string) (Auth::user()['name'] ?? 'Web');
+                    $serverId = !empty($report['server_id']) ? (int) $report['server_id'] : null;
 
-                if ($requestedType === 'ban') {
-                    BanModel::create([
-                        'player_name' => (string) ($report['target_name'] ?? ''),
-                        'player_steamid' => (string) $report['target_steamid'],
-                        'player_ip' => null,
-                        'admin_steamid' => $actorSteamId,
-                        'admin_name' => $actorName,
-                        'reason' => $actionReason,
-                        'duration' => $duration,
-                        'server_id' => $serverId,
-                    ]);
-                    $appliedAction = Lang::t('reports.type_ban');
-                } else {
-                    $muteType = match ($requestedType) {
-                        'gag' => 'GAG',
-                        'silence' => 'SILENCE',
-                        default => 'MUTE',
-                    };
-                    \App\Models\MuteModel::create([
-                        'player_name' => (string) ($report['target_name'] ?? ''),
-                        'player_steamid' => (string) $report['target_steamid'],
-                        'admin_steamid' => $actorSteamId,
-                        'admin_name' => $actorName,
-                        'reason' => $actionReason,
-                        'duration' => $duration,
-                        'type' => $muteType,
-                        'server_id' => $serverId,
-                    ]);
-                    $appliedAction = Lang::t('reports.type_' . $requestedType);
+                    if ($requestedType === 'ban') {
+                        BanModel::create([
+                            'player_name' => (string) ($report['target_name'] ?? ''),
+                            'player_steamid' => (string) $report['target_steamid'],
+                            'player_ip' => null,
+                            'admin_steamid' => $actorSteamId,
+                            'admin_name' => $actorName,
+                            'reason' => $actionReason,
+                            'duration' => $duration,
+                            'server_id' => $serverId,
+                        ]);
+                        $appliedAction = Lang::t('reports.type_ban');
+                    } else {
+                        $muteType = match ($requestedType) {
+                            'gag' => 'GAG',
+                            'silence' => 'SILENCE',
+                            default => 'MUTE',
+                        };
+                        \App\Models\MuteModel::create([
+                            'player_name' => (string) ($report['target_name'] ?? ''),
+                            'player_steamid' => (string) $report['target_steamid'],
+                            'admin_steamid' => $actorSteamId,
+                            'admin_name' => $actorName,
+                            'reason' => $actionReason,
+                            'duration' => $duration,
+                            'type' => $muteType,
+                            'server_id' => $serverId,
+                        ]);
+                        $appliedAction = Lang::t('reports.type_' . $requestedType);
+                    }
                 }
-            }
 
-            ReportModel::resolve(
-                (int) $id,
-                $status,
-                $reply,
-                (string) Auth::steamId(),
-                (string) (Auth::user()['name'] ?? '')
-            );
-            if ($ownTransaction) {
-                $pdo->commit();
-            }
+                ReportModel::resolve(
+                    (int) $id,
+                    $status,
+                    $reply,
+                    (string) Auth::steamId(),
+                    (string) (Auth::user()['name'] ?? '')
+                );
+            });
         } catch (\Throwable $e) {
-            if ($ownTransaction && $pdo->inTransaction()) {
-                $pdo->rollBack();
-            }
+            $appliedAction = '';
             error_log('[CS2Panel] report resolution failed: ' . $e->getMessage());
             $this->flash('error', Lang::t('reports.resolve_failed'));
             $this->redirect('/reports');

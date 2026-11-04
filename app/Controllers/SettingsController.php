@@ -6,6 +6,8 @@ namespace App\Controllers;
 
 use App\Core\Auth;
 use App\Core\Controller;
+use App\Core\Database;
+use App\Core\DevMode;
 use App\Core\Discord;
 use App\Core\Lang;
 use App\Core\Settings;
@@ -187,6 +189,7 @@ final class SettingsController extends Controller
                 'wp_prefix'       => Settings::get('wp_prefix', \App\Core\Config::get('weaponpaints.prefix', 'wp_')),
                 'chat_logs_enabled' => ChatLogModel::enabled(),
                 'chat_logs_table'   => Settings::get('chat_logs_table', 'chat_logs'),
+                'extdb'             => self::integrationDbView(),
             ],
             // Built-in preset themes shown in the Themes tab.
             // Each entry carries a full color set used to render a live mini preview.
@@ -218,6 +221,7 @@ final class SettingsController extends Controller
             $this->flash('error', Lang::t('settings.chat_logs_invalid_table'));
             $this->redirect('/settings#integrations');
         }
+        $extDb = $this->collectIntegrationDbInput();
 
         // Avoid a separate remote DB round-trip for every settings field.
                                                                                   
@@ -405,6 +409,9 @@ final class SettingsController extends Controller
         Settings::set('wp_prefix', trim((string) $this->input('wp_prefix', 'wp_')) ?: 'wp_');
         Settings::set('chat_logs_enabled', $this->input('chat_logs_enabled') ? '1' : '0');
         Settings::set('chat_logs_table', trim($chatTable));
+        foreach ($extDb as $key => $value) {
+            Settings::set($key, $value);
+        }
 
                                                                                                
         if ($this->input('reset_logo')) {
@@ -515,6 +522,8 @@ final class SettingsController extends Controller
             // Per-category Discord toggles -> single "Discord notifications" label.
             if (str_starts_with($k, 'discord_notify_')) {
                 $label = 'Discord notifications';
+            } elseif (preg_match('/^extdb_([a-z0-9]+)_/', $k, $em) && isset(\App\Core\IntegrationDb::KEYS[$em[1]])) {
+                $label = 'Separate database: ' . \App\Core\IntegrationDb::KEYS[$em[1]];
             } elseif ($k === 'stats_backend') {
                 // Spell out which backend was chosen so the log isn't ambiguous.
                 $backend = \App\Models\StatsBackend::which();
@@ -829,6 +838,119 @@ final class SettingsController extends Controller
             $this->json(['ok' => true]);
         }
         $this->redirect('/settings#themes');
+    }
+
+    /**
+     * Separate-database state per integration for the Settings view (the
+     * password itself is never sent back, only whether one is stored).
+     * @return array<string,array<string,mixed>>
+     */
+    private static function integrationDbView(): array
+    {
+        $out = [];
+        foreach (\App\Core\IntegrationDb::KEYS as $k => $label) {
+            $out[$k] = [
+                'label'    => $label,
+                'enabled'  => Settings::get("extdb_{$k}_enabled", '0') === '1',
+                'active'   => Database::isSeparate($k),
+                'host'     => (string) Settings::get("extdb_{$k}_host", ''),
+                'port'     => (string) Settings::get("extdb_{$k}_port", '3306'),
+                'name'     => (string) Settings::get("extdb_{$k}_name", ''),
+                'user'     => (string) Settings::get("extdb_{$k}_user", ''),
+                'has_pass' => (string) Settings::get("extdb_{$k}_pass", '') !== '',
+                'tables'   => \App\Core\IntegrationDb::ownedTables($k),
+            ];
+        }
+        return $out;
+    }
+
+    /**
+     * Validated extdb_* values from the Settings form. A blank password keeps
+     * the stored one. A newly enabled or changed connection is tested first so
+     * a typo can't take an integration offline.
+     * @return array<string,string>
+     */
+    private function collectIntegrationDbInput(): array
+    {
+        $out = [];
+        foreach (\App\Core\IntegrationDb::KEYS as $k => $label) {
+            $enabled = $this->input("extdb_{$k}_enabled") ? '1' : '0';
+            $host = trim((string) $this->input("extdb_{$k}_host", ''));
+            $port = (int) $this->input("extdb_{$k}_port", 3306);
+            $name = trim((string) $this->input("extdb_{$k}_name", ''));
+            $user = trim((string) $this->input("extdb_{$k}_user", ''));
+            $pass = (string) $this->input("extdb_{$k}_pass", '');
+            if ($pass === '') {
+                $pass = (string) Settings::get("extdb_{$k}_pass", '');
+            }
+            $port = $port >= 1 && $port <= 65535 ? $port : 3306;
+
+            if ($enabled === '1') {
+                if ($host === '' || $name === '' || $user === ''
+                    || !preg_match('/^[A-Za-z0-9.\-_:\[\]]{1,255}$/', $host)
+                    || !preg_match('/^[A-Za-z0-9_$\-]{1,64}$/', $name)
+                    || mb_strlen($user) > 80) {
+                    $this->flash('error', Lang::t('settings.extdb_invalid', ['name' => $label]));
+                    $this->redirect('/settings#integrations');
+                }
+                $changed = Settings::get("extdb_{$k}_enabled", '0') !== '1'
+                    || Settings::get("extdb_{$k}_host", '') !== $host
+                    || (string) Settings::get("extdb_{$k}_port", '3306') !== (string) $port
+                    || Settings::get("extdb_{$k}_name", '') !== $name
+                    || Settings::get("extdb_{$k}_user", '') !== $user
+                    || Settings::get("extdb_{$k}_pass", '') !== $pass;
+                if ($changed && !DevMode::enabled()) {
+                    $test = Database::test(['host' => $host, 'port' => $port, 'name' => $name, 'user' => $user, 'password' => $pass]);
+                    if (!$test['ok']) {
+                        $this->flash('error', Lang::t('settings.extdb_connect_failed', ['name' => $label]) . ' ' . $test['error']);
+                        $this->redirect('/settings#integrations');
+                    }
+                    // Appeals and Reports write to SimpleAdmin and the panel together:
+                    // both servers must support two-phase commit so those writes stay atomic.
+                    if (in_array($k, \App\Core\IntegrationDb::CROSS_WRITE_KEYS, true)
+                        && (empty($test['xa']) || !Database::supportsXa(Database::connection()))) {
+                        $this->flash('error', Lang::t('settings.extdb_xa_required', ['name' => $label]));
+                        $this->redirect('/settings#integrations');
+                    }
+                }
+            }
+            $out["extdb_{$k}_enabled"] = $enabled;
+            $out["extdb_{$k}_host"] = $host;
+            $out["extdb_{$k}_port"] = (string) $port;
+            $out["extdb_{$k}_name"] = $name;
+            $out["extdb_{$k}_user"] = $user;
+            $out["extdb_{$k}_pass"] = $pass;
+        }
+        return $out;
+    }
+
+    /** Test a separate integration database (Settings > Integrations). AJAX JSON. */
+    public function testIntegrationDb(): void
+    {
+        Auth::requireManage();
+        $this->verifyCsrf();
+        $k = (string) $this->input('key', '');
+        if (!isset(\App\Core\IntegrationDb::KEYS[$k])) {
+            $this->json(['ok' => false, 'error' => 'Unknown integration.'], 422);
+        }
+        $host = trim((string) $this->input('host', ''));
+        $name = trim((string) $this->input('name', ''));
+        if (!preg_match('/^[A-Za-z0-9.\-_:\[\]]{1,255}$/', $host) || !preg_match('/^[A-Za-z0-9_$\-]{1,64}$/', $name)) {
+            $this->json(['ok' => false, 'error' => Lang::t('settings.extdb_invalid', ['name' => \App\Core\IntegrationDb::KEYS[$k]])], 422);
+        }
+        $pass = (string) $this->input('pass', '');
+        if ($pass === '') {
+            $pass = (string) Settings::get("extdb_{$k}_pass", '');
+        }
+        $port = (int) $this->input('port', 3306);
+        $result = Database::test([
+            'host' => $host,
+            'port' => $port >= 1 && $port <= 65535 ? $port : 3306,
+            'name' => $name,
+            'user' => trim((string) $this->input('user', '')),
+            'password' => $pass,
+        ], \App\Core\IntegrationDb::ownedTables($k)['tables']);
+        $this->json($result, $result['ok'] ? 200 : 422);
     }
 
     /**

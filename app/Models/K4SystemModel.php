@@ -159,7 +159,7 @@ final class K4SystemModel
         $killsSel  = self::hasStats() ? 'COALESCE(s.`kills`, 0)' : '0';
         $deathsSel = self::hasStats() ? 'COALESCE(s.`deaths`, 0)' : '0';
         $join = self::hasStats() ? "LEFT JOIN `{$stats}` s ON s.`{$sc}` = tm.`{$sc}`" : '';
-        $castMin = static fn(string $col): string => Database::castInt("tm.`{$col}` / 60");
+        $castMin = static fn(string $col): string => Database::castInt("tm.`{$col}` / 60", Database::connection('k4system'));
 
         $base = "SELECT tm.`{$sc}` AS steam_id, tm.`name` AS name,
                         {$castMin('all')} AS playtime_minutes,
@@ -377,7 +377,7 @@ final class K4SystemModel
         $times = self::timesTable();
         // k4times stores seconds; 'all' is the total, 'ct_t' sums ct + t.
         $secs = $source === 'ct_t' ? '(`ct` + `t`)' : '`all`';
-        $castSecs = Database::castInt("{$secs} / 60");
+        $castSecs = Database::castInt("{$secs} / 60", Database::connection('k4system'));
 
         return Database::all(
             "SELECT `{$sc}` AS steam_id, `name` AS name,

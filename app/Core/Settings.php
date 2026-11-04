@@ -360,6 +360,7 @@ final class Settings
         foreach (array_keys(Store::testFeatures()) as $feat) {
             $d['test_feat_' . $feat] = '0';
         }
+        $d += IntegrationDb::defaults();
 
         return $d;
     }

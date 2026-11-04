@@ -195,7 +195,7 @@ final class BanModel
                 }
                 self::recordUnban($id, $liftAdminId, $liftReason);
             }
-        });
+        }, 'simpleadmin');
     }
 
     /**
@@ -230,7 +230,7 @@ final class BanModel
      */
     public static function unban(int $banId, int $adminId, string $reason): void
     {
-        Database::transaction(static fn() => self::recordUnban($banId, $adminId, $reason));
+        Database::transaction(static fn() => self::recordUnban($banId, $adminId, $reason), 'simpleadmin');
     }
 
     private static function recordUnban(int $banId, int $adminId, string $reason): void

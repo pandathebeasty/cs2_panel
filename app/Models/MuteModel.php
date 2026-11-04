@@ -112,7 +112,7 @@ final class MuteModel
                 "UPDATE {$p}mutes SET status = 'UNMUTED', unmute_id = ?, ends = ? WHERE id = ?",
                 [$unmuteId, date('Y-m-d H:i:s'), $muteId]
             );
-        });
+        }, 'simpleadmin');
     }
 
     public static function stats(): array

@@ -1,7 +1,8 @@
 <?php use App\Core\Lang; use App\Core\View;
 /** @var array $errors @var array $old @var string $csrf */
 $o = fn(string $k, string $d = '') => View::e($old[$k] ?? $d);
-$title = 'Panel Installation';
+$t = static fn(string $k): string => View::e(Lang::t($k));
+$title = Lang::t('install.title');
 $curLang = Lang::current();
 $year = date('Y');
 // required marker
@@ -13,9 +14,9 @@ $req = '<span class="req">*</span>';
         <div class="install-hero-inner">
             <img src="/assets/img/logo.svg" alt="logo" class="install-logo">
             <h1>CS2 Panel</h1>
-            <p>Admin panel for Counter-Strike 2.</p>
+            <p><?= $t('install.hero_sub') ?></p>
             <ul class="install-features">
-                <li>Compatibility with: Simple Admin, VIP Core &amp; K4 Rank System</li>
+                <li><?= $t('install.hero_compat') ?></li>
             </ul>
         </div>
         <div class="install-credit">
@@ -43,7 +44,7 @@ $req = '<span class="req">*</span>';
         </div>
 
         <div class="install-form-scroll">
-            <h2>Panel Installation</h2>
+            <h2><?= $t('install.title') ?></h2>
 
             <?php foreach ($errors as $e): ?>
                 <div class="flash flash-error"><?= View::e($e) ?></div>
@@ -52,54 +53,54 @@ $req = '<span class="req">*</span>';
             <form method="post" action="/install" id="install-form" novalidate>
                 <input type="hidden" name="csrf" value="<?= View::e($csrf) ?>">
 
-                <h3 class="section-title">Database</h3>
+                <h3 class="section-title"><?= $t('install.sec_database') ?></h3>
                 <div class="form-row">
-                    <div class="field"><label>Host <?= $req ?></label><input type="text" name="db_host" value="<?= $o('db_host', '127.0.0.1') ?>" required></div>
-                    <div class="field"><label>Port</label><input type="number" name="db_port" value="<?= $o('db_port', '3306') ?>"></div>
+                    <div class="field"><label><?= $t('install.host') ?> <?= $req ?></label><input type="text" name="db_host" value="<?= $o('db_host', '127.0.0.1') ?>" required></div>
+                    <div class="field"><label><?= $t('install.port') ?></label><input type="number" name="db_port" value="<?= $o('db_port', '3306') ?>"></div>
                 </div>
                 <div class="form-row">
-                    <div class="field"><label>Database name <?= $req ?></label><input type="text" name="db_name" value="<?= $o('db_name') ?>" required></div>
-                    <div class="field"><label>SimpleAdmin table prefix</label><input type="text" name="sa_prefix" value="<?= $o('sa_prefix', 'sa_') ?>"></div>
+                    <div class="field"><label><?= $t('install.db_name') ?> <?= $req ?></label><input type="text" name="db_name" value="<?= $o('db_name') ?>" required></div>
+                    <div class="field"><label><?= $t('install.sa_prefix') ?></label><input type="text" name="sa_prefix" value="<?= $o('sa_prefix', 'sa_') ?>"></div>
                 </div>
                 <div class="form-row">
-                    <div class="field"><label>User <?= $req ?></label><input type="text" name="db_user" value="<?= $o('db_user') ?>" required></div>
-                    <div class="field"><label>Password</label><input type="password" name="db_password" value="<?= $o('db_password') ?>"></div>
+                    <div class="field"><label><?= $t('install.user') ?> <?= $req ?></label><input type="text" name="db_user" value="<?= $o('db_user') ?>" required></div>
+                    <div class="field"><label><?= $t('install.password') ?></label><input type="password" name="db_password" value="<?= $o('db_password') ?>"></div>
                 </div>
 
-                <h3 class="section-title">Site</h3>
+                <h3 class="section-title"><?= $t('install.sec_site') ?></h3>
                 <div class="form-row">
-                    <div class="field"><label>Site name</label><input type="text" name="site_name" value="<?= $o('site_name', 'CS2 Panel') ?>"></div>
-                    <div class="field"><label>Timezone</label><input type="text" name="timezone" value="<?= $o('timezone', 'UTC') ?>"></div>
+                    <div class="field"><label><?= $t('install.site_name') ?></label><input type="text" name="site_name" value="<?= $o('site_name', 'CS2 Panel') ?>"></div>
+                    <div class="field"><label><?= $t('install.timezone') ?></label><input type="text" name="timezone" value="<?= $o('timezone', 'UTC') ?>"></div>
                 </div>
-                <div class="field"><label>Realm / site URL (no trailing slash) <?= $req ?></label><input type="url" name="realm" placeholder="https://panel.example.com" value="<?= $o('realm', $suggestedRealm ?? '') ?>" required></div>
-                <div class="field"><label>Steam Web API key (optional, for name + avatar)</label><input type="text" name="steam_api_key" value="<?= $o('steam_api_key') ?>"></div>
+                <div class="field"><label><?= $t('install.realm') ?> <?= $req ?></label><input type="url" name="realm" placeholder="https://panel.example.com" value="<?= $o('realm', $suggestedRealm ?? '') ?>" required></div>
+                <div class="field"><label><?= $t('install.steam_key') ?></label><input type="text" name="steam_api_key" value="<?= $o('steam_api_key') ?>"></div>
 
-                <h3 class="section-title">Site Admin</h3>
+                <h3 class="section-title"><?= $t('install.sec_admin') ?></h3>
                 <div class="form-row">
                     <div class="field"><label>Root SteamID64 <?= $req ?></label><input type="text" name="root_steamid" placeholder="7656119..." value="<?= $o('root_steamid') ?>" required></div>
-                    <div class="field"><label>Display name</label><input type="text" name="root_name" value="<?= $o('root_name', 'Root') ?>"></div>
+                    <div class="field"><label><?= $t('install.display_name') ?></label><input type="text" name="root_name" value="<?= $o('root_name', 'Root') ?>"></div>
                 </div>
                 <div class="field">
-                    <label>Additional super admins (SteamID64, comma-separated)</label>
+                    <label><?= $t('install.super_admins') ?></label>
                     <input type="text" name="super_admins" value="<?= $o('super_admins') ?>">
                 </div>
 
-                <h3 class="section-title">Integrations</h3>
+                <h3 class="section-title"><?= $t('install.sec_integrations') ?></h3>
                 <div class="integration-block">
-                    <div class="check"><input type="checkbox" name="vip_enabled" id="vip_enabled" <?= isset($old['vip_enabled']) || !$old ? 'checked' : '' ?>><label for="vip_enabled">Enable VIPCore</label></div>
-                    <p class="hint">VIPCore uses the same database configured above &mdash; no extra setup needed.</p>
+                    <div class="check"><input type="checkbox" name="vip_enabled" id="vip_enabled" <?= isset($old['vip_enabled']) || !$old ? 'checked' : '' ?>><label for="vip_enabled"><?= $t('install.vip_enable') ?></label></div>
+                    <p class="hint"><?= $t('install.vip_hint') ?></p>
                     <div class="field" style="margin-top:10px">
-                        <label>VIP groups <span class="hint-inline" title="One per line. These appear as a dropdown when adding a VIP. Optional — you can set them later in Settings.">?</span></label>
+                        <label><?= $t('install.vip_groups') ?> <span class="hint-inline" title="<?= $t('install.vip_groups_tip') ?>">?</span></label>
                         <textarea name="vip_groups" rows="3" placeholder="VIP&#10;GOLD&#10;PLATINUM"><?= $o('vip_groups') ?></textarea>
-                        <p class="hint">Optional &mdash; leave empty and configure later in Settings.</p>
+                        <p class="hint"><?= $t('install.vip_groups_hint') ?></p>
                     </div>
                 </div>
                 <div class="integration-block">
                     <?php $backend = $o('stats_backend', 'zenith'); ?>
-                    <div class="check"><input type="checkbox" name="zenith_enabled" id="zenith_enabled" <?= isset($old['zenith_enabled']) || !$old ? 'checked' : '' ?>><label for="zenith_enabled">Enable ranks &amp; stats plugin</label></div>
+                    <div class="check"><input type="checkbox" name="zenith_enabled" id="zenith_enabled" <?= isset($old['zenith_enabled']) || !$old ? 'checked' : '' ?>><label for="zenith_enabled"><?= $t('install.stats_enable') ?></label></div>
                     <div class="zenith-fields" id="zenith-fields">
                         <div class="field" style="margin-top:10px">
-                            <label>Stats plugin <span class="hint-inline" title="Which plugin provides ranks, stats and play time: K4-Zenith (JSON storage) or K4-System (flat tables).">?</span></label>
+                            <label><?= $t('install.stats_plugin') ?> <span class="hint-inline" title="<?= $t('install.stats_plugin_tip') ?>">?</span></label>
                             <label class="inline-check"><input type="radio" name="stats_backend" value="zenith" <?= $backend !== 'k4system' ? 'checked' : '' ?>> K4-Zenith</label>
                             <label class="inline-check"><input type="radio" name="stats_backend" value="k4system" <?= $backend === 'k4system' ? 'checked' : '' ?>> K4-System</label>
                         </div>
@@ -107,28 +108,28 @@ $req = '<span class="req">*</span>';
                         <!-- K4-Zenith tables -->
                         <div class="backend-fields" id="backend-zenith">
                             <div class="form-row">
-                                <div class="field"><label>Ranks table</label><input type="text" name="zenith_ranks" value="<?= $o('zenith_ranks', 'zenith_ranks') ?>"></div>
-                                <div class="field"><label>Stats table</label><input type="text" name="zenith_stats" value="<?= $o('zenith_stats', 'zenith_stats') ?>"></div>
+                                <div class="field"><label><?= $t('install.ranks_table') ?></label><input type="text" name="zenith_ranks" value="<?= $o('zenith_ranks', 'zenith_ranks') ?>"></div>
+                                <div class="field"><label><?= $t('install.stats_table') ?></label><input type="text" name="zenith_stats" value="<?= $o('zenith_stats', 'zenith_stats') ?>"></div>
                             </div>
                             <div class="form-row">
-                                <div class="field"><label>Storage table</label><input type="text" name="zenith_storage" value="<?= $o('zenith_storage', 'zenith_player_storage') ?>"></div>
-                                <div class="field"><label>SteamID column <span class="hint-inline" title="Name of the column that stores the player's SteamID64 in the Zenith tables">?</span></label><input type="text" name="zenith_steam_col" value="<?= $o('zenith_steam_col', 'steam_id') ?>"></div>
+                                <div class="field"><label><?= $t('install.storage_table') ?></label><input type="text" name="zenith_storage" value="<?= $o('zenith_storage', 'zenith_player_storage') ?>"></div>
+                                <div class="field"><label><?= $t('install.steam_col') ?> <span class="hint-inline" title="<?= $t('install.steam_col_tip') ?>">?</span></label><input type="text" name="zenith_steam_col" value="<?= $o('zenith_steam_col', 'steam_id') ?>"></div>
                             </div>
                         </div>
 
                         <!-- K4-System tables -->
                         <div class="backend-fields" id="backend-k4system">
                             <div class="form-row">
-                                <div class="field"><label>Table prefix <span class="hint-inline" title="K4-System table-prefix setting. Leave empty unless you set one in k4-system.jsonc.">?</span></label><input type="text" name="k4_prefix" value="<?= $o('k4_prefix') ?>" placeholder="(none)"></div>
-                                <div class="field"><label>SteamID column</label><input type="text" name="k4_steam" value="<?= $o('k4_steam', 'steam_id') ?>"></div>
+                                <div class="field"><label><?= $t('install.table_prefix') ?> <span class="hint-inline" title="<?= $t('install.k4_prefix_tip') ?>">?</span></label><input type="text" name="k4_prefix" value="<?= $o('k4_prefix') ?>" placeholder="<?= $t('install.none') ?>"></div>
+                                <div class="field"><label><?= $t('install.steam_col') ?></label><input type="text" name="k4_steam" value="<?= $o('k4_steam', 'steam_id') ?>"></div>
                             </div>
                             <div class="form-row">
-                                <div class="field"><label>Ranks table</label><input type="text" name="k4_ranks_table" value="<?= $o('k4_ranks_table', 'k4ranks') ?>"></div>
-                                <div class="field"><label>Stats table</label><input type="text" name="k4_stats_table" value="<?= $o('k4_stats_table', 'k4stats') ?>"></div>
+                                <div class="field"><label><?= $t('install.ranks_table') ?></label><input type="text" name="k4_ranks_table" value="<?= $o('k4_ranks_table', 'k4ranks') ?>"></div>
+                                <div class="field"><label><?= $t('install.stats_table') ?></label><input type="text" name="k4_stats_table" value="<?= $o('k4_stats_table', 'k4stats') ?>"></div>
                             </div>
                             <div class="form-row">
-                                <div class="field"><label>Times table</label><input type="text" name="k4_times_table" value="<?= $o('k4_times_table', 'k4times') ?>"></div>
-                                <div class="field"><label>Rank style <span class="hint-inline" title="Competitive shows CS:GO skill-group icons; Premier shows the rating number.">?</span></label>
+                                <div class="field"><label><?= $t('install.times_table') ?></label><input type="text" name="k4_times_table" value="<?= $o('k4_times_table', 'k4times') ?>"></div>
+                                <div class="field"><label><?= $t('install.rank_style') ?> <span class="hint-inline" title="<?= $t('install.rank_style_tip') ?>">?</span></label>
                                     <?php $rt = $o('k4_rank_type', 'competitive'); ?>
                                     <select name="k4_rank_type">
                                         <option value="competitive" <?= $rt !== 'premier' ? 'selected' : '' ?>>Competitive</option>
@@ -141,22 +142,41 @@ $req = '<span class="req">*</span>';
                 </div>
 
                 <div class="integration-block">
-                    <div class="check"><input type="checkbox" name="skins_enabled" id="skins_enabled" <?= isset($old['skins_enabled']) ? 'checked' : '' ?>><label for="skins_enabled">Enable Skins (WeaponPaints)</label></div>
-                    <p class="hint">Lets players build their WeaponPaints loadout from the panel. Uses the same database &mdash; set the table prefix to match your plugin.</p>
+                    <div class="check"><input type="checkbox" name="skins_enabled" id="skins_enabled" <?= isset($old['skins_enabled']) ? 'checked' : '' ?>><label for="skins_enabled"><?= $t('install.skins_enable') ?></label></div>
+                    <p class="hint"><?= $t('install.skins_hint') ?></p>
                     <div class="field" style="margin-top:10px">
-                        <label>Skins table prefix <span class="hint-inline" title="WeaponPaints table prefix (the part before player_skins). Default wp_.">?</span></label>
+                        <label><?= $t('install.skins_prefix') ?> <span class="hint-inline" title="<?= $t('install.skins_prefix_tip') ?>">?</span></label>
                         <input type="text" name="wp_prefix" value="<?= $o('wp_prefix', 'wp_') ?>" placeholder="wp_">
                     </div>
                 </div>
 
+                <h3 class="section-title"><?= View::e(Lang::t('settings.extdb_title')) ?></h3>
+<p class="hint"><?= $t('settings.extdb_hint') ?></p>
+                <?php foreach (\App\Core\IntegrationDb::KEYS as $xk => $xlabel): $xon = !empty($old["extdb_{$xk}_enabled"]); ?>
+                <div class="integration-block extdb-block">
+                    <div class="check"><input type="checkbox" name="extdb_<?= $xk ?>_enabled" id="extdb_<?= $xk ?>_enabled" class="js-extdb-toggle" data-target="extdb-<?= $xk ?>" <?= $xon ? 'checked' : '' ?>><label for="extdb_<?= $xk ?>_enabled"><?= View::e($xlabel) ?></label></div>
+                    <div class="extdb-fields" id="extdb-<?= $xk ?>"<?= $xon ? '' : ' hidden' ?>>
+                        <div class="form-row">
+                            <div class="field"><label><?= View::e(Lang::t('settings.extdb_host')) ?></label><input type="text" name="extdb_<?= $xk ?>_host" value="<?= $o("extdb_{$xk}_host") ?>" placeholder="127.0.0.1"></div>
+                            <div class="field"><label><?= View::e(Lang::t('settings.extdb_port')) ?></label><input type="number" name="extdb_<?= $xk ?>_port" value="<?= $o("extdb_{$xk}_port") ?>" placeholder="3306" min="1" max="65535"></div>
+                        </div>
+                        <div class="form-row">
+                            <div class="field"><label><?= View::e(Lang::t('settings.extdb_name')) ?> <?= $req ?></label><input type="text" name="extdb_<?= $xk ?>_name" value="<?= $o("extdb_{$xk}_name") ?>" data-extdb-required></div>
+                            <div class="field"><label><?= View::e(Lang::t('settings.extdb_user')) ?></label><input type="text" name="extdb_<?= $xk ?>_user" value="<?= $o("extdb_{$xk}_user") ?>" autocomplete="off"></div>
+                        </div>
+                        <div class="field"><label><?= View::e(Lang::t('settings.extdb_pass')) ?></label><input type="password" name="extdb_<?= $xk ?>_pass" value="<?= $o("extdb_{$xk}_pass") ?>" autocomplete="new-password"></div>
+                    </div>
+                </div>
+                <?php endforeach; ?>
+
                 <h3 class="section-title">Discord</h3>
                 <div class="field">
-                    <label>Webhook URL (you can also set this later in Settings)</label>
+                    <label><?= $t('install.discord_webhook') ?></label>
                     <input type="url" name="discord_webhook" placeholder="https://discord.com/api/webhooks/..." value="<?= $o('discord_webhook') ?>">
                 </div>
 
-                <button type="submit" class="btn btn-primary install-submit">Install</button>
-                <p class="req-note"><span class="req">*</span> required fields</p>
+                <button type="submit" class="btn btn-primary install-submit"><?= $t('install.submit') ?></button>
+                <p class="req-note"><span class="req">*</span> <?= $t('install.required_note') ?></p>
             </form>
         </div>
     </div>
@@ -183,6 +203,21 @@ $req = '<span class="req">*</span>';
         r.addEventListener('change', syncBackend);
     });
     syncBackend();
+
+    // Separate database blocks: show the fields only when ticked; the database
+    // name is required only for ticked integrations.
+    document.querySelectorAll('.js-extdb-toggle').forEach(function (cbx) {
+        var fields = document.getElementById(cbx.getAttribute('data-target'));
+        function syncDb() {
+            if (!fields) return;
+            fields.hidden = !cbx.checked;
+            fields.querySelectorAll('[data-extdb-required]').forEach(function (el) {
+                if (cbx.checked) { el.setAttribute('required', ''); } else { el.removeAttribute('required'); el.classList.remove('input-error'); }
+            });
+        }
+        cbx.addEventListener('change', syncDb);
+        syncDb();
+    });
 
     // Client-side required validation with a clear message.
     var form = document.getElementById('install-form');

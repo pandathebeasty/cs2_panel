@@ -78,4 +78,16 @@ return [
     'query' => [
         'timeout' => 1.0, // seconds
     ],
+
+    // Optional: a separate database per integration (simpleadmin, vipcore,
+    // zenith, k4system, weaponpaints, chatlogs, store). Managed from
+    // Settings > Integrations > Separate databases, which rewrites this block
+    // (including the owned tables/prefixes used to route queries).
+    // 'integration_db' => [
+    //     'vipcore' => [
+    //         'host' => '10.0.0.5', 'port' => 3306, 'name' => 'vipcore',
+    //         'user' => 'vip', 'password' => 'secret', 'charset' => 'utf8mb4',
+    //         'tables' => ['vip_users', 'vip_servers'], 'prefixes' => [],
+    //     ],
+    // ],
 ];

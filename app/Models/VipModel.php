@@ -353,7 +353,7 @@ final class VipModel
         Database::run(
             "INSERT INTO {$t} (account_id, name, lastvisit, sid, `group`, expires)
              VALUES (?, ?, ?, ?, ?, ?)"
-             . Database::onDuplicateUpdate(['name', 'lastvisit', 'group', 'expires']),
+             . Database::onDuplicateUpdate(['name', 'lastvisit', 'group', 'expires'], Database::connection('vipcore')),
             [$accountId, $name !== '' ? $name : 'VIP', time(), $sid, $group, $expires]
         );
     }

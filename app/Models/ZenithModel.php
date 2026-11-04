@@ -27,6 +27,9 @@ use App\Core\Settings;
  */
 final class ZenithModel
 {
+    /** Connection key: K4-Zenith's own database when configured, else the panel one. */
+    private const DB = 'zenith';
+
     // JSON columns inside zenith_player_storage.
     private const RANKS_COL = 'K4-Zenith-Ranks.storage';
     private const STATS_COL = 'K4-Zenith-Stats.storage';
@@ -73,7 +76,7 @@ final class ZenithModel
 
         $out = [];
         foreach ([$map, $weapon] as $t) {
-            if ($t !== '' && Database::tableExists($t)) {
+            if ($t !== '' && Database::tableExists($t, self::DB)) {
                 $out[] = $t;
             }
         }
@@ -83,13 +86,13 @@ final class ZenithModel
     /** True when the modern Zenith storage table is present. */
     private static function isZenith(): bool
     {
-        return Database::tableExists(self::storageTable());
+        return Database::tableExists(self::storageTable(), self::DB);
     }
 
     /** True when the legacy flat K4-System tables are present. */
     private static function isLegacy(): bool
     {
-        return Database::tableExists(self::legacyRanksTable());
+        return Database::tableExists(self::legacyRanksTable(), self::DB);
     }
 
     public static function enabled(): bool
@@ -156,7 +159,7 @@ final class ZenithModel
                      WHERE `{$ranks}` IS NOT NULL";
             $count = "SELECT COUNT(*) FROM `{$t}` WHERE `{$ranks}` IS NOT NULL";
 
-            return Paginator::make($base, $count, [], $page, $perPage, $order);
+            return Paginator::make($base, $count, [], $page, $perPage, $order, self::DB);
         }
 
         if (self::isLegacy()) {
@@ -175,7 +178,7 @@ final class ZenithModel
             $count = "SELECT COUNT(*) FROM `{$t}`";
             // Legacy only has points; other sorts fall back to points.
             $legacyDir = strtolower($dir) === 'asc' ? 'ASC' : 'DESC';
-            return Paginator::make($base, $count, [], $page, $perPage, "`{$pointsCol}` {$legacyDir}");
+            return Paginator::make($base, $count, [], $page, $perPage, "`{$pointsCol}` {$legacyDir}", self::DB);
         }
 
         return null;
@@ -226,7 +229,7 @@ final class ZenithModel
                  WHERE `{$time}` IS NOT NULL";
         $count = "SELECT COUNT(*) FROM `{$t}` WHERE `{$time}` IS NOT NULL";
 
-        return Paginator::make($base, $count, [], $page, $perPage, $order);
+        return Paginator::make($base, $count, [], $page, $perPage, $order, self::DB);
     }
 
                                                                         
@@ -252,12 +255,12 @@ final class ZenithModel
                      WHERE `{$stats}` IS NOT NULL";
             $count = "SELECT COUNT(*) FROM `{$t}` WHERE `{$stats}` IS NOT NULL";
 
-            return Paginator::make($base, $count, [], $page, $perPage, 'kills DESC');
+            return Paginator::make($base, $count, [], $page, $perPage, 'kills DESC', self::DB);
         }
 
         if (self::isLegacy()) {
             $t = self::legacyStatsTable();
-            if (!Database::tableExists($t)) {
+            if (!Database::tableExists($t, self::DB)) {
                 return null;
             }
             $killsCol  = self::firstExistingColumn($t, ['kills', 'Kills']);
@@ -277,7 +280,7 @@ final class ZenithModel
                             {$deathsSelect}, {$assistsSelect}, {$hsSelect}
                      FROM `{$t}`";
             $count = "SELECT COUNT(*) FROM `{$t}`";
-            return Paginator::make($base, $count, [], $page, $perPage, "`{$killsCol}` DESC");
+            return Paginator::make($base, $count, [], $page, $perPage, "`{$killsCol}` DESC", self::DB);
         }
 
         return null;
@@ -302,7 +305,7 @@ final class ZenithModel
                 "UPDATE `{$t}`
                  SET `{$ranks}` = JSON_SET(COALESCE(`{$ranks}`, '{}'), '$.Points', 0)
                  WHERE `{$steamCol}` = ?",
-                [$steamId]
+                [$steamId], self::DB
             );
             return true;
         }
@@ -313,7 +316,7 @@ final class ZenithModel
             if ($pointsCol === null) {
                 return false;
             }
-            Database::run("UPDATE `{$t}` SET `{$pointsCol}` = 0 WHERE `{$steamCol}` = ?", [$steamId]);
+            Database::run("UPDATE `{$t}` SET `{$pointsCol}` = 0 WHERE `{$steamCol}` = ?", [$steamId], self::DB);
             return true;
         }
 
@@ -334,17 +337,17 @@ final class ZenithModel
             $stats = self::STATS_COL;
             Database::run(
                 "UPDATE `{$t}` SET `{$stats}` = NULL WHERE `{$steamCol}` = ?",
-                [$steamId]
+                [$steamId], self::DB
             );
             return true;
         }
 
         if (self::isLegacy()) {
             $t = self::legacyStatsTable();
-            if (!Database::tableExists($t)) {
+            if (!Database::tableExists($t, self::DB)) {
                 return false;
             }
-            Database::run("DELETE FROM `{$t}` WHERE `{$steamCol}` = ?", [$steamId]);
+            Database::run("DELETE FROM `{$t}` WHERE `{$steamCol}` = ?", [$steamId], self::DB);
             return true;
         }
 
@@ -364,13 +367,13 @@ final class ZenithModel
             $ranks = self::RANKS_COL;
             // Ranks, stats and play time share this row, so only the rank data
             // is wiped (same as resetAllStats does for the stats column).
-            $stmt = Database::run("UPDATE `{$t}` SET `{$ranks}` = NULL");
+            $stmt = Database::run("UPDATE `{$t}` SET `{$ranks}` = NULL", [], self::DB);
             return $stmt->rowCount();
         }
 
         if (self::isLegacy()) {
             $t = self::legacyRanksTable();
-            return Database::run("DELETE FROM `{$t}`")->rowCount();
+            return Database::run("DELETE FROM `{$t}`", [], self::DB)->rowCount();
         }
 
         return 0;
@@ -388,21 +391,21 @@ final class ZenithModel
         if (self::isZenith()) {
             // The per-map and per-weapon tables are stats-only, safe to empty.
             foreach (self::extraStatsTables() as $extra) {
-                Database::run("DELETE FROM `{$extra}`");
+                Database::run("DELETE FROM `{$extra}`", [], self::DB);
             }
             $t = self::storageTable();
             $stats = self::STATS_COL;
-            $stmt = Database::run("UPDATE `{$t}` SET `{$stats}` = NULL");
+            $stmt = Database::run("UPDATE `{$t}` SET `{$stats}` = NULL", [], self::DB);
             return $stmt->rowCount();
         }
 
         if (self::isLegacy()) {
             $t = self::legacyStatsTable();
-            if (!Database::tableExists($t)) {
+            if (!Database::tableExists($t, self::DB)) {
                 return 0;
             }
-            $count = (int) Database::scalar("SELECT COUNT(*) FROM `{$t}`");
-            Database::run("DELETE FROM `{$t}`");
+            $count = (int) Database::scalar("SELECT COUNT(*) FROM `{$t}`", [], self::DB);
+            Database::run("DELETE FROM `{$t}`", [], self::DB);
             return $count;
         }
 
@@ -424,7 +427,7 @@ final class ZenithModel
                 if ($pointsCol === null) {
                     return false;
                 }
-                Database::run("UPDATE `{$t}` SET `{$pointsCol}` = ? WHERE `" . self::steamColumn() . "` = ?", [max(0, $points), $steamId]);
+                Database::run("UPDATE `{$t}` SET `{$pointsCol}` = ? WHERE `" . self::steamColumn() . "` = ?", [max(0, $points), $steamId], self::DB);
                 return true;
             }
             return false;
@@ -433,7 +436,7 @@ final class ZenithModel
         $ranks = self::RANKS_COL;
         Database::run(
             "UPDATE `{$t}` SET `{$ranks}` = JSON_SET(COALESCE(`{$ranks}`, '{}'), '$.Points', ?) WHERE `" . self::steamColumn() . "` = ?",
-            [max(0, $points), $steamId]
+            [max(0, $points), $steamId], self::DB
         );
         return true;
     }
@@ -466,7 +469,7 @@ final class ZenithModel
         $params[] = $steamId;
         Database::run(
             "UPDATE `{$t}` SET `{$stats}` = JSON_SET(COALESCE(`{$stats}`, '{}'), " . implode(', ', $sets) . ") WHERE `" . self::steamColumn() . "` = ?",
-            $params
+            $params, self::DB
         );
         return true;
     }
@@ -481,7 +484,7 @@ final class ZenithModel
         $time = self::TIME_COL;
         Database::run(
             "UPDATE `{$t}` SET `{$time}` = JSON_SET(COALESCE(`{$time}`, '{}'), '$.TotalPlaytime', ?) WHERE `" . self::steamColumn() . "` = ?",
-            [max(0, $minutes), $steamId]
+            [max(0, $minutes), $steamId], self::DB
         );
         return true;
     }
@@ -501,7 +504,7 @@ final class ZenithModel
             $time = self::TIME_COL;
             Database::run(
                 "UPDATE `{$t}` SET `{$time}` = JSON_SET(COALESCE(`{$time}`, '{}'), '$.TotalPlaytime', 0) WHERE `{$steamCol}` = ?",
-                [$steamId]
+                [$steamId], self::DB
             );
             return true;
         }
@@ -524,7 +527,7 @@ final class ZenithModel
             $time = self::TIME_COL;
             // Touch EVERY player (no WHERE filter, which used to skip rows and
             // leave some users with their time intact).
-            $stmt = Database::run("UPDATE `{$t}` SET `{$time}` = JSON_SET(COALESCE(`{$time}`, '{}'), '$.TotalPlaytime', 0)");
+            $stmt = Database::run("UPDATE `{$t}` SET `{$time}` = JSON_SET(COALESCE(`{$time}`, '{}'), '$.TotalPlaytime', 0)", [], self::DB);
             return $stmt->rowCount();
         }
 
@@ -568,7 +571,7 @@ final class ZenithModel
                  {$playerFilter}
                  ORDER BY points DESC, `{$steamCol}` ASC
                  LIMIT {$limit} OFFSET {$offset}",
-                $parameters
+                $parameters, self::DB
             );
         }
 
@@ -584,7 +587,7 @@ final class ZenithModel
             "SELECT `{$steamCol}` AS steam_id, {$nameSelect}, `{$pointsCol}` AS points,
                     '' AS rank_name, 0 AS kills, 0 AS deaths, NULL AS last_online
              FROM `{$rt}`" . ($steamId !== null ? " WHERE `{$steamCol}` = ?" : '') . " ORDER BY `{$pointsCol}` DESC, `{$steamCol}` ASC LIMIT {$limit} OFFSET {$offset}",
-            $parameters
+            $parameters, self::DB
         );
     }
 
@@ -617,7 +620,7 @@ final class ZenithModel
              FROM `{$t}`
              WHERE `{$time}` IS NOT NULL
              ORDER BY points DESC, `{$steamCol}` ASC
-             LIMIT {$limit} OFFSET {$offset}"
+             LIMIT {$limit} OFFSET {$offset}", [], self::DB
         );
     }
 
@@ -663,7 +666,7 @@ final class ZenithModel
              FROM `{$t}`
              WHERE `last_online` IS NOT NULL
              ORDER BY `last_online` DESC
-             LIMIT {$limit}"
+             LIMIT {$limit}", [], self::DB
         );
     }
 
@@ -708,7 +711,7 @@ final class ZenithModel
                  FROM `{$t}`
                  WHERE `last_online` IS NOT NULL
                    AND CAST(UNIX_TIMESTAMP(`last_online`) AS SIGNED) >= ?",
-                [$sinceTs]
+                [$sinceTs], self::DB
             );
         } catch (\Throwable $e) {
             return [];
@@ -751,7 +754,7 @@ final class ZenithModel
                  FROM `{$table}`
                  WHERE {$extraWhere} AND {$tsExpr} >= {$from}
                  GROUP BY bucket",
-                []
+                [], self::DB
             );
         } catch (\Throwable $e) {
             return $buckets;
@@ -773,8 +776,8 @@ final class ZenithModel
         }
         $t = self::isZenith() ? self::storageTable() : self::legacyRanksTable();
         return [
-            'total'  => (int) Database::scalar("SELECT COUNT(*) FROM `{$t}`"),
-            'active' => (int) Database::scalar("SELECT COUNT(*) FROM `{$t}`"),
+            'total'  => (int) Database::scalar("SELECT COUNT(*) FROM `{$t}`", [], self::DB),
+            'active' => (int) Database::scalar("SELECT COUNT(*) FROM `{$t}`", [], self::DB),
         ];
     }
 
@@ -793,7 +796,7 @@ final class ZenithModel
             $cols = Database::all(
                 'SELECT column_name FROM information_schema.columns
                  WHERE table_schema = DATABASE() AND table_name = ?',
-                [$table]
+                [$table], self::DB
             );
             self::$columnCache[$table] = array_map('strtolower', array_column($cols, 'column_name'));
         }

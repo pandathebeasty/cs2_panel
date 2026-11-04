@@ -94,7 +94,7 @@ final class SanctionBulkModel
         }
         $table = $prefix . $kind;
         $placeholders = implode(', ', array_fill(0, count($ids), '?'));
-        $pdo = Database::connection();
+        $pdo = Database::connection('simpleadmin');
         $pdo->beginTransaction();
         try {
             if (array_key_exists('server_id', $changes)) {

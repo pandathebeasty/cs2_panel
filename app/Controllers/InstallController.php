@@ -6,6 +6,7 @@ namespace App\Controllers;
 
 use App\Core\Controller;
 use App\Core\Installer;
+use App\Core\Lang;
 use App\Core\Steam;
 
 final class InstallController extends Controller
@@ -39,21 +40,21 @@ final class InstallController extends Controller
 
         // Required fields (label => field name).
         $required = [
-            'Database host'    => 'db_host',
-            'Database name'    => 'db_name',
-            'Database user'    => 'db_user',
-            'Site URL (realm)' => 'realm',
-            'Root SteamID64'   => 'root_steamid',
+            Lang::t('install.db_host_label')  => 'db_host',
+            Lang::t('install.db_name')        => 'db_name',
+            Lang::t('install.db_user_label')  => 'db_user',
+            Lang::t('install.site_url_label') => 'realm',
+            'Root SteamID64'                  => 'root_steamid',
         ];
         foreach ($required as $label => $field) {
             if (trim((string) ($input[$field] ?? '')) === '') {
-                $errors[] = "{$label} is required.";
+                $errors[] = Lang::t('install.err_required', ['field' => $label]);
             }
         }
 
         $rootSteam = trim((string) ($input['root_steamid'] ?? ''));
         if ($rootSteam !== '' && !Steam::isValidSteamId64($rootSteam)) {
-            $errors[] = 'Root SteamID64 is invalid (must be 17 digits).';
+            $errors[] = Lang::t('install.err_steamid');
         }
 
         // Test DB connection
@@ -68,8 +69,13 @@ final class InstallController extends Controller
                     'password' => $input['db_password'] ?? '',
                 ]);
             } catch (\Throwable $e) {
-                $errors[] = 'DB connection failed: ' . $e->getMessage();
+                $errors[] = Lang::t('install.err_db', ['e' => $e->getMessage()]);
             }
+        }
+
+        $extdb = [];
+        if (!$errors && $pdo !== null) {
+            $extdb = Installer::integrationDbInput($input, $pdo, $errors);
         }
 
         if ($errors) {
@@ -83,14 +89,14 @@ final class InstallController extends Controller
             $preserveExistingSettings = Installer::hasPanelSettings($pdo);
             Installer::runPanelSchema($pdo);
             Installer::createRoot($pdo, $rootSteam, trim((string) ($input['root_name'] ?? 'Root')) ?: 'Root');
-            Installer::saveInitialSettings($pdo, $input, $preserveExistingSettings);
+            Installer::saveInitialSettings($pdo, $input, $preserveExistingSettings, $extdb);
 
             $configContents = Installer::buildConfig($input);
             if (!Installer::writeConfig($configContents)) {
-                throw new \RuntimeException('Cannot write config/config.php (check the config/ folder permissions).');
+                throw new \RuntimeException(Lang::t('install.err_config'));
             }
         } catch (\Throwable $e) {
-            $_SESSION['install_errors'] = ['Installation failed: ' . $e->getMessage()];
+            $_SESSION['install_errors'] = [Lang::t('install.err_install', ['e' => $e->getMessage()])];
             $_SESSION['install_old'] = $input;
             $this->redirect('/install');
         }
@@ -113,7 +119,7 @@ final class InstallController extends Controller
             );
         }
 
-        $this->flash('success', 'Installation complete! Sign in with Steam.');
+        $this->flash('success', Lang::t('install.success'));
         $this->redirect('/login');
     }
 }

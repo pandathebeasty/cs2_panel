@@ -11,6 +11,9 @@ use App\Core\Steam;
 
 final class ChatLogModel
 {
+    /** Connection key: Chat Logger's own database when configured, else the panel one. */
+    private const DB = 'chatlogs';
+
     public const PER_PAGE_OPTIONS = [10, 25, 50];
     public const TEAMS = ['unassigned', 'spec', 't', 'ct'];
     public const CHANNELS = ['public', 'team'];
@@ -37,7 +40,7 @@ final class ChatLogModel
     public static function serverIds(): array
     {
         $table = self::table();
-        $rows = Database::all("SELECT DISTINCT `server_id` FROM `{$table}` WHERE `server_id` <> '' ORDER BY `server_id` ASC");
+        $rows = Database::all("SELECT DISTINCT `server_id` FROM `{$table}` WHERE `server_id` <> '' ORDER BY `server_id` ASC", [], self::DB);
         return array_map(static fn(array $row): string => (string) $row['server_id'], $rows);
     }
 
@@ -93,7 +96,7 @@ final class ChatLogModel
             $params,
             $page,
             $perPage,
-            '`id` DESC'
+            '`id` DESC', self::DB
         );
     }
 

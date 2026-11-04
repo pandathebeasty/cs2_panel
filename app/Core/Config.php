@@ -192,10 +192,20 @@ final class Config
         $siteName = $S('site_name', null);
         if ($siteName !== null && $siteName !== '') $map['app.name'] = (string) $siteName;
 
+        // Separate databases per integration; replaced as a whole so disabled
+        // integrations disappear from the file.
+        $integrationDb = IntegrationDb::configFromSettings();
+        if ($integrationDb !== null) {
+            $map['integration_db'] = $integrationDb;
+        }
+
         $data = self::$data;
         $changed = false;
         foreach ($map as $key => $value) {
             if (self::get($key) !== $value) {
+                if ($key === 'integration_db' && $value === [] && !array_key_exists('integration_db', $data)) {
+                    continue;
+                }
                 self::setNested($data, $key, $value);
                 $changed = true;
             }
@@ -216,6 +226,7 @@ final class Config
         }
 
         self::$data = $data;
+        Database::resetRouting();
         return true;
     }
 

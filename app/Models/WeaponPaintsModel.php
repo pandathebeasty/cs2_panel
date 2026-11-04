@@ -23,6 +23,9 @@ use App\Core\WeaponPaintsData;
  */
 final class WeaponPaintsModel
 {
+    /** Connection key: WeaponPaints's own database when configured, else the panel one. */
+    private const DB = 'weaponpaints';
+
     private static function prefix(): string
     {
         return (string) Settings::get('wp_prefix', (string) Config::get('weaponpaints.prefix', 'wp_'));
@@ -61,7 +64,7 @@ final class WeaponPaintsModel
     /** Enabled when the setting is on AND the core player_skins table exists. */
     public static function enabled(): bool
     {
-        return Settings::bool('skins_enabled', false) && Database::tableExists(self::skinsTable());
+        return Settings::bool('skins_enabled', false) && Database::tableExists(self::skinsTable(), self::DB);
     }
 
                                                                         
@@ -78,8 +81,8 @@ final class WeaponPaintsModel
     {
         static $has = null;
         if ($has === null) {
-            $has = Database::columnExists(self::skinsTable(), 'weapon_sticker_0')
-                && Database::columnExists(self::skinsTable(), 'weapon_keychain');
+            $has = Database::columnExists(self::skinsTable(), 'weapon_sticker_0', self::DB)
+                && Database::columnExists(self::skinsTable(), 'weapon_keychain', self::DB);
         }
         return $has;
     }
@@ -89,7 +92,7 @@ final class WeaponPaintsModel
 
     public static function playerSkins(string $steamid): array
     {
-        if (!Database::tableExists(self::skinsTable())) {
+        if (!Database::tableExists(self::skinsTable(), self::DB)) {
             return [];
         }
         $stickerCols = self::hasStickerColumns()
@@ -99,7 +102,7 @@ final class WeaponPaintsModel
             'SELECT `weapon_defindex`, `weapon_paint_id`, `weapon_wear`, `weapon_seed`, `weapon_team`,
                     `weapon_stattrak`, `weapon_stattrak_count`, `weapon_nametag`' . $stickerCols . '
              FROM `' . self::skinsTable() . '` WHERE `steamid` = ?',
-            [$steamid]
+            [$steamid], self::DB
         );
     }
 
@@ -114,7 +117,7 @@ final class WeaponPaintsModel
      */
     public static function normalizeForcedTeams(string $steamid): int
     {
-        if (!Database::tableExists(self::skinsTable())) {
+        if (!Database::tableExists(self::skinsTable(), self::DB)) {
             return 0;
         }
         $map = WeaponPaintsData::forcedTeamWeapons();
@@ -127,7 +130,7 @@ final class WeaponPaintsModel
             // forced team (covers both wrong-team rows and legacy TEAM_BOTH).
             $stmt = Database::run(
                 'DELETE FROM `' . self::skinsTable() . '` WHERE `steamid` = ? AND `weapon_defindex` = ? AND `weapon_team` <> ?',
-                [$steamid, (int) $defindex, (int) $team]
+                [$steamid, (int) $defindex, (int) $team], self::DB
             );
             $removed += $stmt->rowCount();
         }
@@ -142,7 +145,7 @@ final class WeaponPaintsModel
      */
     public static function normalizeStaleBoth(string $steamid): int
     {
-        if (!Database::tableExists(self::skinsTable())) {
+        if (!Database::tableExists(self::skinsTable(), self::DB)) {
             return 0;
         }
         $stmt = Database::run(
@@ -151,36 +154,36 @@ final class WeaponPaintsModel
                ON p.`steamid` = b.`steamid` AND p.`weapon_defindex` = b.`weapon_defindex`
               AND p.`weapon_team` IN (2, 3)
              WHERE b.`steamid` = ? AND b.`weapon_team` = 1',
-            [$steamid]
+            [$steamid], self::DB
         );
         return $stmt->rowCount();
     }
 
     public static function playerKnives(string $steamid): array
     {
-        if (!Database::tableExists(self::knifeTable())) {
+        if (!Database::tableExists(self::knifeTable(), self::DB)) {
             return [];
         }
-        return Database::all('SELECT * FROM `' . self::knifeTable() . '` WHERE `steamid` = ?', [$steamid]);
+        return Database::all('SELECT * FROM `' . self::knifeTable() . '` WHERE `steamid` = ?', [$steamid], self::DB);
     }
 
     public static function playerGloves(string $steamid): array
     {
-        if (!Database::tableExists(self::glovesTable())) {
+        if (!Database::tableExists(self::glovesTable(), self::DB)) {
             return [];
         }
-        return Database::all('SELECT * FROM `' . self::glovesTable() . '` WHERE `steamid` = ?', [$steamid]);
+        return Database::all('SELECT * FROM `' . self::glovesTable() . '` WHERE `steamid` = ?', [$steamid], self::DB);
     }
 
     /** @return array{ct:?string,t:?string} */
     public static function playerAgents(string $steamid): array
     {
-        if (!Database::tableExists(self::agentsTable())) {
+        if (!Database::tableExists(self::agentsTable(), self::DB)) {
             return ['ct' => null, 't' => null];
         }
         $row = Database::one(
             'SELECT `agent_ct`, `agent_t` FROM `' . self::agentsTable() . '` WHERE `steamid` = ?',
-            [$steamid]
+            [$steamid], self::DB
         );
         return [
             'ct' => ($row['agent_ct'] ?? null) ?: null,
@@ -190,18 +193,18 @@ final class WeaponPaintsModel
 
     public static function playerMusic(string $steamid): array
     {
-        if (!Database::tableExists(self::musicTable())) {
+        if (!Database::tableExists(self::musicTable(), self::DB)) {
             return [];
         }
-        return Database::all('SELECT * FROM `' . self::musicTable() . '` WHERE `steamid` = ?', [$steamid]);
+        return Database::all('SELECT * FROM `' . self::musicTable() . '` WHERE `steamid` = ?', [$steamid], self::DB);
     }
 
     public static function playerPins(string $steamid): array
     {
-        if (!Database::tableExists(self::pinsTable())) {
+        if (!Database::tableExists(self::pinsTable(), self::DB)) {
             return [];
         }
-        return Database::all('SELECT * FROM `' . self::pinsTable() . '` WHERE `steamid` = ?', [$steamid]);
+        return Database::all('SELECT * FROM `' . self::pinsTable() . '` WHERE `steamid` = ?', [$steamid], self::DB);
     }
 
                                                                         
@@ -217,7 +220,7 @@ final class WeaponPaintsModel
         if (!isset($post['forma']) || $steamid === '') {
             return false;
         }
-        if (!Database::tableExists(self::skinsTable())) {
+        if (!Database::tableExists(self::skinsTable(), self::DB)) {
             return false;
         }
 
@@ -239,18 +242,18 @@ final class WeaponPaintsModel
                 $modelPath = null;
             }
 
-            $existing = Database::all('SELECT `steamid` FROM `' . self::agentsTable() . '` WHERE `steamid` = ?', [$steamid]);
+            $existing = Database::all('SELECT `steamid` FROM `' . self::agentsTable() . '` WHERE `steamid` = ?', [$steamid], self::DB);
             if ($agentTeam === WeaponPaintsData::TEAM_CT) {
                 if ($existing) {
-                    Database::run('UPDATE `' . self::agentsTable() . '` SET `agent_ct` = ? WHERE `steamid` = ?', [$modelPath, $steamid]);
+                    Database::run('UPDATE `' . self::agentsTable() . '` SET `agent_ct` = ? WHERE `steamid` = ?', [$modelPath, $steamid], self::DB);
                 } else {
-                    Database::run('INSERT INTO `' . self::agentsTable() . '` (`steamid`, `agent_ct`, `agent_t`) VALUES (?, ?, NULL)', [$steamid, $modelPath]);
+                    Database::run('INSERT INTO `' . self::agentsTable() . '` (`steamid`, `agent_ct`, `agent_t`) VALUES (?, ?, NULL)', [$steamid, $modelPath], self::DB);
                 }
             } elseif ($agentTeam === WeaponPaintsData::TEAM_T) {
                 if ($existing) {
-                    Database::run('UPDATE `' . self::agentsTable() . '` SET `agent_t` = ? WHERE `steamid` = ?', [$modelPath, $steamid]);
+                    Database::run('UPDATE `' . self::agentsTable() . '` SET `agent_t` = ? WHERE `steamid` = ?', [$modelPath, $steamid], self::DB);
                 } else {
-                    Database::run('INSERT INTO `' . self::agentsTable() . '` (`steamid`, `agent_ct`, `agent_t`) VALUES (?, NULL, ?)', [$steamid, $modelPath]);
+                    Database::run('INSERT INTO `' . self::agentsTable() . '` (`steamid`, `agent_ct`, `agent_t`) VALUES (?, NULL, ?)', [$steamid, $modelPath], self::DB);
                 }
             }
         } elseif (($ex[0] ?? '') === 'knife') {
@@ -260,24 +263,24 @@ final class WeaponPaintsModel
 
             if (array_key_exists($knifeDefindex, $knifes)) {
                 if ($team === WeaponPaintsData::TEAM_BOTH) {
-                    Database::run('DELETE FROM `' . self::knifeTable() . '` WHERE `steamid` = ?', [$steamid]);
-                    Database::run('DELETE FROM `' . self::skinsTable() . '` WHERE `steamid` = ? AND `weapon_defindex` IN (' . $knifeDefindexes . ')', [$steamid]);
+                    Database::run('DELETE FROM `' . self::knifeTable() . '` WHERE `steamid` = ?', [$steamid], self::DB);
+                    Database::run('DELETE FROM `' . self::skinsTable() . '` WHERE `steamid` = ? AND `weapon_defindex` IN (' . $knifeDefindexes . ')', [$steamid], self::DB);
                 } else {
-                    $rows = Database::all('SELECT weapon_team FROM `' . self::knifeTable() . '` WHERE `steamid` = ?', [$steamid]);
+                    $rows = Database::all('SELECT weapon_team FROM `' . self::knifeTable() . '` WHERE `steamid` = ?', [$steamid], self::DB);
                     foreach ($rows as $r) {
                         if ((int) $r['weapon_team'] === 1) {
                             $opp = ($team === WeaponPaintsData::TEAM_T) ? WeaponPaintsData::TEAM_CT : WeaponPaintsData::TEAM_T;
-                            Database::run('UPDATE `' . self::knifeTable() . '` SET `weapon_team` = ? WHERE `steamid` = ? AND `weapon_team` = 1', [$opp, $steamid]);
-                            Database::run('UPDATE `' . self::skinsTable() . '` SET `weapon_team` = ? WHERE `steamid` = ? AND `weapon_team` = 1 AND `weapon_defindex` IN (' . $knifeDefindexes . ')', [$opp, $steamid]);
+                            Database::run('UPDATE `' . self::knifeTable() . '` SET `weapon_team` = ? WHERE `steamid` = ? AND `weapon_team` = 1', [$opp, $steamid], self::DB);
+                            Database::run('UPDATE `' . self::skinsTable() . '` SET `weapon_team` = ? WHERE `steamid` = ? AND `weapon_team` = 1 AND `weapon_defindex` IN (' . $knifeDefindexes . ')', [$opp, $steamid], self::DB);
                         }
                     }
-                    Database::run('DELETE FROM `' . self::knifeTable() . '` WHERE `steamid` = ? AND `weapon_team` = ?', [$steamid, $team]);
-                    Database::run('DELETE FROM `' . self::skinsTable() . '` WHERE `steamid` = ? AND `weapon_team` = ? AND `weapon_defindex` IN (' . $knifeDefindexes . ')', [$steamid, $team]);
+                    Database::run('DELETE FROM `' . self::knifeTable() . '` WHERE `steamid` = ? AND `weapon_team` = ?', [$steamid, $team], self::DB);
+                    Database::run('DELETE FROM `' . self::skinsTable() . '` WHERE `steamid` = ? AND `weapon_team` = ? AND `weapon_defindex` IN (' . $knifeDefindexes . ')', [$steamid, $team], self::DB);
                 }
 
                 Database::run(
                     'INSERT INTO `' . self::knifeTable() . '` (`steamid`, `knife`, `weapon_team`) VALUES (?, ?, ?)',
-                    [$steamid, $knifes[$knifeDefindex]['weapon_name'], $team]
+                    [$steamid, $knifes[$knifeDefindex]['weapon_name'], $team], self::DB
                 );
 
                 if ($knifeDefindex !== 0) {
@@ -291,24 +294,24 @@ final class WeaponPaintsModel
 
             if (array_key_exists($gloveDefindex, $gloves)) {
                 if ($team === WeaponPaintsData::TEAM_BOTH) {
-                    Database::run('DELETE FROM `' . self::glovesTable() . '` WHERE `steamid` = ?', [$steamid]);
-                    Database::run('DELETE FROM `' . self::skinsTable() . '` WHERE `steamid` = ? AND `weapon_defindex` IN (' . $gloveDefindexes . ')', [$steamid]);
+                    Database::run('DELETE FROM `' . self::glovesTable() . '` WHERE `steamid` = ?', [$steamid], self::DB);
+                    Database::run('DELETE FROM `' . self::skinsTable() . '` WHERE `steamid` = ? AND `weapon_defindex` IN (' . $gloveDefindexes . ')', [$steamid], self::DB);
                 } else {
-                    $rows = Database::all('SELECT weapon_team FROM `' . self::glovesTable() . '` WHERE `steamid` = ?', [$steamid]);
+                    $rows = Database::all('SELECT weapon_team FROM `' . self::glovesTable() . '` WHERE `steamid` = ?', [$steamid], self::DB);
                     foreach ($rows as $r) {
                         if ((int) $r['weapon_team'] === 1) {
                             $opp = ($team === WeaponPaintsData::TEAM_T) ? WeaponPaintsData::TEAM_CT : WeaponPaintsData::TEAM_T;
-                            Database::run('UPDATE `' . self::glovesTable() . '` SET `weapon_team` = ? WHERE `steamid` = ? AND `weapon_team` = 1', [$opp, $steamid]);
-                            Database::run('UPDATE `' . self::skinsTable() . '` SET `weapon_team` = ? WHERE `steamid` = ? AND `weapon_team` = 1 AND `weapon_defindex` IN (' . $gloveDefindexes . ')', [$opp, $steamid]);
+                            Database::run('UPDATE `' . self::glovesTable() . '` SET `weapon_team` = ? WHERE `steamid` = ? AND `weapon_team` = 1', [$opp, $steamid], self::DB);
+                            Database::run('UPDATE `' . self::skinsTable() . '` SET `weapon_team` = ? WHERE `steamid` = ? AND `weapon_team` = 1 AND `weapon_defindex` IN (' . $gloveDefindexes . ')', [$opp, $steamid], self::DB);
                         }
                     }
-                    Database::run('DELETE FROM `' . self::glovesTable() . '` WHERE `steamid` = ? AND `weapon_team` = ?', [$steamid, $team]);
-                    Database::run('DELETE FROM `' . self::skinsTable() . '` WHERE `steamid` = ? AND `weapon_team` = ? AND `weapon_defindex` IN (' . $gloveDefindexes . ')', [$steamid, $team]);
+                    Database::run('DELETE FROM `' . self::glovesTable() . '` WHERE `steamid` = ? AND `weapon_team` = ?', [$steamid, $team], self::DB);
+                    Database::run('DELETE FROM `' . self::skinsTable() . '` WHERE `steamid` = ? AND `weapon_team` = ? AND `weapon_defindex` IN (' . $gloveDefindexes . ')', [$steamid, $team], self::DB);
                 }
 
                 Database::run(
                     'INSERT INTO `' . self::glovesTable() . '` (`steamid`, `weapon_defindex`, `weapon_team`) VALUES (?, ?, ?)',
-                    [$steamid, $gloveDefindex, $team]
+                    [$steamid, $gloveDefindex, $team], self::DB
                 );
 
                 if ($gloveDefindex !== 0) {
@@ -318,38 +321,38 @@ final class WeaponPaintsModel
         } elseif (($ex[0] ?? '') === 'music') {
             $musicId = (int) ($ex[1] ?? 0);
             if ($team === WeaponPaintsData::TEAM_BOTH) {
-                Database::run('DELETE FROM `' . self::musicTable() . '` WHERE `steamid` = ?', [$steamid]);
+                Database::run('DELETE FROM `' . self::musicTable() . '` WHERE `steamid` = ?', [$steamid], self::DB);
             } else {
-                $existing = Database::all('SELECT weapon_team FROM `' . self::musicTable() . '` WHERE `steamid` = ?', [$steamid]);
+                $existing = Database::all('SELECT weapon_team FROM `' . self::musicTable() . '` WHERE `steamid` = ?', [$steamid], self::DB);
                 foreach ($existing as $r) {
                     if ((int) $r['weapon_team'] === WeaponPaintsData::TEAM_BOTH) {
                         $opp = ($team === WeaponPaintsData::TEAM_T) ? WeaponPaintsData::TEAM_CT : WeaponPaintsData::TEAM_T;
-                        Database::run('UPDATE `' . self::musicTable() . '` SET `weapon_team` = ? WHERE `steamid` = ? AND `weapon_team` = 1', [$opp, $steamid]);
+                        Database::run('UPDATE `' . self::musicTable() . '` SET `weapon_team` = ? WHERE `steamid` = ? AND `weapon_team` = 1', [$opp, $steamid], self::DB);
                     }
                 }
-                Database::run('DELETE FROM `' . self::musicTable() . '` WHERE `steamid` = ? AND `weapon_team` = ?', [$steamid, $team]);
+                Database::run('DELETE FROM `' . self::musicTable() . '` WHERE `steamid` = ? AND `weapon_team` = ?', [$steamid, $team], self::DB);
             }
             Database::run(
                 'INSERT INTO `' . self::musicTable() . '` (`steamid`, `weapon_team`, `music_id`) VALUES (?, ?, ?)',
-                [$steamid, $team, $musicId]
+                [$steamid, $team, $musicId], self::DB
             );
         } elseif (($ex[0] ?? '') === 'pin') {
             $pinId = (int) ($ex[1] ?? 0);
             if ($team === WeaponPaintsData::TEAM_BOTH) {
-                Database::run('DELETE FROM `' . self::pinsTable() . '` WHERE `steamid` = ?', [$steamid]);
+                Database::run('DELETE FROM `' . self::pinsTable() . '` WHERE `steamid` = ?', [$steamid], self::DB);
             } else {
-                $existing = Database::all('SELECT weapon_team FROM `' . self::pinsTable() . '` WHERE `steamid` = ?', [$steamid]);
+                $existing = Database::all('SELECT weapon_team FROM `' . self::pinsTable() . '` WHERE `steamid` = ?', [$steamid], self::DB);
                 foreach ($existing as $r) {
                     if ((int) $r['weapon_team'] === WeaponPaintsData::TEAM_BOTH) {
                         $opp = ($team === WeaponPaintsData::TEAM_T) ? WeaponPaintsData::TEAM_CT : WeaponPaintsData::TEAM_T;
-                        Database::run('UPDATE `' . self::pinsTable() . '` SET `weapon_team` = ? WHERE `steamid` = ? AND `weapon_team` = 1', [$opp, $steamid]);
+                        Database::run('UPDATE `' . self::pinsTable() . '` SET `weapon_team` = ? WHERE `steamid` = ? AND `weapon_team` = 1', [$opp, $steamid], self::DB);
                     }
                 }
-                Database::run('DELETE FROM `' . self::pinsTable() . '` WHERE `steamid` = ? AND `weapon_team` = ?', [$steamid, $team]);
+                Database::run('DELETE FROM `' . self::pinsTable() . '` WHERE `steamid` = ? AND `weapon_team` = ?', [$steamid, $team], self::DB);
             }
             Database::run(
                 'INSERT INTO `' . self::pinsTable() . '` (`steamid`, `weapon_team`, `id`) VALUES (?, ?, ?)',
-                [$steamid, $team, $pinId]
+                [$steamid, $team, $pinId], self::DB
             );
         } else {
             $defindex = (int) ($ex[0] ?? 0);
@@ -384,31 +387,31 @@ final class WeaponPaintsModel
             // before this normalization existed — then insert the single row.
             Database::run(
                 'DELETE FROM `' . self::skinsTable() . '` WHERE `steamid` = ? AND `weapon_defindex` = ?',
-                [$steamid, $defindex]
+                [$steamid, $defindex], self::DB
             );
             $team = $forcedTeam;
         } elseif ($team === WeaponPaintsData::TEAM_BOTH) {
             Database::run(
                 'DELETE FROM `' . self::skinsTable() . '` WHERE `steamid` = ? AND `weapon_defindex` = ?',
-                [$steamid, $defindex]
+                [$steamid, $defindex], self::DB
             );
         } else {
             $existing = Database::all(
                 'SELECT weapon_team FROM `' . self::skinsTable() . '` WHERE `steamid` = ? AND `weapon_defindex` = ?',
-                [$steamid, $defindex]
+                [$steamid, $defindex], self::DB
             );
             foreach ($existing as $row) {
                 if ((int) $row['weapon_team'] === WeaponPaintsData::TEAM_BOTH) {
                     $opp = ($team === WeaponPaintsData::TEAM_T) ? WeaponPaintsData::TEAM_CT : WeaponPaintsData::TEAM_T;
                     Database::run(
                         'UPDATE `' . self::skinsTable() . '` SET `weapon_team` = ? WHERE `steamid` = ? AND `weapon_defindex` = ? AND `weapon_team` = 1',
-                        [$opp, $steamid, $defindex]
+                        [$opp, $steamid, $defindex], self::DB
                     );
                 }
             }
             Database::run(
                 'DELETE FROM `' . self::skinsTable() . '` WHERE `steamid` = ? AND `weapon_defindex` = ? AND `weapon_team` = ?',
-                [$steamid, $defindex, $team]
+                [$steamid, $defindex, $team], self::DB
             );
         }
 
@@ -459,7 +462,7 @@ final class WeaponPaintsModel
             );
             Database::run(
                 'INSERT INTO `' . self::skinsTable() . '` (' . $cols . ') VALUES (' . $placeholders . ')',
-                $params
+                $params, self::DB
             );
             return;
         }
@@ -467,7 +470,7 @@ final class WeaponPaintsModel
         Database::run(
             'INSERT INTO `' . self::skinsTable() . '` (`steamid`, `weapon_defindex`, `weapon_paint_id`, `weapon_wear`, `weapon_seed`, `weapon_team`, `weapon_stattrak`, `weapon_stattrak_count`, `weapon_nametag`)
              VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
-            [$steamid, $defindex, $paintId, $wear, $seed, $team, $stattrak, $stattrakCount, $nametag]
+            [$steamid, $defindex, $paintId, $wear, $seed, $team, $stattrak, $stattrakCount, $nametag], self::DB
         );
     }
 

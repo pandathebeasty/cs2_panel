@@ -675,6 +675,97 @@ $L = fn(string $k) => View::e(Lang::t($k));
                 </div>
             </div>
 
+            <!-- Separate database per integration (written to config.php as
+                 integration_db; queries on those tables are routed there). -->
+            <div class="card" style="margin-bottom:18px" id="extdb-card">
+                <div class="card-title"><?= $L('settings.extdb_title') ?></div>
+                <p class="hint" style="margin:-4px 0 14px"><?= $L('settings.extdb_hint') ?></p>
+                <?php foreach ($s['extdb'] as $xk => $x): $xid = 'extdb_' . $xk; ?>
+                <div class="extdb-item" data-extdb="<?= View::e($xk) ?>" style="border:1px solid var(--border);border-radius:12px;padding:12px 14px;margin-bottom:10px">
+                    <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+                        <div class="check" style="margin:0"><input type="checkbox" name="<?= $xid ?>_enabled" id="<?= $xid ?>_en" class="js-extdb-toggle" <?= $x['enabled'] ? 'checked' : '' ?>><label for="<?= $xid ?>_en"><?= View::e($x['label']) ?></label></div>
+                        <?php if ($x['active']): ?><span class="badge badge-active" style="font-size:10px"><?= $L('settings.extdb_active') ?></span><?php endif; ?>
+                    </div>
+                    <div class="extdb-fields" style="margin-top:12px<?= $x['enabled'] ? '' : ';display:none' ?>">
+                        <div class="form-row">
+                            <div class="field"><label><?= $L('settings.extdb_host') ?></label><input type="text" name="<?= $xid ?>_host" value="<?= View::e($x['host']) ?>" placeholder="127.0.0.1" maxlength="255" autocomplete="off"></div>
+                            <div class="field" style="max-width:130px"><label><?= $L('settings.extdb_port') ?></label><input type="number" name="<?= $xid ?>_port" value="<?= View::e($x['port']) ?>" min="1" max="65535"></div>
+                            <div class="field"><label><?= $L('settings.extdb_name') ?></label><input type="text" name="<?= $xid ?>_name" value="<?= View::e($x['name']) ?>" maxlength="64" pattern="[A-Za-z0-9_$\-]{1,64}" autocomplete="off"></div>
+                        </div>
+                        <div class="form-row">
+                            <div class="field"><label><?= $L('settings.extdb_user') ?></label><input type="text" name="<?= $xid ?>_user" value="<?= View::e($x['user']) ?>" maxlength="80" autocomplete="off"></div>
+                            <div class="field">
+                                <label><?= $L('settings.extdb_pass') ?><?php if ($x['has_pass']): ?> <span class="badge badge-active" style="font-size:10px"><?= $L('settings.mail_pass_saved') ?></span><?php endif; ?></label>
+                                <input type="password" name="<?= $xid ?>_pass" value="" autocomplete="new-password" placeholder="<?= $x['has_pass'] ? '••••••••' : '' ?>">
+                                <?php if ($x['has_pass']): ?><p class="hint" style="margin-top:4px"><?= $L('settings.mail_pass_keep') ?></p><?php endif; ?>
+                            </div>
+                        </div>
+                        <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+                            <button type="button" class="btn btn-sm js-extdb-test"><?= $L('settings.extdb_test') ?></button>
+                            <span class="hint js-extdb-result" style="margin:0"></span>
+                        </div>
+                    </div>
+                </div>
+                <?php endforeach; ?>
+                
+            </div>
+            <script>
+            (function () {
+                var card = document.getElementById('extdb-card');
+                if (!card) return;
+                var T = {
+                    busy: <?= json_encode(Lang::t('settings.extdb_testing'), JSON_UNESCAPED_UNICODE | JSON_HEX_TAG) ?>,
+                    ok: <?= json_encode(Lang::t('settings.extdb_test_ok'), JSON_UNESCAPED_UNICODE | JSON_HEX_TAG) ?>,
+                    missing: <?= json_encode(Lang::t('settings.extdb_test_missing'), JSON_UNESCAPED_UNICODE | JSON_HEX_TAG) ?>,
+                    fail: <?= json_encode(Lang::t('settings.extdb_test_fail'), JSON_UNESCAPED_UNICODE | JSON_HEX_TAG) ?>,
+                    noXa: <?= json_encode(Lang::t('settings.extdb_test_no_xa'), JSON_UNESCAPED_UNICODE | JSON_HEX_TAG) ?>,
+                    crossKeys: <?= json_encode(\App\Core\IntegrationDb::CROSS_WRITE_KEYS) ?>
+                };
+                card.querySelectorAll('.extdb-item').forEach(function (item) {
+                    var key = item.getAttribute('data-extdb');
+                    var toggle = item.querySelector('.js-extdb-toggle');
+                    var fields = item.querySelector('.extdb-fields');
+                    var out = item.querySelector('.js-extdb-result');
+                    var btn = item.querySelector('.js-extdb-test');
+                    function val(f) { var el = item.querySelector('[name="extdb_' + key + '_' + f + '"]'); return el ? el.value : ''; }
+                    toggle.addEventListener('change', function () { fields.style.display = toggle.checked ? '' : 'none'; });
+                    btn.addEventListener('click', function () {
+                        btn.disabled = true;
+                        out.style.color = '';
+                        out.textContent = T.busy;
+                        var body = new URLSearchParams({
+                            csrf: window.CS2_CSRF || '', key: key,
+                            host: val('host'), port: val('port'), name: val('name'), user: val('user'), pass: val('pass')
+                        });
+                        fetch((window.CS2_BASE || '') + '/settings/test-integration-db', {
+                            method: 'POST',
+                            credentials: 'same-origin',
+                            headers: { 'Content-Type': 'application/x-www-form-urlencoded', 'X-Requested-With': 'XMLHttpRequest', 'Accept': 'application/json' },
+                            body: body.toString()
+                        }).then(function (r) {
+                            return r.text().then(function (t) { var j = null; try { j = JSON.parse(t); } catch (e) {} return { status: r.status, j: j }; });
+                        }).then(function (res) {
+                            var j = res.j;
+                            if (j && j.ok) {
+                                var msg = T.ok.replace('{server}', j.server || '');
+                                if (j.missing && j.missing.length) msg += ' ' + T.missing.replace('{tables}', j.missing.join(', '));
+                                var noXa = j.xa === false && T.crossKeys.indexOf(key) !== -1;
+                                if (noXa) msg += ' ' + T.noXa;
+                                out.style.color = noXa ? 'var(--danger, #ef4444)' : (j.missing && j.missing.length ? 'var(--warning, #f5a524)' : 'var(--success, #22c55e)');
+                                out.textContent = msg;
+                            } else {
+                                out.style.color = 'var(--danger, #ef4444)';
+                                out.textContent = T.fail.replace('{e}', (j && j.error) ? j.error : 'HTTP ' + res.status);
+                            }
+                        }).catch(function () {
+                            out.style.color = 'var(--danger, #ef4444)';
+                            out.textContent = T.fail.replace('{e}', 'network');
+                        }).finally(function () { btn.disabled = false; });
+                    });
+                });
+            })();
+            </script>
+
         </div>
 
         <div data-tabpanel="admin" style="display:none">

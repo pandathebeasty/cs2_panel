@@ -29,6 +29,9 @@ use App\Core\Settings;
  */
 final class StoreCreditsModel
 {
+    /** Connection key: the Store plugin's own database when configured, else the panel one. */
+    private const DB = 'store';
+
     /** The cs2-store players table name (configurable to match the plugin cfg). */
     public static function table(): string
     {
@@ -49,7 +52,7 @@ final class StoreCreditsModel
     public static function tableReady(): bool
     {
         try {
-            return Database::tableExists(self::table());
+            return Database::tableExists(self::table(), self::DB);
         } catch (\Throwable $e) {
             return false;
         }
@@ -88,7 +91,7 @@ final class StoreCreditsModel
                         `DateOfLastJoin` AS last_online, `DateOfJoin` AS joined
                  FROM `{$t}`";
         $count = "SELECT COUNT(*) FROM `{$t}`";
-        return Paginator::make($base, $count, [], $page, $perPage, $order);
+        return Paginator::make($base, $count, [], $page, $perPage, $order, self::DB);
     }
 
     /** A single player's credit row, or null. $steamId64 is a SteamID64 string. */
@@ -102,7 +105,7 @@ final class StoreCreditsModel
             "SELECT CAST(`SteamID` AS CHAR) AS steam_id, `PlayerName` AS name,
                     `Credits` AS credits, `DateOfJoin` AS joined, `DateOfLastJoin` AS last_online
              FROM `{$t}` WHERE `SteamID` = ? LIMIT 1",
-            [$steamId64]
+            [$steamId64], self::DB
         );
     }
 
@@ -127,14 +130,14 @@ final class StoreCreditsModel
         try {
             $existing = self::find($steamId64);
             if ($existing !== null) {
-                Database::run("UPDATE `{$t}` SET `Credits` = ? WHERE `SteamID` = ?", [$credits, $steamId64]);
+                Database::run("UPDATE `{$t}` SET `Credits` = ? WHERE `SteamID` = ?", [$credits, $steamId64], self::DB);
             } else {
                 // New row: mirror the plugin's column set so a later plugin load
                 // doesn't choke on NULLs it doesn't expect.
                 Database::run(
                     "INSERT INTO `{$t}` (`SteamID`, `PlayerName`, `Credits`, `DateOfJoin`, `DateOfLastJoin`, `Vip`)
                      VALUES (?, ?, ?, NOW(), NOW(), 0)",
-                    [$steamId64, mb_substr($name !== '' ? $name : 'Player', 0, 255), $credits]
+                    [$steamId64, mb_substr($name !== '' ? $name : 'Player', 0, 255), $credits], self::DB
                 );
             }
             return true;
@@ -161,17 +164,17 @@ final class StoreCreditsModel
                 // GREATEST(...,0) mirrors the plugin's own non-negative clamp.
                 Database::run(
                     "UPDATE `{$t}` SET `Credits` = GREATEST(`Credits` + ?, 0) WHERE `SteamID` = ?",
-                    [$amount, $steamId64]
+                    [$amount, $steamId64], self::DB
                 );
                 if ($name !== '') {
                     Database::run("UPDATE `{$t}` SET `PlayerName` = ? WHERE `SteamID` = ?",
-                        [mb_substr($name, 0, 255), $steamId64]);
+                        [mb_substr($name, 0, 255), $steamId64], self::DB);
                 }
             } else {
                 Database::run(
                     "INSERT INTO `{$t}` (`SteamID`, `PlayerName`, `Credits`, `DateOfJoin`, `DateOfLastJoin`, `Vip`)
                      VALUES (?, ?, ?, NOW(), NOW(), 0)",
-                    [$steamId64, mb_substr($name !== '' ? $name : 'Player', 0, 255), max(0, $amount)]
+                    [$steamId64, mb_substr($name !== '' ? $name : 'Player', 0, 255), max(0, $amount)], self::DB
                 );
             }
             return self::get($steamId64);
@@ -197,8 +200,8 @@ final class StoreCreditsModel
             return 0;
         }
         $t = self::table();
-        $before = (int) Database::scalar("SELECT COUNT(*) FROM `{$t}` WHERE `Credits` <> 0");
-        Database::run("UPDATE `{$t}` SET `Credits` = 0");
+        $before = (int) Database::scalar("SELECT COUNT(*) FROM `{$t}` WHERE `Credits` <> 0", [], self::DB);
+        Database::run("UPDATE `{$t}` SET `Credits` = 0", [], self::DB);
         return $before;
     }
 
@@ -209,7 +212,7 @@ final class StoreCreditsModel
             return ['players' => 0, 'credits' => 0];
         }
         $t = self::table();
-        $row = Database::one("SELECT COUNT(*) AS players, COALESCE(SUM(`Credits`),0) AS credits FROM `{$t}`");
+        $row = Database::one("SELECT COUNT(*) AS players, COALESCE(SUM(`Credits`),0) AS credits FROM `{$t}`", [], self::DB);
         return [
             'players' => (int) ($row['players'] ?? 0),
             'credits' => (int) ($row['credits'] ?? 0),

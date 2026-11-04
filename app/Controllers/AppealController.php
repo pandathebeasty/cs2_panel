@@ -154,31 +154,25 @@ final class AppealController extends Controller
             }
         }
 
-        $pdo = \App\Core\Database::connection();
-        $ownTransaction = !$pdo->inTransaction();
-        if ($ownTransaction) {
-            $pdo->beginTransaction();
-        }
         try {
-            if ($unbanRequested && $ban !== null) {
-                $adminId = \App\Models\ServerModel::adminIdBySteamId(Auth::steamId());
-                BanModel::unban((int) $ban['id'], $adminId, $unbanReason);
-                $unbanDone = true;
-            }
-            AppealModel::resolve(
-                (int) $id,
-                $status,
-                $reply,
-                (string) Auth::steamId(),
-                (string) (Auth::user()['name'] ?? '')
-            );
-            if ($ownTransaction) {
-                $pdo->commit();
-            }
+            // Unban (SimpleAdmin) + appeal status (panel) commit together, even
+            // when SimpleAdmin lives in a separate database.
+            \App\Core\Database::atomic(['default', 'simpleadmin'], static function () use ($unbanRequested, $ban, $unbanReason, $id, $status, $reply, &$unbanDone): void {
+                if ($unbanRequested && $ban !== null) {
+                    $adminId = \App\Models\ServerModel::adminIdBySteamId(Auth::steamId());
+                    BanModel::unban((int) $ban['id'], $adminId, $unbanReason);
+                    $unbanDone = true;
+                }
+                AppealModel::resolve(
+                    (int) $id,
+                    $status,
+                    $reply,
+                    (string) Auth::steamId(),
+                    (string) (Auth::user()['name'] ?? '')
+                );
+            });
         } catch (\Throwable $e) {
-            if ($ownTransaction && $pdo->inTransaction()) {
-                $pdo->rollBack();
-            }
+            $unbanDone = false;
             error_log('[CS2Panel] appeal resolution failed: ' . $e->getMessage());
             $this->flash('error', Lang::t('appeals.resolve_failed'));
             $this->redirect('/appeals');

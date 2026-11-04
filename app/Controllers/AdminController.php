@@ -168,7 +168,7 @@ final class AdminController extends Controller
             $this->redirect('/admins');
         }
 
-        $pdo = Database::connection();
+        $pdo = Database::connection('simpleadmin');
         $pdo->beginTransaction();
         try {
             Database::run(
@@ -235,7 +235,7 @@ final class AdminController extends Controller
         }
         $storedFlags = array_values(array_unique(array_merge($cleanFlags, [$groupFlag])));
 
-        $pdo = Database::connection();
+        $pdo = Database::connection('simpleadmin');
         $pdo->beginTransaction();
         try {
             Database::run(
@@ -316,7 +316,7 @@ final class AdminController extends Controller
         );
         $flags = array_column($flagRows, 'flag');
 
-        $pdo = Database::connection();
+        $pdo = Database::connection('simpleadmin');
         $pdo->beginTransaction();
         try {
             Database::run("DELETE FROM {$p}admins_flags WHERE admin_id IN ({$idPlaceholders})", $adminIds);

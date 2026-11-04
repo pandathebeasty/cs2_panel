@@ -29,6 +29,60 @@ final class Installer
         ]);
     }
 
+    /**
+     * extdb_* settings from the wizard. Each ticked integration is validated and
+     * its connection tested; blank host/port/user fall back to the main
+     * database, and a blank password too when the user is the main one.
+     * @param array<string,mixed> $input
+     * @param string[] $errors
+     * @return array<string,string>
+     */
+    public static function integrationDbInput(array $input, PDO $main, array &$errors): array
+    {
+        $out = [];
+        foreach (IntegrationDb::KEYS as $k => $label) {
+            $enabled = !empty($input["extdb_{$k}_enabled"]);
+            $host = trim((string) ($input["extdb_{$k}_host"] ?? ''));
+            $port = (int) ($input["extdb_{$k}_port"] ?? 0);
+            $name = trim((string) ($input["extdb_{$k}_name"] ?? ''));
+            $user = trim((string) ($input["extdb_{$k}_user"] ?? ''));
+            $pass = (string) ($input["extdb_{$k}_pass"] ?? '');
+            if ($enabled) {
+                $host = $host !== '' ? $host : trim((string) ($input['db_host'] ?? ''));
+                $port = $port > 0 ? $port : ((int) ($input['db_port'] ?? 0) ?: 3306);
+                $user = $user !== '' ? $user : trim((string) ($input['db_user'] ?? ''));
+                if ($pass === '' && $user === trim((string) ($input['db_user'] ?? ''))) {
+                    $pass = (string) ($input['db_password'] ?? '');
+                }
+            }
+            $port = $port >= 1 && $port <= 65535 ? $port : 3306;
+
+            if ($enabled) {
+                if ($host === '' || $name === '' || $user === ''
+                    || !preg_match('/^[A-Za-z0-9.\-_:\[\]]{1,255}$/', $host)
+                    || !preg_match('/^[A-Za-z0-9_$\-]{1,64}$/', $name)
+                    || strlen($user) > 80) {
+                    $errors[] = Lang::t('settings.extdb_invalid', ['name' => $label]);
+                } else {
+                    $test = Database::test(['host' => $host, 'port' => $port, 'name' => $name, 'user' => $user, 'password' => $pass]);
+                    if (!$test['ok']) {
+                        $errors[] = Lang::t('settings.extdb_connect_failed', ['name' => $label]) . ' ' . $test['error'];
+                    } elseif (in_array($k, IntegrationDb::CROSS_WRITE_KEYS, true)
+                        && (empty($test['xa']) || !Database::supportsXa($main))) {
+                        $errors[] = Lang::t('settings.extdb_xa_required', ['name' => $label]);
+                    }
+                }
+            }
+            $out["extdb_{$k}_enabled"] = $enabled ? '1' : '0';
+            $out["extdb_{$k}_host"] = $enabled ? $host : '';
+            $out["extdb_{$k}_port"] = (string) $port;
+            $out["extdb_{$k}_name"] = $enabled ? $name : '';
+            $out["extdb_{$k}_user"] = $enabled ? $user : '';
+            $out["extdb_{$k}_pass"] = $enabled ? $pass : '';
+        }
+        return $out;
+    }
+
     public static function hasPanelSettings(PDO $pdo): bool
     {
         $statement = $pdo->query(
@@ -171,7 +225,8 @@ final class Installer
        
                                                                             
        
-    public static function saveInitialSettings(PDO $pdo, array $input, bool $preserveExisting = false): void
+    /** @param array<string,string> $extdb validated output of integrationDbInput() */
+    public static function saveInitialSettings(PDO $pdo, array $input, bool $preserveExisting = false, array $extdb = []): void
     {
         $webhook = trim((string) ($input['discord_webhook'] ?? ''));
 
@@ -214,13 +269,17 @@ final class Installer
         // Materialise every known setting first, so the fresh install already
         // has a complete panel_settings table (a copy of the DB is portable).
         $pairs = array_merge(Settings::defaults(), $pairs);
+        $upsert = 'INSERT INTO panel_settings (`key`, `value`) VALUES (?, ?)'
+            . Database::onDuplicateUpdate(['value'], $pdo);
 
-        $sql = $preserveExisting
-            ? 'INSERT IGNORE INTO panel_settings (`key`, `value`) VALUES (?, ?)'
-            : 'INSERT INTO panel_settings (`key`, `value`) VALUES (?, ?)'
-              . Database::onDuplicateUpdate(['value'], $pdo);
-        $stmt = $pdo->prepare($sql);
-        foreach ($pairs as $k => $v) {
+        $stmt = $pdo->prepare($preserveExisting ? 'INSERT IGNORE INTO panel_settings (`key`, `value`) VALUES (?, ?)' : $upsert);
+        foreach (array_diff_key($pairs, $extdb) as $k => $v) {
+            $stmt->execute([$k, $v]);
+        }
+        // The separate-database choices were just validated in the wizard, so
+        // they replace any older values even when existing settings are kept.
+        $stmt = $pdo->prepare($upsert);
+        foreach ($extdb as $k => $v) {
             $stmt->execute([$k, $v]);
         }
     }
