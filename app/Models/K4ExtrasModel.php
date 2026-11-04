@@ -511,13 +511,14 @@ final class K4ExtrasModel
         $defs = self::missions();
         $today = self::today();
         $week = self::weekStart();
+        $day = self::latestDailyDay($steamId) ?? $today;
         $rows = [];
         try {
             $rows = Database::all(
                 'SELECT `slot`, `mission_id`, `progress`, `completed`, `day` FROM `' . self::table('k4missions') . '`
                  WHERE `steam_id` = ? AND ((`day` = ? AND `slot` < ' . self::WEEKLY_SLOT . ') OR (`day` = ? AND `slot` = ' . self::WEEKLY_SLOT . '))
                  ORDER BY `slot`',
-                [$steamId, $today, $week],
+                [$steamId, $day, $week],
                 self::DB
             );
         } catch (\Throwable $e) {
@@ -551,7 +552,34 @@ final class K4ExtrasModel
             }
         }
 
-        return ['daily' => array_values($daily), 'weekly' => $weekly, 'done' => $done] + $state;
+        return ['daily' => array_values($daily), 'weekly' => $weekly, 'done' => $done, 'day' => $day, 'stale' => $daily && $day !== $today] + $state;
+    }
+
+    /**
+     * K4 writes daily rows only when it saves a player who played that day, while the weekly row
+     * lives under Monday all week. So today can have no daily rows yet; fall back to the last day
+     * that has any, server-wide or for one player.
+     */
+    public static function latestDailyDay(?string $steamId = null): ?string
+    {
+        static $cache = [];
+        $key = $steamId ?? '';
+        if (array_key_exists($key, $cache)) {
+            return $cache[$key];
+        }
+        $sql = 'SELECT MAX(`day`) FROM `' . self::table('k4missions') . '` WHERE `slot` < ' . self::WEEKLY_SLOT . ' AND `day` <= ?';
+        $params = [self::today()];
+        if ($steamId !== null) {
+            $sql .= ' AND `steam_id` = ?';
+            $params[] = $steamId;
+        }
+        try {
+            $day = Database::scalar($sql, $params, self::DB);
+        } catch (\Throwable $e) {
+            $day = null;
+        }
+        $day = $day ? substr((string) $day, 0, 10) : null;
+        return $cache[$key] = $day;
     }
 
     private static function missionCard(string $id, int $progress, bool $completed, array $defs): array
@@ -588,7 +616,7 @@ final class K4ExtrasModel
                  FROM `' . self::table('k4missions') . '`
                  WHERE (`day` = ? AND `slot` < ' . self::WEEKLY_SLOT . ') OR (`day` = ? AND `slot` = ' . self::WEEKLY_SLOT . ')
                  GROUP BY `mission_id`',
-                [self::today(), self::weekStart()],
+                [self::latestDailyDay() ?? self::today(), self::weekStart()],
                 self::DB
             );
         } catch (\Throwable $e) {
