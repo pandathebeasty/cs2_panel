@@ -56,8 +56,7 @@ $card = function (array $m, int $n) use ($L, $icon): string {
         </div>
 
         <?php if (!$steamId && $active): ?>
-            <?php $activeDay = K4ExtrasModel::latestDailyDay(); ?>
-            <p class="muted k4x-active-note"><?= $L('k4x.active_today_hint') ?><?php if ($activeDay && $activeDay !== K4ExtrasModel::today()): ?> <strong><?= View::e($activeDay) ?></strong><?php endif; ?></p>
+            <p class="muted k4x-active-note"><?= $L('k4x.active_today_hint') ?></p>
             <div class="k4x-missions">
                 <?php foreach ($active as $i => $m): ?><?= $card($m, min($i, 8)) ?><?php endforeach; ?>
             </div>
@@ -66,7 +65,6 @@ $card = function (array $m, int $n) use ($L, $icon): string {
         <?php elseif (!$mine['daily'] && !$mine['weekly']): ?>
             <div class="card k4x-empty"><?= $icon(K4ExtrasModel::uiIcon('mission_star'), 'k4x-icon-xl') ?><p><?= $isSelf ? $L('k4x.no_missions_self') : $L('k4x.no_missions') ?></p></div>
         <?php else: ?>
-            <?php if (!empty($mine['stale'])): ?><p class="muted k4x-active-note"><?= View::e((string) $mine['day']) ?></p><?php endif; ?>
             <div class="k4x-missions">
                 <?php foreach ($mine['daily'] as $i => $m): ?><?= $card($m, $i) ?><?php endforeach; ?>
             </div>
