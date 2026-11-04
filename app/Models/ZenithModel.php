@@ -124,7 +124,7 @@ final class ZenithModel
                                                                         
     // Ranks leaderboard
                                                                         
-    public static function ranksLeaderboard(int $page, int $perPage, string $sort = 'points', string $dir = 'desc'): ?Paginator
+    public static function ranksLeaderboard(int $page, int $perPage, string $sort = 'points', string $dir = 'desc', string $search = ''): ?Paginator
     {
         $steamCol = self::steamColumn();
         $order = self::orderClause(self::RANK_SORTS, $sort, $dir, 'points');
@@ -161,7 +161,7 @@ final class ZenithModel
                      WHERE `{$ranks}` IS NOT NULL";
             $count = "SELECT COUNT(*) FROM `{$t}` WHERE `{$ranks}` IS NOT NULL";
 
-            return Paginator::make($base, $count, [], $page, $perPage, $order, self::DB);
+            return Paginator::filtered($base, $count, [], $page, $perPage, $order, self::DB, $search);
         }
 
         if (self::isLegacy()) {
@@ -180,7 +180,7 @@ final class ZenithModel
             $count = "SELECT COUNT(*) FROM `{$t}`";
             // Legacy only has points; other sorts fall back to points.
             $legacyDir = strtolower($dir) === 'asc' ? 'ASC' : 'DESC';
-            return Paginator::make($base, $count, [], $page, $perPage, "`{$pointsCol}` {$legacyDir}", self::DB);
+            return Paginator::filtered($base, $count, [], $page, $perPage, "points {$legacyDir}", self::DB, $search);
         }
 
         return null;
@@ -189,7 +189,7 @@ final class ZenithModel
                                                                         
     // Play time leaderboard (K4-Zenith-TimeStats.storage -> TotalPlaytime, in minutes)
                                                                         
-    public static function playtimeLeaderboard(int $page, int $perPage, string $sort = 'playtime', string $dir = 'desc'): ?Paginator
+    public static function playtimeLeaderboard(int $page, int $perPage, string $sort = 'playtime', string $dir = 'desc', string $search = ''): ?Paginator
     {
         $steamCol = self::steamColumn();
         $sortMap = [
@@ -231,13 +231,13 @@ final class ZenithModel
                  WHERE `{$time}` IS NOT NULL";
         $count = "SELECT COUNT(*) FROM `{$t}` WHERE `{$time}` IS NOT NULL";
 
-        return Paginator::make($base, $count, [], $page, $perPage, $order, self::DB);
+        return Paginator::filtered($base, $count, [], $page, $perPage, $order, self::DB, $search);
     }
 
                                                                         
     // Stats leaderboard
                                                                         
-    public static function statsLeaderboard(int $page, int $perPage): ?Paginator
+    public static function statsLeaderboard(int $page, int $perPage, string $search = ''): ?Paginator
     {
         $steamCol = self::steamColumn();
 
@@ -257,7 +257,7 @@ final class ZenithModel
                      WHERE `{$stats}` IS NOT NULL";
             $count = "SELECT COUNT(*) FROM `{$t}` WHERE `{$stats}` IS NOT NULL";
 
-            return Paginator::make($base, $count, [], $page, $perPage, 'kills DESC', self::DB);
+            return Paginator::filtered($base, $count, [], $page, $perPage, 'kills DESC', self::DB, $search);
         }
 
         if (self::isLegacy()) {
@@ -282,7 +282,7 @@ final class ZenithModel
                             {$deathsSelect}, {$assistsSelect}, {$hsSelect}
                      FROM `{$t}`";
             $count = "SELECT COUNT(*) FROM `{$t}`";
-            return Paginator::make($base, $count, [], $page, $perPage, "`{$killsCol}` DESC", self::DB);
+            return Paginator::filtered($base, $count, [], $page, $perPage, 'kills DESC', self::DB, $search);
         }
 
         return null;

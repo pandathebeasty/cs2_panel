@@ -22,8 +22,9 @@ final class ZenithController extends Controller
 
         $sort = (string) $this->query('sort', 'points');
         $dir  = (string) $this->query('dir', 'desc');
-        $board = StatsBackend::ranksLeaderboard($this->page(), (int) Config::get('app.per_page', 25), $sort, $dir);
-        $this->view('zenith/ranks', ['board' => $board, 'csrf' => $this->csrfToken(), 'sort' => $sort, 'dir' => $dir]);
+        $search = mb_substr(trim((string) $this->query('search', '')), 0, 64);
+        $board = StatsBackend::ranksLeaderboard($this->page(), (int) Config::get('app.per_page', 25), $sort, $dir, $search);
+        $this->view('zenith/ranks', ['board' => $board, 'csrf' => $this->csrfToken(), 'sort' => $sort, 'dir' => $dir, 'search' => $search]);
     }
 
     public function stats(): void
@@ -35,8 +36,9 @@ final class ZenithController extends Controller
             return;
         }
 
-        $board = StatsBackend::statsLeaderboard($this->page(), (int) Config::get('app.per_page', 25));
-        $this->view('zenith/stats', ['board' => $board, 'csrf' => $this->csrfToken()]);
+        $search = mb_substr(trim((string) $this->query('search', '')), 0, 64);
+        $board = StatsBackend::statsLeaderboard($this->page(), (int) Config::get('app.per_page', 25), $search);
+        $this->view('zenith/stats', ['board' => $board, 'csrf' => $this->csrfToken(), 'search' => $search]);
     }
 
     public function playtime(): void
@@ -50,8 +52,9 @@ final class ZenithController extends Controller
 
         $sort = (string) $this->query('sort', 'playtime');
         $dir  = (string) $this->query('dir', 'desc');
-        $board = StatsBackend::playtimeLeaderboard($this->page(), (int) Config::get('app.per_page', 25), $sort, $dir);
-        $this->view('zenith/playtime', ['board' => $board, 'csrf' => $this->csrfToken(), 'sort' => $sort, 'dir' => $dir]);
+        $search = mb_substr(trim((string) $this->query('search', '')), 0, 64);
+        $board = StatsBackend::playtimeLeaderboard($this->page(), (int) Config::get('app.per_page', 25), $sort, $dir, $search);
+        $this->view('zenith/playtime', ['board' => $board, 'csrf' => $this->csrfToken(), 'sort' => $sort, 'dir' => $dir, 'search' => $search]);
     }
 
     public function resetRank(): void

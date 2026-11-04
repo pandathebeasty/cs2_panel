@@ -9,6 +9,9 @@ $L = fn(string $k) => View::e(Lang::t($k));
 $canManage = Auth::canManage();
 $isRoot = Auth::isRoot();
 $offset = $board ? ($board->page - 1) * $board->perPage : 0;
+$search = (string) ($search ?? '');
+$liveSearchKey = $board !== null ? 'zenith-playtime' : null;
+$posOf = fn(array $r, int $i): string => isset($r['pos']) ? (string) (int) $r['pos'] : ($search !== '' ? '—' : (string) ($offset + $i + 1));
 $sort = $sort ?? 'playtime';
 $dir  = ($dir ?? 'desc') === 'asc' ? 'asc' : 'desc';
 
@@ -31,11 +34,11 @@ $hm = function ($minutes): string {
     return $h > 0 ? ($h . 'h ' . $rem . 'm') : ($rem . 'm');
 };
 // Sortable header: toggles dir when clicking the active column.
-$sortH = function (string $col, string $label) use ($sort, $dir): string {
+$sortH = function (string $col, string $label) use ($sort, $dir, $search): string {
     $active = $sort === $col;
     $newDir = ($active && $dir === 'desc') ? 'asc' : 'desc';
     $arrow = $active ? ($dir === 'desc' ? ' ▾' : ' ▴') : '';
-    $href = '/zenith/playtime?sort=' . urlencode($col) . '&dir=' . $newDir;
+    $href = '/zenith/playtime?sort=' . urlencode($col) . '&dir=' . $newDir . ($search !== '' ? '&search=' . urlencode($search) : '');
     return '<a class="sort-h' . ($active ? ' active' : '') . '" href="' . View::e($href) . '">' . View::e($label) . $arrow . '</a>';
 };
 ?>
@@ -51,10 +54,17 @@ $sortH = function (string $col, string $label) use ($sort, $dir): string {
     <div class="card"><div class="empty"><?= $L('playtime.no_source') ?></div></div>
 <?php else: ?>
     <?php $pg = $board; ?>
+    <div class="toolbar">
+        <form method="get" data-live-search="zenith-playtime" role="search">
+            <input type="text" name="search" placeholder="<?= $L('search.player_ph') ?>" value="<?= View::e($search) ?>" maxlength="64">
+        </form>
+    </div>
+    <?php require BASE_PATH . '/app/Views/partials/live-search-status.php'; ?>
+    <div class="live-search-results" id="search-results-zenith-playtime" data-live-search-results="zenith-playtime" tabindex="-1">
     <?php $avatars = $pg->items ? Steam::avatars(array_column($pg->items, 'steam_id')) : []; ?>
     <div class="card" style="padding:0">
         <?php if (!$pg->items): ?>
-            <div class="empty"><?= $L('playtime.none') ?></div>
+            <div class="empty"><?= $search !== '' ? $L('k4x.no_match') : $L('playtime.none') ?></div>
         <?php else: ?>
             <div class="table-wrap">
                 <table>
@@ -73,7 +83,7 @@ $sortH = function (string $col, string $label) use ($sort, $dir): string {
                     <tbody>
                     <?php foreach ($pg->items as $i => $r): ?>
                         <tr>
-                            <td class="muted"><?= $offset + $i + 1 ?></td>
+                            <td class="muted"><?= $posOf($r, $i) ?></td>
                             <td>
                                 <a class="player-cell" <?= Steam::linkAttrs($r['steam_id']) ?>>
                                     <img class="player-avatar" src="<?= View::e($avatars[(string) $r['steam_id']] ?? Steam::avatarPlaceholder()) ?>" alt="" loading="lazy">
@@ -108,6 +118,7 @@ $sortH = function (string $col, string $label) use ($sort, $dir): string {
         <?php endif; ?>
     </div>
     <?php require BASE_PATH . '/app/Views/partials/pagination.php'; ?>
+    </div>
 <?php endif; ?>
 
 <?php if ($canManage): ?>

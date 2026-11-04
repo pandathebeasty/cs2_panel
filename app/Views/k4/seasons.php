@@ -13,7 +13,9 @@ $icon = fn(string $url, string $cls = '') => '<span class="k4x-icon ' . $cls . '
 $live = $season === $current;
 $pg = $board;
 $offset = ($pg->page - 1) * $pg->perPage;
-$podium = $pg->page === 1 ? array_slice($pg->items, 0, 3) : [];
+$search = (string) ($search ?? '');
+$liveSearchKey = 'k4-seasons';
+$podium = $pg->page === 1 && $search === '' ? array_slice($pg->items, 0, 3) : [];
 $avatars = $pg->items ? Steam::avatars(array_column($pg->items, 'steam_id')) : [];
 ?>
 <?php require __DIR__ . '/_extras_head.php'; ?>
@@ -39,6 +41,15 @@ $avatars = $pg->items ? Steam::avatars(array_column($pg->items, 'steam_id')) : [
     <?php endif; ?>
 </div>
 
+<div class="toolbar">
+    <form method="get" data-live-search="k4-seasons" role="search">
+        <input type="hidden" name="season" value="<?= View::e($season) ?>">
+        <?php if ($steamId): ?><input type="hidden" name="player" value="<?= View::e($steamId) ?>"><?php endif; ?>
+        <input type="text" name="search" placeholder="<?= $L('search.player_ph') ?>" value="<?= View::e($search) ?>" maxlength="64">
+    </form>
+</div>
+<?php require BASE_PATH . '/app/Views/partials/live-search-status.php'; ?>
+<div class="live-search-results" id="search-results-k4-seasons" data-live-search-results="k4-seasons" tabindex="-1">
 <?php if ($podium): ?>
     <div class="k4x-podium">
         <?php foreach ([1, 0, 2] as $slot): ?>
@@ -58,7 +69,7 @@ $avatars = $pg->items ? Steam::avatars(array_column($pg->items, 'steam_id')) : [
     <section class="k4x-main">
         <div class="card" style="padding:0">
             <?php if (!$pg->items): ?>
-                <div class="empty"><?= $L('k4x.no_season_data') ?></div>
+                <div class="empty"><?= $search !== '' ? $L('k4x.no_match') : $L('k4x.no_season_data') ?></div>
             <?php else: ?>
                 <div class="table-wrap">
                     <table>
@@ -66,7 +77,7 @@ $avatars = $pg->items ? Steam::avatars(array_column($pg->items, 'steam_id')) : [
                         <tbody>
                         <?php foreach ($pg->items as $i => $r): ?>
                             <tr class="<?= (string) $r['steam_id'] === (string) $steamId ? 'k4x-me-row' : '' ?>">
-                                <td class="muted"><?= $offset + $i + 1 ?></td>
+                                <td class="muted"><?= isset($r['pos']) ? (int) $r['pos'] : ($search !== '' ? '—' : $offset + $i + 1) ?></td>
                                 <td><?= Steam::playerCell((string) $r['steam_id'], (string) ($r['name'] ?: Lang::t('common.player')), $avatars) ?></td>
                                 <td style="font-weight:700"><?= number_format((int) $r['points']) ?></td>
                                 <td class="muted"><?= number_format((int) $r['peak_points']) ?></td>
@@ -102,5 +113,6 @@ $avatars = $pg->items ? Steam::avatars(array_column($pg->items, 'steam_id')) : [
             <?php endif; ?>
         </div>
     </aside>
+</div>
 </div>
 <?php require __DIR__ . '/_extras_script.php'; ?>

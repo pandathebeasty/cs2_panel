@@ -376,22 +376,22 @@ final class K4ExtrasModel
             : self::humanize($def['type']) . ' · ' . number_format($def['goal']);
     }
 
-    /** Panorama SVG (used as a CSS mask so it takes the theme colour). */
+    /** Panorama SVG (used as a CSS mask so it takes the theme colour). Inline style URLs are not base-rewritten, so they carry the subfolder prefix. */
     public static function icon(string $type, ?string $weapon = null): string
     {
         $rel = 'ui/mission_star';
         if ($type === 'WeaponKills') {
             $w = self::normaliseWeapon($weapon);
-            $rel = is_file(BASE_PATH . self::ICON_BASE . 'equipment/' . $w . '.svg') ? 'equipment/' . $w : 'ui/bullet';
+            $rel = is_file((defined('PUBLIC_PATH') ? PUBLIC_PATH : BASE_PATH) . self::ICON_BASE . 'equipment/' . $w . '.svg') ? 'equipment/' . $w : 'ui/bullet';
         } elseif (isset(self::MISSION_ICONS[$type])) {
             $rel = self::MISSION_ICONS[$type];
         }
-        return self::ICON_BASE . $rel . '.svg';
+        return \App\Core\Url::to(self::ICON_BASE . $rel . '.svg');
     }
 
     public static function uiIcon(string $name): string
     {
-        return self::ICON_BASE . 'ui/' . preg_replace('/[^a-z0-9_]/', '', $name) . '.svg';
+        return \App\Core\Url::to(self::ICON_BASE . 'ui/' . preg_replace('/[^a-z0-9_]/', '', $name) . '.svg');
     }
 
     /** bronze < 300 points, silver < 800, gold from 800 (AchievementRules.Tier). */
@@ -572,6 +572,46 @@ final class K4ExtrasModel
             'reward' => $def ? self::reward($def) : 0,
             'known' => $def !== null,
         ];
+    }
+
+    /**
+     * Every mission handed out on the server today (daily) and this week (weekly), with how many
+     * players got it and finished it. Shown when no player is selected.
+     * @return array<int,array>
+     */
+    public static function activeMissions(): array
+    {
+        $defs = self::missions();
+        try {
+            $rows = Database::all(
+                'SELECT `mission_id`, MAX(`slot` = ' . self::WEEKLY_SLOT . ') AS weekly, COUNT(*) AS assigned, SUM(`completed`) AS done
+                 FROM `' . self::table('k4missions') . '`
+                 WHERE (`day` = ? AND `slot` < ' . self::WEEKLY_SLOT . ') OR (`day` = ? AND `slot` = ' . self::WEEKLY_SLOT . ')
+                 GROUP BY `mission_id`',
+                [self::today(), self::weekStart()],
+                self::DB
+            );
+        } catch (\Throwable $e) {
+            return [];
+        }
+        $order = ['Easy' => 0, 'Medium' => 1, 'Hard' => 2, 'Weekly' => 3];
+        $out = [];
+        foreach ($rows as $r) {
+            $assigned = (int) $r['assigned'];
+            $done = (int) $r['done'];
+            $card = self::missionCard((string) $r['mission_id'], 0, false, $defs);
+            if ((int) $r['weekly'] === 1) {
+                $card['difficulty'] = 'Weekly';
+                $card['difficulty_label'] = self::difficultyLabel('Weekly');
+            }
+            $card['assigned'] = $assigned;
+            $card['done'] = $done;
+            $card['percent'] = $assigned > 0 ? (int) round($done * 100 / $assigned) : 0;
+            $out[] = $card;
+        }
+        usort($out, fn($a, $b) => ($order[$a['difficulty']] ?? 9) <=> ($order[$b['difficulty']] ?? 9)
+            ?: $b['assigned'] <=> $a['assigned'] ?: $a['target'] <=> $b['target']);
+        return $out;
     }
 
     /** Server-wide numbers for today. */
@@ -820,23 +860,23 @@ final class K4ExtrasModel
     }
 
     /** Standings of one season. The running season reads live points from k4ranks. */
-    public static function seasonStandings(string $season, int $page, int $perPage): Paginator
+    public static function seasonStandings(string $season, int $page, int $perPage, string $search = ''): Paginator
     {
         $sc = self::steamColumn();
         $live = $season === self::currentSeason();
         if ($live) {
-            $base = "SELECT r.`{$sc}` AS steam_id, r.`name`, r.`points`, r.`rank` AS rank_name,
+            $base = "SELECT r.`{$sc}` AS steam_id, r.`name` AS name, r.`points` AS points, r.`rank` AS rank_name,
                             GREATEST(r.`points`, COALESCE(s.`peak_points`, 0)) AS peak_points
                      FROM `" . self::ranksTable() . "` r
                      LEFT JOIN `" . self::table('k4seasons') . "` s ON s.`steam_id` = r.`{$sc}` AND s.`season` = ?";
             $count = 'SELECT COUNT(*) FROM `' . self::ranksTable() . "` r
                       LEFT JOIN `" . self::table('k4seasons') . "` s ON s.`steam_id` = r.`{$sc}` AND s.`season` = ?";
-            return Paginator::make($base, $count, [$season], $page, $perPage, 'r.`points` DESC', self::DB);
+            return Paginator::filtered($base, $count, [$season], $page, $perPage, 'points DESC', self::DB, $search);
         }
-        $base = 'SELECT s.`steam_id`, s.`name`, COALESCE(s.`points`, s.`peak_points`) AS points, s.`rank` AS rank_name, s.`peak_points`
+        $base = 'SELECT s.`steam_id` AS steam_id, s.`name` AS name, COALESCE(s.`points`, s.`peak_points`) AS points, s.`rank` AS rank_name, s.`peak_points`
                  FROM `' . self::table('k4seasons') . '` s WHERE s.`season` = ?';
         $count = 'SELECT COUNT(*) FROM `' . self::table('k4seasons') . '` s WHERE s.`season` = ?';
-        return Paginator::make($base, $count, [$season], $page, $perPage, 'COALESCE(s.`points`, s.`peak_points`) DESC', self::DB);
+        return Paginator::filtered($base, $count, [$season], $page, $perPage, 'points DESC', self::DB, $search);
     }
 
     /** One player's finished seasons with final position. */

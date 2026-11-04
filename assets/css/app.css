@@ -2510,7 +2510,22 @@ body.theme-anim .skins-app * { transition: none !important; }
 .k4x-ach.is-unlocked { background: radial-gradient(120% 120% at 0% 0%, color-mix(in srgb, var(--t) 14%, transparent), transparent 60%), var(--card); border-color: color-mix(in srgb, var(--t) 40%, var(--border)); }
 .k4x-ach.is-unlocked::after { content: ""; position: absolute; inset: 0; background: linear-gradient(115deg, transparent 35%, color-mix(in srgb, #fff 10%, transparent) 50%, transparent 65%); transform: translateX(-100%); animation: k4xSheen 5s ease-in-out calc(1s + var(--d, 0ms)) infinite; pointer-events: none; }
 .k4x-ach-badge { position: relative; width: 58px; height: 58px; flex: none; border-radius: 50%; display: grid; place-items: center; color: var(--t); background: radial-gradient(circle at 35% 30%, color-mix(in srgb, #fff 18%, transparent), transparent 55%), color-mix(in srgb, var(--t) 18%, var(--bg-3)); box-shadow: inset 0 0 0 3px var(--t), 0 0 18px color-mix(in srgb, var(--t) 35%, transparent); }
-.k4x-ach.is-locked .k4x-ach-badge, .k4x-ach.is-progress .k4x-ach-badge { color: var(--text-mut); background: var(--bg-3); box-shadow: inset 0 0 0 2px var(--border); filter: grayscale(1); }
+.k4x-ach.is-locked .k4x-ach-badge, .k4x-ach.is-progress .k4x-ach-badge { color: color-mix(in srgb, var(--t) 45%, var(--text-dim)); background: color-mix(in srgb, var(--t) 7%, var(--bg-3)); box-shadow: inset 0 0 0 2px color-mix(in srgb, var(--t) 30%, var(--border)); }
+.k4x-ach.is-progress .k4x-ach-badge { color: color-mix(in srgb, var(--t) 70%, var(--text-dim)); box-shadow: inset 0 0 0 2px color-mix(in srgb, var(--t) 55%, var(--border)); }
+.k4x-tools { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.k4x-find { width: 220px; max-width: 100%; }
+.k4x-row[hidden], .k4x-find-empty[hidden] { display: none; }
+.k4x-find-empty { grid-column: 1 / -1; }
+.k4x-head:has(.k4x-suggest:not([hidden])) { overflow: visible; z-index: 30; }
+.k4x-head:has(.k4x-suggest:not([hidden]))::after { display: none; }
+.k4x-suggest { position: absolute; top: calc(100% + 6px); left: 0; width: max(100%, 280px); max-height: 320px; overflow-y: auto; padding: 6px; border-radius: 12px; border: 1px solid var(--border); background: var(--card); box-shadow: 0 18px 40px rgba(0, 0, 0, .35); z-index: 40; animation: k4xIn .18s ease both; }
+.k4x-suggest a { display: flex; align-items: center; gap: 10px; padding: 7px 9px; border-radius: 8px; color: var(--text); text-decoration: none; }
+.k4x-suggest a:hover, .k4x-suggest a.active { background: color-mix(in srgb, var(--accent) 16%, var(--bg-3)); }
+.k4x-suggest img { width: 30px; height: 30px; border-radius: 50%; flex: none; }
+.k4x-suggest span { display: flex; flex-direction: column; min-width: 0; }
+.k4x-suggest strong { font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.k4x-suggest small { font-size: 11px; color: var(--text-mut); font-variant-numeric: tabular-nums; }
+.k4x-suggest-empty { padding: 10px; font-size: 13px; color: var(--text-dim); }
 .k4x-lock { position: absolute; right: -2px; bottom: -2px; width: 22px; height: 22px; border-radius: 50%; display: grid; place-items: center; background: var(--card); color: var(--text-dim); box-shadow: 0 0 0 2px var(--border); }
 .k4x-lock .k4x-icon { width: 12px; height: 12px; }
 .k4x-ach-body { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 6px; }

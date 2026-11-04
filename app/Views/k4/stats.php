@@ -8,15 +8,25 @@ $title = Lang::t('stats.title');
 $L = fn(string $k) => View::e(Lang::t($k));
 $canManage = Auth::canManage();
 $offset = $board ? ($board->page - 1) * $board->perPage : 0;
+$search = (string) ($search ?? '');
+$liveSearchKey = $board !== null ? 'k4-stats' : null;
+$posOf = fn(array $r, int $i): string => isset($r['pos']) ? (string) (int) $r['pos'] : ($search !== '' ? '—' : (string) ($offset + $i + 1));
 ?>
 <?php if ($board === null): ?>
     <div class="card"><div class="empty"><?= $L('stats.no_source') ?></div></div>
 <?php else: ?>
     <?php $pg = $board; ?>
+    <div class="toolbar">
+        <form method="get" data-live-search="k4-stats" role="search">
+            <input type="text" name="search" placeholder="<?= $L('search.player_ph') ?>" value="<?= View::e($search) ?>" maxlength="64">
+        </form>
+    </div>
+    <?php require BASE_PATH . '/app/Views/partials/live-search-status.php'; ?>
+    <div class="live-search-results" id="search-results-k4-stats" data-live-search-results="k4-stats" tabindex="-1">
     <?php $avatars = $pg->items ? Steam::avatars(array_column($pg->items, 'steam_id')) : []; ?>
     <div class="card" style="padding:0">
         <?php if (!$pg->items): ?>
-            <div class="empty"><?= $L('stats.none') ?></div>
+            <div class="empty"><?= $search !== '' ? $L('k4x.no_match') : $L('stats.none') ?></div>
         <?php else: ?>
             <div class="table-wrap">
                 <table>
@@ -31,7 +41,7 @@ $offset = $board ? ($board->page - 1) * $board->perPage : 0;
                         $kd = $deaths > 0 ? round($kills / $deaths, 2) : $kills;
                         ?>
                         <tr>
-                            <td class="muted"><?= $offset + $i + 1 ?></td>
+                            <td class="muted"><?= $posOf($r, $i) ?></td>
                             <td>
                                 <?= Steam::playerCell((string) $r['steam_id'], (string) ($r['name'] ?: Lang::t('common.player')), $avatars) ?>
                             </td>
@@ -58,4 +68,5 @@ $offset = $board ? ($board->page - 1) * $board->perPage : 0;
         <?php endif; ?>
     </div>
     <?php require BASE_PATH . '/app/Views/partials/pagination.php'; ?>
+    </div>
 <?php endif; ?>

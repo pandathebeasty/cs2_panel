@@ -37,25 +37,25 @@ final class StatsBackend
         return self::isK4System() ? K4SystemModel::enabled() : ZenithModel::enabled();
     }
 
-    public static function ranksLeaderboard(int $page, int $perPage, string $sort = 'points', string $dir = 'desc'): ?\App\Core\Paginator
+    public static function ranksLeaderboard(int $page, int $perPage, string $sort = 'points', string $dir = 'desc', string $search = ''): ?\App\Core\Paginator
     {
         return self::isK4System()
-            ? K4SystemModel::ranksLeaderboard($page, $perPage, $sort, $dir)
-            : ZenithModel::ranksLeaderboard($page, $perPage, $sort, $dir);
+            ? K4SystemModel::ranksLeaderboard($page, $perPage, $sort, $dir, $search)
+            : ZenithModel::ranksLeaderboard($page, $perPage, $sort, $dir, $search);
     }
 
-    public static function playtimeLeaderboard(int $page, int $perPage, string $sort = 'playtime', string $dir = 'desc'): ?\App\Core\Paginator
+    public static function playtimeLeaderboard(int $page, int $perPage, string $sort = 'playtime', string $dir = 'desc', string $search = ''): ?\App\Core\Paginator
     {
         return self::isK4System()
-            ? K4SystemModel::playtimeLeaderboard($page, $perPage, $sort, $dir)
-            : ZenithModel::playtimeLeaderboard($page, $perPage, $sort, $dir);
+            ? K4SystemModel::playtimeLeaderboard($page, $perPage, $sort, $dir, $search)
+            : ZenithModel::playtimeLeaderboard($page, $perPage, $sort, $dir, $search);
     }
 
-    public static function statsLeaderboard(int $page, int $perPage): ?\App\Core\Paginator
+    public static function statsLeaderboard(int $page, int $perPage, string $search = ''): ?\App\Core\Paginator
     {
         return self::isK4System()
-            ? K4SystemModel::statsLeaderboard($page, $perPage)
-            : ZenithModel::statsLeaderboard($page, $perPage);
+            ? K4SystemModel::statsLeaderboard($page, $perPage, $search)
+            : ZenithModel::statsLeaderboard($page, $perPage, $search);
     }
 
                                                                         

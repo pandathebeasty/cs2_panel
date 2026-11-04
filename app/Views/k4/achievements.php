@@ -46,6 +46,8 @@ $fmtDate = fn(?string $d) => $d ? date('d.m.Y', strtotime($d) ?: time()) : '';
 
         <div class="k4x-section-head">
             <h2><?= $icon(K4ExtrasModel::uiIcon('trophy')) ?><?= $L('nav.k4_achievements') ?></h2>
+            <div class="k4x-tools">
+                <?php if ($list): ?><input type="search" class="k4x-find" data-k4x-find="#k4x-ach-grid" placeholder="<?= $L('search.filter_ph') ?>" aria-label="<?= $L('common.search') ?>" autocomplete="off"><?php endif; ?>
             <?php if ($steamId): ?>
                 <div class="k4x-filter" data-k4x-filter="#k4x-ach-grid">
                     <button type="button" class="active" data-f="all"><?= $L('common.all') ?></button>
@@ -54,6 +56,7 @@ $fmtDate = fn(?string $d) => $d ? date('d.m.Y', strtotime($d) ?: time()) : '';
                     <button type="button" data-f="locked"><?= $L('k4x.locked') ?></button>
                 </div>
             <?php endif; ?>
+            </div>
         </div>
 
         <?php if (!$list): ?>
@@ -61,8 +64,8 @@ $fmtDate = fn(?string $d) => $d ? date('d.m.Y', strtotime($d) ?: time()) : '';
         <?php else: ?>
             <div class="k4x-achievements" id="k4x-ach-grid">
                 <?php foreach ($list as $i => $a): ?>
-                    <?php $state = $a['unlocked'] ? 'unlocked' : ($a['progress'] > 0 ? 'progress' : 'locked'); ?>
-                    <article class="k4x-ach tier-<?= $a['tier'] ?> is-<?= $state ?>" data-state="<?= $state ?>" style="--p:<?= (int) $a['percent'] ?>;--d:<?= min($i, 20) * 35 ?>ms">
+                    <?php $state = !$steamId ? 'catalog' : ($a['unlocked'] ? 'unlocked' : ($a['progress'] > 0 ? 'progress' : 'locked')); ?>
+                    <article class="k4x-ach tier-<?= $a['tier'] ?> is-<?= $state ?>" data-state="<?= $state ?>" data-k4x-text="<?= View::e(mb_strtolower($a['name'] . ' ' . $a['goal_text'])) ?>" style="--p:<?= (int) $a['percent'] ?>;--d:<?= min($i, 20) * 35 ?>ms">
                         <div class="k4x-ach-badge">
                             <?= $icon($a['icon'], 'k4x-icon-lg') ?>
                             <?php if (!$a['unlocked'] && $steamId): ?><span class="k4x-lock"><?= $icon(K4ExtrasModel::uiIcon('locked')) ?></span><?php endif; ?>
@@ -85,6 +88,7 @@ $fmtDate = fn(?string $d) => $d ? date('d.m.Y', strtotime($d) ?: time()) : '';
                         </div>
                     </article>
                 <?php endforeach; ?>
+                <div class="empty k4x-find-empty" data-k4x-find-empty hidden><?= $L('search.no_match') ?></div>
             </div>
         <?php endif; ?>
     </section>

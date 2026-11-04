@@ -8,6 +8,7 @@ use App\Core\Auth;
 use App\Core\Config;
 use App\Core\Controller;
 use App\Core\DevMode;
+use App\Core\Steam;
 use App\Models\K4ExtrasModel;
 
 /**
@@ -59,6 +60,27 @@ final class K4ExtrasController extends Controller
         ];
     }
 
+    /** Live player suggestions for the header search of the K4 pages (JSON). */
+    public function suggest(): void
+    {
+        Auth::requireLogin();
+        if (!DevMode::enabled() && !K4ExtrasModel::enabled('missions')
+            && !K4ExtrasModel::enabled('achievements') && !K4ExtrasModel::enabled('seasons')) {
+            $this->json([], 404);
+        }
+        $q = mb_substr(trim((string) $this->query('q', '')), 0, 64);
+        if (mb_strlen($q) < 2) {
+            $this->json([]);
+        }
+        $rows = K4ExtrasModel::findPlayers($q, 8);
+        $avatars = $rows ? Steam::avatars(array_map('strval', array_column($rows, 'steam_id'))) : [];
+        $this->json(array_map(static fn(array $r): array => [
+            'id' => (string) $r['steam_id'],
+            'name' => Steam::displayName((string) $r['steam_id'], (string) ($r['name'] ?? '')) ?: (string) $r['steam_id'],
+            'avatar' => $avatars[(string) $r['steam_id']] ?? Steam::avatarPlaceholder(),
+        ], $rows));
+    }
+
     public function missions(): void
     {
         Auth::requireLogin();
@@ -67,6 +89,7 @@ final class K4ExtrasController extends Controller
         }
         $data = $this->common('missions');
         $data['mine'] = $data['steamId'] !== null ? K4ExtrasModel::playerMissions($data['steamId']) : null;
+        $data['active'] = $data['steamId'] === null ? K4ExtrasModel::activeMissions() : [];
         $data['overview'] = K4ExtrasModel::missionsOverview();
         $data['popular'] = K4ExtrasModel::missionsToday();
         $data['streaks'] = K4ExtrasModel::streakLeaders();
@@ -102,7 +125,8 @@ final class K4ExtrasController extends Controller
         $data['seasons'] = $seasons;
         $data['season'] = $season;
         $data['current'] = K4ExtrasModel::currentSeason();
-        $data['board'] = K4ExtrasModel::seasonStandings($season, $this->page(), (int) Config::get('app.per_page', 25));
+        $data['search'] = mb_substr(trim((string) $this->query('search', '')), 0, 64);
+        $data['board'] = K4ExtrasModel::seasonStandings($season, $this->page(), (int) Config::get('app.per_page', 25), $data['search']);
         $data['history'] = $data['steamId'] !== null ? K4ExtrasModel::playerSeasons($data['steamId']) : [];
         $this->view('k4/seasons', $data);
     }

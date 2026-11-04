@@ -31,13 +31,15 @@ final class CreditsController extends Controller
 
         $sort = (string) $this->query('sort', 'credits');
         $dir  = (string) $this->query('dir', 'desc');
-        $board = StoreCreditsModel::leaderboard($this->page(), (int) Config::get('app.per_page', 25), $sort, $dir);
+        $search = mb_substr(trim((string) $this->query('search', '')), 0, 64);
+        $board = StoreCreditsModel::leaderboard($this->page(), (int) Config::get('app.per_page', 25), $sort, $dir, $search);
         $this->view('credits/index', [
             'board'  => $board,
             'totals' => StoreCreditsModel::totals(),
             'csrf'   => $this->csrfToken(),
             'sort'   => $sort,
             'dir'    => $dir,
+            'search' => $search,
         ]);
     }
 

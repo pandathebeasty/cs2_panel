@@ -60,26 +60,26 @@ final class StoreCreditsModel
 
     /** Whitelisted sort aliases -> ORDER BY expression (prevents SQL injection). */
     private const SORTS = [
-        'credits' => 'Credits',
-        'name'    => 'PlayerName',
-        'joined'  => 'DateOfJoin',
-        'lastjoin'=> 'DateOfLastJoin',
+        'credits' => 'credits',
+        'name'    => 'name',
+        'joined'  => 'joined',
+        'lastjoin'=> 'last_online',
     ];
 
     private static function orderClause(string $sort, string $dir): string
     {
-        $col = self::SORTS[$sort] ?? 'Credits';
+        $col = self::SORTS[$sort] ?? 'credits';
         $dir = strtolower($dir) === 'asc' ? 'ASC' : 'DESC';
         // Expression only — Paginator::make prepends the ORDER BY keyword.
-        // Stable tiebreaker by id so pagination is deterministic.
-        return "`{$col}` {$dir}, id ASC";
+        // Aliases only (search wraps the base query); SteamID is the stable tiebreaker.
+        return "`{$col}` {$dir}, steam_id ASC";
     }
 
     /**
      * Paginated credits leaderboard. Rows expose steam_id (SteamID64 string),
      * name, credits, last_online so the view matches the other stats boards.
      */
-    public static function leaderboard(int $page, int $perPage, string $sort = 'credits', string $dir = 'desc'): ?Paginator
+    public static function leaderboard(int $page, int $perPage, string $sort = 'credits', string $dir = 'desc', string $search = ''): ?Paginator
     {
         if (!self::tableReady()) {
             return null;
@@ -91,7 +91,7 @@ final class StoreCreditsModel
                         `DateOfLastJoin` AS last_online, `DateOfJoin` AS joined
                  FROM `{$t}`";
         $count = "SELECT COUNT(*) FROM `{$t}`";
-        return Paginator::make($base, $count, [], $page, $perPage, $order, self::DB);
+        return Paginator::filtered($base, $count, [], $page, $perPage, $order, self::DB, $search);
     }
 
     /** A single player's credit row, or null. $steamId64 is a SteamID64 string. */

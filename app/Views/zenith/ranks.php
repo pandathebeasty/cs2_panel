@@ -9,6 +9,9 @@ $L = fn(string $k) => View::e(Lang::t($k));
 $canManage = Auth::canManage();
 $isRoot = Auth::isRoot();
 $offset = $board ? ($board->page - 1) * $board->perPage : 0;
+$search = (string) ($search ?? '');
+$liveSearchKey = $board !== null ? 'zenith-ranks' : null;
+$posOf = fn(array $r, int $i): string => isset($r['pos']) ? (string) (int) $r['pos'] : ($search !== '' ? '—' : (string) ($offset + $i + 1));
 $sort = $sort ?? 'points';
 $dir  = ($dir ?? 'desc') === 'asc' ? 'asc' : 'desc';
 // Rank display style: 'premier' shows the CS2 rating, else competitive badges.
@@ -18,11 +21,11 @@ $rankType = \App\Models\StatsBackend::isK4System()
     : 'competitive';
 
 // Sortable header link (toggles dir on the active column).
-$sortH = function (string $col, string $label) use ($sort, $dir): string {
+$sortH = function (string $col, string $label) use ($sort, $dir, $search): string {
     $active = $sort === $col;
     $newDir = ($active && $dir === 'desc') ? 'asc' : 'desc';
     $arrow = $active ? ($dir === 'desc' ? ' ▾' : ' ▴') : '';
-    $href = '/zenith/ranks?sort=' . urlencode($col) . '&dir=' . $newDir;
+    $href = '/zenith/ranks?sort=' . urlencode($col) . '&dir=' . $newDir . ($search !== '' ? '&search=' . urlencode($search) : '');
     return '<a class="sort-h' . ($active ? ' active' : '') . '" href="' . View::e($href) . '">' . View::e($label) . $arrow . '</a>';
 };
 
@@ -53,10 +56,17 @@ $ago = function (?string $dt): string {
     <div class="card"><div class="empty"><?= $L('ranks.no_source') ?></div></div>
 <?php else: ?>
     <?php $pg = $board; ?>
+    <div class="toolbar">
+        <form method="get" data-live-search="zenith-ranks" role="search">
+            <input type="text" name="search" placeholder="<?= $L('search.player_ph') ?>" value="<?= View::e($search) ?>" maxlength="64">
+        </form>
+    </div>
+    <?php require BASE_PATH . '/app/Views/partials/live-search-status.php'; ?>
+    <div class="live-search-results" id="search-results-zenith-ranks" data-live-search-results="zenith-ranks" tabindex="-1">
     <?php $avatars = $pg->items ? Steam::avatars(array_column($pg->items, 'steam_id')) : []; ?>
     <div class="card" style="padding:0">
         <?php if (!$pg->items): ?>
-            <div class="empty"><?= $L('ranks.no_players') ?></div>
+            <div class="empty"><?= $search !== '' ? $L('k4x.no_match') : $L('ranks.no_players') ?></div>
         <?php else: ?>
             <div class="table-wrap">
                 <table>
@@ -71,7 +81,7 @@ $ago = function (?string $dt): string {
                     <?php foreach ($pg->items as $i => $r): ?>
                         <?php $seen = $ago($r['last_online'] ?? null); ?>
                         <tr>
-                            <td class="muted"><?= $offset + $i + 1 ?></td>
+                            <td class="muted"><?= $posOf($r, $i) ?></td>
                             <td>
                                 <a class="player-cell" <?= Steam::linkAttrs($r['steam_id']) ?>>
                                     <img class="player-avatar" src="<?= View::e($avatars[(string) $r['steam_id']] ?? Steam::avatarPlaceholder()) ?>" alt="" loading="lazy">
@@ -125,6 +135,7 @@ $ago = function (?string $dt): string {
         <?php endif; ?>
     </div>
     <?php require BASE_PATH . '/app/Views/partials/pagination.php'; ?>
+    </div>
 <?php endif; ?>
 
 <?php if ($canManage): ?>

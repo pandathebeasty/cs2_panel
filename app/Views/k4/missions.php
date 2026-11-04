@@ -81,10 +81,11 @@ $card = function (array $m, int $n) use ($L, $icon): string {
         <?php if ($popular): ?>
             <div class="k4x-section-head" style="margin-top:28px">
                 <h2><?= $icon(K4ExtrasModel::uiIcon('stats')) ?><?= $L('k4x.today_on_server') ?></h2>
+                <input type="search" class="k4x-find" data-k4x-find="#k4x-popular" placeholder="<?= $L('search.filter_ph') ?>" aria-label="<?= $L('common.search') ?>" autocomplete="off">
             </div>
-            <div class="card k4x-list">
+            <div class="card k4x-list" id="k4x-popular">
                 <?php foreach ($popular as $i => $p): ?>
-                    <div class="k4x-row" style="--d:<?= $i * 50 ?>ms;--p:<?= (int) $p['rate'] ?>">
+                    <div class="k4x-row" data-k4x-text="<?= View::e(mb_strtolower($p['title'] . ' ' . $p['difficulty_label'])) ?>" style="--d:<?= $i * 50 ?>ms;--p:<?= (int) $p['rate'] ?>">
                         <?= $icon($p['icon']) ?>
                         <div class="k4x-row-main">
                             <span class="k4x-row-title"><?= View::e($p['title']) ?></span>
@@ -94,6 +95,7 @@ $card = function (array $m, int $n) use ($L, $icon): string {
                         <span class="k4x-row-num"><strong><?= (int) $p['done'] ?></strong>/<?= (int) $p['assigned'] ?></span>
                     </div>
                 <?php endforeach; ?>
+                <div class="empty" data-k4x-find-empty hidden><?= $L('search.no_match') ?></div>
             </div>
         <?php endif; ?>
     </section>

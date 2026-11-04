@@ -42,8 +42,9 @@ final class K4Controller extends Controller
         }
         $sort = (string) $this->query('sort', 'points');
         $dir  = (string) $this->query('dir', 'desc');
-        $board = K4SystemModel::ranksLeaderboard($this->page(), (int) Config::get('app.per_page', 25), $sort, $dir);
-        $this->view('k4/ranks', ['board' => $board, 'csrf' => $this->csrfToken(), 'sort' => $sort, 'dir' => $dir]);
+        $search = mb_substr(trim((string) $this->query('search', '')), 0, 64);
+        $board = K4SystemModel::ranksLeaderboard($this->page(), (int) Config::get('app.per_page', 25), $sort, $dir, $search);
+        $this->view('k4/ranks', ['board' => $board, 'csrf' => $this->csrfToken(), 'sort' => $sort, 'dir' => $dir, 'search' => $search]);
     }
 
     public function stats(): void
@@ -52,8 +53,9 @@ final class K4Controller extends Controller
         if (!$this->guard()) {
             return;
         }
-        $board = K4SystemModel::statsLeaderboard($this->page(), (int) Config::get('app.per_page', 25));
-        $this->view('k4/stats', ['board' => $board, 'csrf' => $this->csrfToken()]);
+        $search = mb_substr(trim((string) $this->query('search', '')), 0, 64);
+        $board = K4SystemModel::statsLeaderboard($this->page(), (int) Config::get('app.per_page', 25), $search);
+        $this->view('k4/stats', ['board' => $board, 'csrf' => $this->csrfToken(), 'search' => $search]);
     }
 
     public function playtime(): void
@@ -64,8 +66,9 @@ final class K4Controller extends Controller
         }
         $sort = (string) $this->query('sort', 'playtime');
         $dir  = (string) $this->query('dir', 'desc');
-        $board = K4SystemModel::playtimeLeaderboard($this->page(), (int) Config::get('app.per_page', 25), $sort, $dir);
-        $this->view('k4/playtime', ['board' => $board, 'csrf' => $this->csrfToken(), 'sort' => $sort, 'dir' => $dir]);
+        $search = mb_substr(trim((string) $this->query('search', '')), 0, 64);
+        $board = K4SystemModel::playtimeLeaderboard($this->page(), (int) Config::get('app.per_page', 25), $sort, $dir, $search);
+        $this->view('k4/playtime', ['board' => $board, 'csrf' => $this->csrfToken(), 'sort' => $sort, 'dir' => $dir, 'search' => $search]);
     }
 
     public function resetRank(): void

@@ -8,6 +8,9 @@ $title = Lang::t('nav.stats');
 $L = fn(string $k) => View::e(Lang::t($k));
 $isRoot = Auth::isRoot();
 $offset = $board ? ($board->page - 1) * $board->perPage : 0;
+$search = (string) ($search ?? '');
+$liveSearchKey = $board !== null ? 'credits' : null;
+$posOf = fn(array $r, int $i): string => isset($r['pos']) ? (string) (int) $r['pos'] : ($search !== '' ? '—' : (string) ($offset + $i + 1));
 $sort = $sort ?? 'credits';
 $dir  = ($dir ?? 'desc') === 'asc' ? 'asc' : 'desc';
 $totals = $totals ?? ['players' => 0, 'credits' => 0];
@@ -23,11 +26,11 @@ $ago = function (?string $dt): string {
     }
     return Lang::t('time.just_now');
 };
-$sortH = function (string $col, string $label) use ($sort, $dir): string {
+$sortH = function (string $col, string $label) use ($sort, $dir, $search): string {
     $active = $sort === $col;
     $newDir = ($active && $dir === 'desc') ? 'asc' : 'desc';
     $arrow = $active ? ($dir === 'desc' ? ' ▾' : ' ▴') : '';
-    $href = '/credits?sort=' . urlencode($col) . '&dir=' . $newDir;
+    $href = '/credits?sort=' . urlencode($col) . '&dir=' . $newDir . ($search !== '' ? '&search=' . urlencode($search) : '');
     return '<a class="sort-h' . ($active ? ' active' : '') . '" href="' . View::e($href) . '">' . View::e($label) . $arrow . '</a>';
 };
 ?>
@@ -60,11 +63,18 @@ $sortH = function (string $col, string $label) use ($sort, $dir): string {
     <div class="card"><div class="empty"><?= $L('credits.no_source') ?></div></div>
 <?php else: ?>
     <?php $pg = $board; ?>
+    <div class="toolbar">
+        <form method="get" data-live-search="credits" role="search">
+            <input type="text" name="search" placeholder="<?= $L('search.player_ph') ?>" value="<?= View::e($search) ?>" maxlength="64">
+        </form>
+    </div>
+    <?php require BASE_PATH . '/app/Views/partials/live-search-status.php'; ?>
+    <div class="live-search-results" id="search-results-credits" data-live-search-results="credits" tabindex="-1">
     <?php $avatars = $pg->items ? Steam::avatars(array_column($pg->items, 'steam_id')) : []; ?>
 
     <div class="card" style="padding:0">
         <?php if (!$pg->items): ?>
-            <div class="empty"><?= $L('credits.none') ?></div>
+            <div class="empty"><?= $search !== '' ? $L('k4x.no_match') : $L('credits.none') ?></div>
         <?php else: ?>
             <div class="table-wrap">
                 <table>
@@ -78,7 +88,7 @@ $sortH = function (string $col, string $label) use ($sort, $dir): string {
                     <tbody>
                     <?php foreach ($pg->items as $i => $r): ?>
                         <tr>
-                            <td class="muted"><?= $offset + $i + 1 ?></td>
+                            <td class="muted"><?= $posOf($r, $i) ?></td>
                             <td>
                                 <a class="player-cell" <?= Steam::linkAttrs($r['steam_id']) ?>>
                                     <img class="player-avatar" src="<?= View::e($avatars[(string) $r['steam_id']] ?? Steam::avatarPlaceholder()) ?>" alt="" loading="lazy">
@@ -117,6 +127,7 @@ $sortH = function (string $col, string $label) use ($sort, $dir): string {
         <?php endif; ?>
     </div>
     <?php require BASE_PATH . '/app/Views/partials/pagination.php'; ?>
+    </div>
 <?php endif; ?>
 
 <?php if ($isRoot): ?>

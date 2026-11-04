@@ -98,7 +98,7 @@ final class K4SystemModel
                                                                         
     // Ranks leaderboard
                                                                         
-    public static function ranksLeaderboard(int $page, int $perPage, string $sort = 'points', string $dir = 'desc'): ?Paginator
+    public static function ranksLeaderboard(int $page, int $perPage, string $sort = 'points', string $dir = 'desc', string $search = ''): ?Paginator
     {
         if (!self::enabled()) {
             return null;
@@ -136,13 +136,13 @@ final class K4SystemModel
         }
         $count = "SELECT COUNT(*) FROM `{$ranks}` r";
 
-        return Paginator::make($base, $count, [], $page, $perPage, $order);
+        return Paginator::filtered($base, $count, [], $page, $perPage, $order, null, $search);
     }
 
                                                                         
     // Play time leaderboard (k4times.all is SECONDS -> expose minutes)
                                                                         
-    public static function playtimeLeaderboard(int $page, int $perPage, string $sort = 'playtime', string $dir = 'desc'): ?Paginator
+    public static function playtimeLeaderboard(int $page, int $perPage, string $sort = 'playtime', string $dir = 'desc', string $search = ''): ?Paginator
     {
         if (!self::enabled() || !self::hasTimes()) {
             return null;
@@ -179,13 +179,13 @@ final class K4SystemModel
                  {$join}";
         $count = "SELECT COUNT(*) FROM `{$times}` tm";
 
-        return Paginator::make($base, $count, [], $page, $perPage, $order);
+        return Paginator::filtered($base, $count, [], $page, $perPage, $order, null, $search);
     }
 
                                                                         
     // Stats leaderboard
                                                                         
-    public static function statsLeaderboard(int $page, int $perPage): ?Paginator
+    public static function statsLeaderboard(int $page, int $perPage, string $search = ''): ?Paginator
     {
         if (!self::enabled() || !self::hasStats()) {
             return null;
@@ -199,7 +199,7 @@ final class K4SystemModel
                  FROM `{$stats}`";
         $count = "SELECT COUNT(*) FROM `{$stats}`";
 
-        return Paginator::make($base, $count, [], $page, $perPage, 'kills DESC');
+        return Paginator::filtered($base, $count, [], $page, $perPage, 'kills DESC', null, $search);
     }
 
                                                                         

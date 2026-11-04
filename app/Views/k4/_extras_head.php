@@ -34,9 +34,13 @@ $extraQuery = $page === 'seasons' && isset($season) ? '&season=' . rawurlencode(
             </div>
         <?php endif; ?>
     </div>
-    <form class="k4x-search" method="get" action="/k4/<?= View::e($page) ?>">
+    <form class="k4x-search" method="get" action="/k4/<?= View::e($page) ?>" role="search"
+          data-k4x-suggest="<?= View::e(\App\Core\Url::to('/k4/players/suggest')) ?>"
+          data-k4x-go="<?= View::e(\App\Core\Url::to('/k4/' . $page) . '?player={id}' . $extraQuery) ?>"
+          data-k4x-empty="<?= $L('k4x.no_match') ?>">
         <?php if ($page === 'seasons' && isset($season)): ?><input type="hidden" name="season" value="<?= View::e((string) $season) ?>"><?php endif; ?>
-        <input type="search" name="q" value="<?= View::e($q) ?>" placeholder="<?= $L('k4x.search_ph') ?>" autocomplete="off">
+        <input type="search" name="q" value="<?= View::e($q) ?>" placeholder="<?= $L('k4x.search_ph') ?>" autocomplete="off" maxlength="64" aria-autocomplete="list" aria-controls="k4x-suggest" aria-expanded="false">
+        <div class="k4x-suggest" id="k4x-suggest" role="listbox" hidden></div>
         <button class="btn btn-primary btn-sm" type="submit"><?= $L('common.search') ?></button>
         <?php if (!$isSelf && \App\Core\Auth::steamId()): ?>
             <a class="btn btn-sm" href="/k4/<?= View::e($page) ?>?player=<?= View::e((string) \App\Core\Auth::steamId()) . $extraQuery ?>"><?= $L('k4x.me') ?></a>

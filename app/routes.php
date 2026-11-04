@@ -235,6 +235,7 @@ $router->post('/k4/playtime/edit', [K4Controller::class, 'editPlaytime']);
 $router->get('/k4/missions', [K4ExtrasController::class, 'missions']);
 $router->get('/k4/achievements', [K4ExtrasController::class, 'achievements']);
 $router->get('/k4/seasons', [K4ExtrasController::class, 'seasons']);
+$router->get('/k4/players/suggest', [K4ExtrasController::class, 'suggest']);
 
 // Store credits (Statistics group). View = any logged-in user; writes = root.
 $router->get('/credits', [CreditsController::class, 'index']);
