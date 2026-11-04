@@ -53,6 +53,10 @@ final class K4SystemModel
     /** Enabled when the selected backend is K4-System and its ranks table exists. */
     public static function enabled(): bool
     {
+        if (!Settings::bool('stats_enabled', (bool) Config::get('stats.enabled', true))
+            || StatsBackend::which() !== 'k4system') {
+            return false;
+        }
         return Database::tableExists(self::ranksTable());
     }
 

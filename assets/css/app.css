@@ -2385,3 +2385,5 @@ body.theme-anim .skins-app * { transition: none !important; }
 .activity-xaxis span { flex: 1; text-align: center; }
 .activity-xaxis span:first-child { text-align: left; }
 .activity-xaxis span:last-child { text-align: right; }
+
+.extdb-fields[hidden] { display: none !important; }

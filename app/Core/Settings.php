@@ -271,6 +271,7 @@ final class Settings
             // Stats backend: which plugin provides ranks/stats/playtime.
             // 'zenith' (K4-Zenith JSON storage) or 'k4system' (K4-System flat tables).
             'stats_backend'       => (string) Config::get('stats.backend', 'zenith'),
+            'stats_enabled'       => Config::get('stats.enabled', true) ? '1' : '0',
                         
             'zenith_enabled'      => '1',
             'zenith_ranks'        => (string) Config::get('zenith.ranks_table', 'zenith_ranks'),

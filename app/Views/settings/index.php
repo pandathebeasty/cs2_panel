@@ -414,10 +414,50 @@ $L = fn(string $k) => View::e(Lang::t($k));
 
         <!-- Integrations -->
         <div data-tabpanel="integrations" style="display:none">
+            <?php
+            // Per-integration database block (integration_db in config.php); by
+            // default every integration uses the panel database.
+            $extdbBlock = static function (string $xk) use ($s, $L): void {
+                $x = $s['extdb'][$xk] ?? null;
+                if ($x === null) { return; }
+                $xid = 'extdb_' . $xk;
+            ?>
+                <div class="extdb-item" data-extdb="<?= View::e($xk) ?>" style="border-top:1px dashed var(--border);margin-top:16px;padding-top:14px">
+                    <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+                        <div class="check" style="margin:0"><input type="checkbox" name="<?= $xid ?>_enabled" id="<?= $xid ?>_en" class="js-extdb-toggle" <?= $x['enabled'] ? 'checked' : '' ?>><label for="<?= $xid ?>_en"><?= $L('settings.extdb_own') ?></label></div>
+                        <?php if ($x['active']): ?><span class="badge badge-active" style="font-size:10px"><?= $L('settings.extdb_active') ?></span><?php endif; ?>
+                        <span class="hint" style="margin:0"><?= $L('settings.extdb_hint') ?></span>
+                    </div>
+                    <div class="extdb-fields" style="margin-top:12px"<?= $x['enabled'] ? '' : ' hidden' ?>>
+                        <div class="form-row">
+                            <div class="field"><label><?= $L('settings.extdb_host') ?></label><input type="text" name="<?= $xid ?>_host" value="<?= View::e($x['host']) ?>" placeholder="127.0.0.1" maxlength="255" autocomplete="off"></div>
+                            <div class="field" style="max-width:130px"><label><?= $L('settings.extdb_port') ?></label><input type="number" name="<?= $xid ?>_port" value="<?= View::e($x['port']) ?>" min="1" max="65535"></div>
+                            <div class="field"><label><?= $L('settings.extdb_name') ?></label><input type="text" name="<?= $xid ?>_name" value="<?= View::e($x['name']) ?>" maxlength="64" pattern="[A-Za-z0-9_$\-]{1,64}" autocomplete="off"></div>
+                        </div>
+                        <div class="form-row">
+                            <div class="field"><label><?= $L('settings.extdb_user') ?></label><input type="text" name="<?= $xid ?>_user" value="<?= View::e($x['user']) ?>" maxlength="80" autocomplete="off"></div>
+                            <div class="field">
+                                <label><?= $L('settings.extdb_pass') ?><?php if ($x['has_pass']): ?> <span class="badge badge-active" style="font-size:10px"><?= $L('settings.mail_pass_saved') ?></span><?php endif; ?></label>
+                                <input type="password" name="<?= $xid ?>_pass" value="" autocomplete="new-password" placeholder="<?= $x['has_pass'] ? '••••••••' : '' ?>">
+                                <?php if ($x['has_pass']): ?><p class="hint" style="margin-top:4px"><?= $L('settings.mail_pass_keep') ?></p><?php endif; ?>
+                            </div>
+                        </div>
+                        <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+                            <button type="button" class="btn btn-sm js-extdb-test"><?= $L('settings.extdb_test') ?></button>
+                            <span class="hint js-extdb-result" style="margin:0"></span>
+                        </div>
+                    </div>
+                </div>
+            <?php }; ?>
+
             <div class="card" style="margin-bottom:18px">
-                <div class="card-title"><?= $L('settings.integrations2') ?></div>
-                <div class="check" style="margin-bottom:10px"><input type="checkbox" name="vip_enabled" id="vip_en" <?= $s['vip_enabled'] ? 'checked' : '' ?>><label for="vip_en"><?= $L('settings.enable_vip') ?></label></div>
-                <p class="hint" style="margin:-4px 0 12px"><?= $L('settings.vip_hint') ?></p>
+                <div class="card-title">CS2-SimpleAdmin</div>
+                <?php $extdbBlock('simpleadmin'); ?>
+            </div>
+
+            <div class="card" style="margin-bottom:18px">
+                <div class="card-title">VIPCore</div>
+                <div class="check" style="margin-bottom:14px"><input type="checkbox" name="vip_enabled" id="vip_en" <?= $s['vip_enabled'] ? 'checked' : '' ?>><label for="vip_en"><?= $L('settings.enable_vip') ?></label></div>
                 <div class="field" style="margin-bottom:16px">
                     <label><?= $L('settings.vip_groups') ?></label>
                     <textarea name="vip_groups" rows="4" placeholder="VIP&#10;GOLD&#10;PLATINUM"><?= View::e($s['vip_groups']) ?></textarea>
@@ -437,7 +477,13 @@ $L = fn(string $k) => View::e(Lang::t($k));
                     </select>
                     <p class="hint" style="margin-top:6px"><?= $L('settings.vip_time_mode_hint') ?></p>
                 </div>
+                <?php $extdbBlock('vipcore'); ?>
+            </div>
 
+            <div class="card" style="margin-bottom:18px">
+                <div class="card-title"><?= $L('settings.stats_title') ?></div>
+                <div class="check" style="margin-bottom:14px"><input type="checkbox" name="stats_enabled" id="stats_en" <?= $s['stats_enabled'] ? 'checked' : '' ?>><label for="stats_en"><?= $L('settings.enable_stats') ?></label></div>
+                <div id="stats-fields"<?= $s['stats_enabled'] ? '' : ' style="display:none"' ?>>
                 <?php $k4Backend = ($s['stats_backend'] ?? 'zenith') === 'k4system'; ?>
                 <div class="field" style="margin-bottom:12px">
                     <label><?= $L('settings.stats_plugin') ?></label>
@@ -456,6 +502,7 @@ $L = fn(string $k) => View::e(Lang::t($k));
                         <div class="field"><label><?= $L('settings.storage_table') ?></label><input type="text" name="zenith_storage" value="<?= View::e($s['zenith_storage']) ?>"></div>
                         <div class="field"><label><?= $L('settings.steam_column') ?></label><input type="text" name="zenith_steam" value="<?= View::e($s['zenith_steam']) ?>"></div>
                     </div>
+                    <?php $extdbBlock('zenith'); ?>
                 </div>
 
                 <!-- K4-System table mapping -->
@@ -477,9 +524,14 @@ $L = fn(string $k) => View::e(Lang::t($k));
                             </select>
                         </div>
                     </div>
+                    <?php $extdbBlock('k4system'); ?>
+                </div>
                 </div>
                 <script>
                 (function () {
+                    var sCb = document.getElementById('stats_en');
+                    var sBox = document.getElementById('stats-fields');
+                    if (sCb && sBox) { sCb.addEventListener('change', function () { sBox.style.display = sCb.checked ? '' : 'none'; }); }
                     var zBox = document.getElementById('backend-zenith');
                     var kBox = document.getElementById('backend-k4system');
                     function sync() {
@@ -510,6 +562,7 @@ $L = fn(string $k) => View::e(Lang::t($k));
                     </div>
                     <p class="hint" style="margin-top:6px"><?= $L('settings.skins_rarity_hint') ?></p>
                 </div>
+                <?php $extdbBlock('weaponpaints'); ?>
             </div>
 
             <div class="card" style="margin-bottom:18px">
@@ -521,6 +574,7 @@ $L = fn(string $k) => View::e(Lang::t($k));
                     <input type="text" id="chat_logs_table" name="chat_logs_table" maxlength="64" pattern="[A-Za-z0-9_]{1,64}" required value="<?= View::e($s['chat_logs_table']) ?>" placeholder="chat_logs">
                     <p class="hint" style="margin-top:6px"><?= $L('settings.chat_logs_table_hint') ?></p>
                 </div>
+                <?php $extdbBlock('chatlogs'); ?>
             </div>
 
             <!-- Skins update progress popup (same look as the site-update HUD). -->
@@ -673,45 +727,12 @@ $L = fn(string $k) => View::e(Lang::t($k));
                     <input type="text" name="store_players_table" value="<?= View::e($s['store_players_table']) ?>" placeholder="store_players">
                     <p class="hint" style="margin-top:6px"><?= $L('settings.store_players_table_hint') ?></p>
                 </div>
+                <?php $extdbBlock('store'); ?>
             </div>
 
-            <!-- Separate database per integration (written to config.php as
-                 integration_db; queries on those tables are routed there). -->
-            <div class="card" style="margin-bottom:18px" id="extdb-card">
-                <div class="card-title"><?= $L('settings.extdb_title') ?></div>
-                <p class="hint" style="margin:-4px 0 14px"><?= $L('settings.extdb_hint') ?></p>
-                <?php foreach ($s['extdb'] as $xk => $x): $xid = 'extdb_' . $xk; ?>
-                <div class="extdb-item" data-extdb="<?= View::e($xk) ?>" style="border:1px solid var(--border);border-radius:12px;padding:12px 14px;margin-bottom:10px">
-                    <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
-                        <div class="check" style="margin:0"><input type="checkbox" name="<?= $xid ?>_enabled" id="<?= $xid ?>_en" class="js-extdb-toggle" <?= $x['enabled'] ? 'checked' : '' ?>><label for="<?= $xid ?>_en"><?= View::e($x['label']) ?></label></div>
-                        <?php if ($x['active']): ?><span class="badge badge-active" style="font-size:10px"><?= $L('settings.extdb_active') ?></span><?php endif; ?>
-                    </div>
-                    <div class="extdb-fields" style="margin-top:12px<?= $x['enabled'] ? '' : ';display:none' ?>">
-                        <div class="form-row">
-                            <div class="field"><label><?= $L('settings.extdb_host') ?></label><input type="text" name="<?= $xid ?>_host" value="<?= View::e($x['host']) ?>" placeholder="127.0.0.1" maxlength="255" autocomplete="off"></div>
-                            <div class="field" style="max-width:130px"><label><?= $L('settings.extdb_port') ?></label><input type="number" name="<?= $xid ?>_port" value="<?= View::e($x['port']) ?>" min="1" max="65535"></div>
-                            <div class="field"><label><?= $L('settings.extdb_name') ?></label><input type="text" name="<?= $xid ?>_name" value="<?= View::e($x['name']) ?>" maxlength="64" pattern="[A-Za-z0-9_$\-]{1,64}" autocomplete="off"></div>
-                        </div>
-                        <div class="form-row">
-                            <div class="field"><label><?= $L('settings.extdb_user') ?></label><input type="text" name="<?= $xid ?>_user" value="<?= View::e($x['user']) ?>" maxlength="80" autocomplete="off"></div>
-                            <div class="field">
-                                <label><?= $L('settings.extdb_pass') ?><?php if ($x['has_pass']): ?> <span class="badge badge-active" style="font-size:10px"><?= $L('settings.mail_pass_saved') ?></span><?php endif; ?></label>
-                                <input type="password" name="<?= $xid ?>_pass" value="" autocomplete="new-password" placeholder="<?= $x['has_pass'] ? '••••••••' : '' ?>">
-                                <?php if ($x['has_pass']): ?><p class="hint" style="margin-top:4px"><?= $L('settings.mail_pass_keep') ?></p><?php endif; ?>
-                            </div>
-                        </div>
-                        <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
-                            <button type="button" class="btn btn-sm js-extdb-test"><?= $L('settings.extdb_test') ?></button>
-                            <span class="hint js-extdb-result" style="margin:0"></span>
-                        </div>
-                    </div>
-                </div>
-                <?php endforeach; ?>
-                
-            </div>
             <script>
             (function () {
-                var card = document.getElementById('extdb-card');
+                var card = document.querySelector('[data-tabpanel="integrations"]');
                 if (!card) return;
                 var T = {
                     busy: <?= json_encode(Lang::t('settings.extdb_testing'), JSON_UNESCAPED_UNICODE | JSON_HEX_TAG) ?>,
@@ -728,7 +749,9 @@ $L = fn(string $k) => View::e(Lang::t($k));
                     var out = item.querySelector('.js-extdb-result');
                     var btn = item.querySelector('.js-extdb-test');
                     function val(f) { var el = item.querySelector('[name="extdb_' + key + '_' + f + '"]'); return el ? el.value : ''; }
-                    toggle.addEventListener('change', function () { fields.style.display = toggle.checked ? '' : 'none'; });
+                    function syncFields() { fields.hidden = !toggle.checked; }
+                    toggle.addEventListener('change', syncFields);
+                    syncFields();
                     btn.addEventListener('click', function () {
                         btn.disabled = true;
                         out.style.color = '';
@@ -2568,7 +2591,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 if (!d || !d.reachable) { updatePopup(esc(UP_MSG.offline), 'error'); return; }
                 if (d.hasUpdate) {
                     var msg = UP_MSG.found.replace('{v}', esc('v' + d.version));
-                    msg += '<div style="margin-top:14px;display:flex;gap:8px;flex-wrap:wrap">'
+                    msg += '<div style="margin-top:14px;display:flex;justify-content:center;gap:8px;flex-wrap:wrap">'
                         + '<button type="button" class="btn btn-sm btn-primary js-update-install">' + esc(UP_MSG.install + ' v' + d.version) + '</button>';
                     if (d.url) {
                         msg += '<a class="btn btn-sm" href="' + esc(d.url) + '" target="_blank" rel="noopener">' + esc(UP_MSG.gotoGit) + '</a>';

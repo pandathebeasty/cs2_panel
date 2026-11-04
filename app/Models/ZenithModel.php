@@ -97,7 +97,9 @@ final class ZenithModel
 
     public static function enabled(): bool
     {
-        if (!Settings::bool('zenith_enabled', (bool) Config::get('zenith.enabled', false))) {
+        if (!Settings::bool('stats_enabled', (bool) Config::get('stats.enabled', true))
+            || StatsBackend::which() !== 'zenith'
+            || !Settings::bool('zenith_enabled', (bool) Config::get('zenith.enabled', false))) {
             return false;
         }
         return self::isZenith() || self::isLegacy();

@@ -113,6 +113,7 @@ final class SettingsController extends Controller
                 'flag_groups'          => \App\Core\Flags::grouped(),
                 'custom_flags'         => \App\Core\Flags::custom(),
                 'zenith_enabled'  => Settings::bool('zenith_enabled', true),
+                'stats_enabled'   => Settings::bool('stats_enabled', true),
                 'appeals_enabled' => Settings::bool('appeals_enabled', true),
                 'reports_enabled' => Settings::bool('reports_enabled', true),
                 'contests_enabled' => Settings::bool('contests_enabled', true),
@@ -393,10 +394,13 @@ final class SettingsController extends Controller
 
         // Stats backend (zenith | k4system) + K4-System table mapping.
         // The backend radio is the single source of truth: the two plugins are
-        // mutually exclusive, so selecting one implicitly disables the other.
+        // mutually exclusive, so selecting one implicitly disables the other;
+        // the stats_enabled switch turns the whole integration off.
         $backend = $this->input('stats_backend') === 'k4system' ? 'k4system' : 'zenith';
+        $statsOn = (bool) $this->input('stats_enabled');
+        Settings::set('stats_enabled', $statsOn ? '1' : '0');
         Settings::set('stats_backend', $backend);
-        Settings::set('zenith_enabled', $backend === 'zenith' ? '1' : '0');
+        Settings::set('zenith_enabled', ($statsOn && $backend === 'zenith') ? '1' : '0');
         Settings::set('k4_prefix', trim((string) $this->input('k4_prefix', '')));
         Settings::set('k4_ranks_table', trim((string) $this->input('k4_ranks_table', 'k4ranks')) ?: 'k4ranks');
         Settings::set('k4_stats_table', trim((string) $this->input('k4_stats_table', 'k4stats')) ?: 'k4stats');
@@ -474,7 +478,7 @@ final class SettingsController extends Controller
             'vip_enabled' => 'VIP enabled', 'vip_groups' => 'VIP groups', 'vip_ignored_groups' => 'VIP ignored groups',
             'vip_time_mode' => 'VIP time mode', 'admin_ignored_groups' => 'Ignored admin groups',
             'custom_flags' => 'Custom flags',
-            'zenith_enabled' => 'Zenith enabled', 'zenith_ranks' => 'Zenith tables', 'zenith_stats' => 'Zenith tables',
+            'stats_enabled' => 'Ranks & stats enabled', 'zenith_enabled' => 'Zenith enabled', 'zenith_ranks' => 'Zenith tables', 'zenith_stats' => 'Zenith tables',
             'appeals_enabled' => 'Appeals enabled', 'reports_enabled' => 'Reports enabled',
             'zenith_storage' => 'Zenith tables', 'zenith_steam' => 'Zenith tables',
             'stats_backend' => 'Stats plugin', 'k4_rank_type' => 'Rank style',
@@ -516,7 +520,7 @@ final class SettingsController extends Controller
 
         $out = [];
         foreach ($keys as $k) {
-            if ($k === 'zenith_enabled' && $backendChanged) {
+            if ($k === 'zenith_enabled' && ($backendChanged || in_array('stats_enabled', $keys, true))) {
                 continue; // covered by the explicit backend label below
             }
             // Per-category Discord toggles -> single "Discord notifications" label.

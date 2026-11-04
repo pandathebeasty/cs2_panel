@@ -31,6 +31,9 @@ final class StatsBackend
 
     public static function enabled(): bool
     {
+        if (!Settings::bool('stats_enabled', (bool) Config::get('stats.enabled', true))) {
+            return false;
+        }
         return self::isK4System() ? K4SystemModel::enabled() : ZenithModel::enabled();
     }
 

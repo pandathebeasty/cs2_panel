@@ -114,6 +114,7 @@ final class Installer
             // Which plugin supplies ranks/stats/playtime: 'zenith' or 'k4system'.
             'stats' => [
                 'backend' => (($input['stats_backend'] ?? 'zenith') === 'k4system') ? 'k4system' : 'zenith',
+                'enabled' => !empty($input['zenith_enabled']),
             ],
             'zenith' => [
                 'enabled'       => !empty($input['zenith_enabled']),
@@ -249,6 +250,7 @@ final class Installer
             // backends are mutually exclusive, so zenith_enabled follows the
             // backend choice (and the master enable checkbox).
             'stats_backend'   => $backend,
+            'stats_enabled'   => !empty($input['zenith_enabled']) ? '1' : '0',
             'zenith_enabled'  => (!empty($input['zenith_enabled']) && $backend === 'zenith') ? '1' : '0',
             'zenith_ranks'    => $input['zenith_ranks'] ?: 'zenith_ranks',
             'zenith_stats'    => $input['zenith_stats'] ?: 'zenith_stats',

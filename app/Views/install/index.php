@@ -86,14 +86,41 @@ $req = '<span class="req">*</span>';
                 </div>
 
                 <h3 class="section-title"><?= $t('install.sec_integrations') ?></h3>
+                <?php
+                // Per-integration database; by default it is the panel database.
+                $dbBlock = static function (string $xk) use ($old, $o, $t, $req): void {
+                    $xon = !empty($old["extdb_{$xk}_enabled"]);
+                ?>
+                    <div class="extdb-block" style="border-top:1px dashed var(--border);margin-top:12px;padding-top:12px">
+                        <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+                            <div class="check" style="margin:0"><input type="checkbox" name="extdb_<?= $xk ?>_enabled" id="extdb_<?= $xk ?>_enabled" class="js-extdb-toggle" data-target="extdb-<?= $xk ?>" <?= $xon ? 'checked' : '' ?>><label for="extdb_<?= $xk ?>_enabled"><?= $t('settings.extdb_own') ?></label></div>
+                            <span class="hint" style="margin:0"><?= $t('settings.extdb_hint') ?></span>
+                        </div>
+                        <div class="extdb-fields" id="extdb-<?= $xk ?>" style="margin-top:10px"<?= $xon ? '' : ' hidden' ?>>
+                            <div class="form-row">
+                                <div class="field"><label><?= $t('settings.extdb_host') ?></label><input type="text" name="extdb_<?= $xk ?>_host" value="<?= $o("extdb_{$xk}_host") ?>" placeholder="127.0.0.1"></div>
+                                <div class="field"><label><?= $t('settings.extdb_port') ?></label><input type="number" name="extdb_<?= $xk ?>_port" value="<?= $o("extdb_{$xk}_port") ?>" placeholder="3306" min="1" max="65535"></div>
+                            </div>
+                            <div class="form-row">
+                                <div class="field"><label><?= $t('settings.extdb_name') ?> <?= $req ?></label><input type="text" name="extdb_<?= $xk ?>_name" value="<?= $o("extdb_{$xk}_name") ?>" data-extdb-required></div>
+                                <div class="field"><label><?= $t('settings.extdb_user') ?></label><input type="text" name="extdb_<?= $xk ?>_user" value="<?= $o("extdb_{$xk}_user") ?>" autocomplete="off"></div>
+                            </div>
+                            <div class="field"><label><?= $t('settings.extdb_pass') ?></label><input type="password" name="extdb_<?= $xk ?>_pass" value="<?= $o("extdb_{$xk}_pass") ?>" autocomplete="new-password"></div>
+                        </div>
+                    </div>
+                <?php }; ?>
+                <div class="integration-block">
+                    <div style="font-weight:700">CS2-SimpleAdmin</div>
+                    <?php $dbBlock('simpleadmin'); ?>
+                </div>
                 <div class="integration-block">
                     <div class="check"><input type="checkbox" name="vip_enabled" id="vip_enabled" <?= isset($old['vip_enabled']) || !$old ? 'checked' : '' ?>><label for="vip_enabled"><?= $t('install.vip_enable') ?></label></div>
-                    <p class="hint"><?= $t('install.vip_hint') ?></p>
                     <div class="field" style="margin-top:10px">
                         <label><?= $t('install.vip_groups') ?> <span class="hint-inline" title="<?= $t('install.vip_groups_tip') ?>">?</span></label>
                         <textarea name="vip_groups" rows="3" placeholder="VIP&#10;GOLD&#10;PLATINUM"><?= $o('vip_groups') ?></textarea>
                         <p class="hint"><?= $t('install.vip_groups_hint') ?></p>
                     </div>
+                    <?php $dbBlock('vipcore'); ?>
                 </div>
                 <div class="integration-block">
                     <?php $backend = $o('stats_backend', 'zenith'); ?>
@@ -115,6 +142,7 @@ $req = '<span class="req">*</span>';
                                 <div class="field"><label><?= $t('install.storage_table') ?></label><input type="text" name="zenith_storage" value="<?= $o('zenith_storage', 'zenith_player_storage') ?>"></div>
                                 <div class="field"><label><?= $t('install.steam_col') ?> <span class="hint-inline" title="<?= $t('install.steam_col_tip') ?>">?</span></label><input type="text" name="zenith_steam_col" value="<?= $o('zenith_steam_col', 'steam_id') ?>"></div>
                             </div>
+                            <?php $dbBlock('zenith'); ?>
                         </div>
 
                         <!-- K4-System tables -->
@@ -137,6 +165,7 @@ $req = '<span class="req">*</span>';
                                     </select>
                                 </div>
                             </div>
+                            <?php $dbBlock('k4system'); ?>
                         </div>
                     </div>
                 </div>
@@ -148,26 +177,17 @@ $req = '<span class="req">*</span>';
                         <label><?= $t('install.skins_prefix') ?> <span class="hint-inline" title="<?= $t('install.skins_prefix_tip') ?>">?</span></label>
                         <input type="text" name="wp_prefix" value="<?= $o('wp_prefix', 'wp_') ?>" placeholder="wp_">
                     </div>
+                    <?php $dbBlock('weaponpaints'); ?>
+                </div>
+                <div class="integration-block">
+                    <div style="font-weight:700">Chat Logger</div>
+                    <?php $dbBlock('chatlogs'); ?>
+                </div>
+                <div class="integration-block">
+                    <div style="font-weight:700">Store Credits</div>
+                    <?php $dbBlock('store'); ?>
                 </div>
 
-                <h3 class="section-title"><?= View::e(Lang::t('settings.extdb_title')) ?></h3>
-<p class="hint"><?= $t('settings.extdb_hint') ?></p>
-                <?php foreach (\App\Core\IntegrationDb::KEYS as $xk => $xlabel): $xon = !empty($old["extdb_{$xk}_enabled"]); ?>
-                <div class="integration-block extdb-block">
-                    <div class="check"><input type="checkbox" name="extdb_<?= $xk ?>_enabled" id="extdb_<?= $xk ?>_enabled" class="js-extdb-toggle" data-target="extdb-<?= $xk ?>" <?= $xon ? 'checked' : '' ?>><label for="extdb_<?= $xk ?>_enabled"><?= View::e($xlabel) ?></label></div>
-                    <div class="extdb-fields" id="extdb-<?= $xk ?>"<?= $xon ? '' : ' hidden' ?>>
-                        <div class="form-row">
-                            <div class="field"><label><?= View::e(Lang::t('settings.extdb_host')) ?></label><input type="text" name="extdb_<?= $xk ?>_host" value="<?= $o("extdb_{$xk}_host") ?>" placeholder="127.0.0.1"></div>
-                            <div class="field"><label><?= View::e(Lang::t('settings.extdb_port')) ?></label><input type="number" name="extdb_<?= $xk ?>_port" value="<?= $o("extdb_{$xk}_port") ?>" placeholder="3306" min="1" max="65535"></div>
-                        </div>
-                        <div class="form-row">
-                            <div class="field"><label><?= View::e(Lang::t('settings.extdb_name')) ?> <?= $req ?></label><input type="text" name="extdb_<?= $xk ?>_name" value="<?= $o("extdb_{$xk}_name") ?>" data-extdb-required></div>
-                            <div class="field"><label><?= View::e(Lang::t('settings.extdb_user')) ?></label><input type="text" name="extdb_<?= $xk ?>_user" value="<?= $o("extdb_{$xk}_user") ?>" autocomplete="off"></div>
-                        </div>
-                        <div class="field"><label><?= View::e(Lang::t('settings.extdb_pass')) ?></label><input type="password" name="extdb_<?= $xk ?>_pass" value="<?= $o("extdb_{$xk}_pass") ?>" autocomplete="new-password"></div>
-                    </div>
-                </div>
-                <?php endforeach; ?>
 
                 <h3 class="section-title">Discord</h3>
                 <div class="field">
@@ -225,6 +245,7 @@ $req = '<span class="req">*</span>';
         var missing = [];
         form.querySelectorAll('[required]').forEach(function (el) {
             el.classList.remove('input-error');
+            if (el.offsetParent === null) { return; }
             if (!el.value.trim()) { missing.push(el); el.classList.add('input-error'); }
         });
         if (missing.length) {

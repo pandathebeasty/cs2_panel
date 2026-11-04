@@ -137,6 +137,11 @@ final class Config
             $map['stats.backend'] = ($backend === 'k4system') ? 'k4system' : 'zenith';
         }
 
+        $statsEnabled = $S('stats_enabled', null);
+        if ($statsEnabled !== null) {
+            $map['stats.enabled'] = ($statsEnabled === '1' || $statsEnabled === 1 || $statsEnabled === true);
+        }
+
         $zenithEnabled = $S('zenith_enabled', null);
         if ($zenithEnabled !== null) {
             $map['zenith.enabled'] = ($zenithEnabled === '1' || $zenithEnabled === 1 || $zenithEnabled === true);
