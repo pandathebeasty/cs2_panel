@@ -652,11 +652,12 @@
     }
 
     // Optional 3D preview (Settings → Skins). The viewer module is loaded on
-    // first use; any failure (no WebGL2, missing model or paint texture) keeps
-    // the regular 2D image.
+    // first use; missing models or WebGL2 show 2D, while a missing paint
+    // texture leaves the base model available for sticker placement.
     var CFG3D = window.SKINS_3D || null;
     var stage3d = document.getElementById("skins3dStage");
     var canvas3d = document.getElementById("skins3dCanvas");
+    var fallback3d = document.getElementById("skins3dFallback");
     var modalBox = modal ? modal.querySelector(".skins-modal") : null;
     var placeBar = document.getElementById("skinsPlaceBar");
     var placeRot = document.getElementById("skinsPlaceRot");
@@ -683,30 +684,43 @@
         view3dOn = false;
         activeSticker = -1;
         if (stage3d) stage3d.hidden = true;
-        if (modalBox) modalBox.classList.remove("has-3d", "is-3d-loading");
+        if (modalBox) modalBox.classList.remove("has-3d", "is-3d-loading", "is-3d-2d", "is-3d-notex");
         if (viewer) viewer.hide();
         updatePlacement();
+    }
+    function show2d(image) {
+        stop3d();
+        if (!image || !fallback3d || !stage3d || !modalBox) return;
+        fallback3d.src = image;
+        stage3d.hidden = false;
+        modalBox.classList.add("has-3d", "is-3d-2d");
     }
     function start3d(cfg) {
         stop3d();
         var seq = ++view3dSeq;
         if (!CFG3D || !stage3d || !canvas3d || !modalBox || !cfg.model3d || !cfg.paint3d) return;
+        var fail = function (err) {
+            if (seq !== view3dSeq) return;
+            if (err && window.console) console.warn(err);
+            show2d(cfg.image);
+        };
         stage3d.hidden = false;
         modalBox.classList.add("has-3d", "is-3d-loading");
         loadViewer().then(function (m) {
             if (!m || seq !== view3dSeq) return false;
             return m.show(canvas3d, {
                 sources: CFG3D.sources || [], model: cfg.model3d, folder: cfg.folder3d || cfg.model3d,
-                paint: cfg.paint3d, legacy: !!cfg.legacy3d
+                paint: cfg.paint3d, legacy: !!cfg.legacy3d, defindex: cfg.defindex3d
             });
         }).then(function (ok) {
             if (seq !== view3dSeq) return;
-            if (!ok) { stop3d(); return; }
+            if (!ok) { fail(); return; }
             view3dOn = true;
             modalBox.classList.remove("is-3d-loading");
+            modalBox.classList.toggle("is-3d-notex", ok === "untextured");
             sync3dStickers();
             updatePlacement();
-        }).catch(function () { if (seq === view3dSeq) stop3d(); });
+        }).catch(fail);
     }
     function sync3dStickers() {
         if (!view3dOn || !viewer) return;
@@ -724,7 +738,7 @@
         updatePlacement();
     }
     function updatePlacement() {
-        var on = view3dOn && currentModalTab === "stickers";
+        var on = view3dOn && viewer && viewer.hasStickerLayout() && currentModalTab === "stickers";
         if (activeSticker >= 0 && !slotState[activeSticker]) activeSticker = -1;
         if (placeBar) placeBar.hidden = !on;
         if (stickerSlotsRow) {
@@ -959,7 +973,8 @@
                 hasPaintFields: true, forcedTeam: skinCard.dataset.forcedTeam,
                 stattrak: skinCard.dataset.stattrak, stattrakCount: skinCard.dataset.stattrakCount, nametag: skinCard.dataset.nametag,
                 stickers: stks, keychain: kc,
-                model3d: skinCard.dataset.model, paint3d: skinCard.dataset.paintid, legacy3d: skinCard.dataset.legacy === "1"
+                model3d: skinCard.dataset.model, paint3d: skinCard.dataset.paintid, legacy3d: skinCard.dataset.legacy === "1",
+                defindex3d: skinCard.dataset.defindex
             });
             return;
         }

@@ -248,10 +248,10 @@ A page appears only when it is ticked, K4-System is the selected plugin and its 
 | Enable Skins | Off | Players build their WeaponPaints loadout from the panel. |
 | Skins Table Prefix | `wp_` | The part before `player_skins` in the table names. |
 | Check for Updates | — | Downloads the latest item lists and rarity colours now. Also refreshed automatically every week. |
-| Enable 3D preview | Off | The skin editor shows the 3D model with the selected paint, and stickers can be placed and rotated on it. If WebGL2, the model or the paint texture is missing, the normal 2D image is shown. |
+| Enable 3D preview | Off | The skin editor shows the 3D model with the selected paint and saved stickers, which can be placed and rotated. If a paint texture is missing, the base 3D model remains usable with a texture-unavailable label. Only a missing model or WebGL2 switches to the 2D image. |
 | Custom 3D sources | empty | Optional base URLs, one per line (at most 5). Each one must contain `models/{weapon}.glb` and `textures/{weapon}/{paint}.webp` (or `.png`, with an optional `{paint}_metal` map). Gloves use the defindex instead of the weapon name. |
 
-The 3D files are looked up in this order: local models (`assets/3d/models`, installed with the **3D models** update part), the custom sources, then the public LielXD mirror (MIT). The paint textures are several GB, so they are not part of the update and come from the sources. Sticker placement is approximate; a sticker without a placement stays at the game's default position.
+The 3D files are looked up in this order: local models (`assets/3d/models`, installed with the **3D models** update part), the custom sources, then the public LielXD mirror (MIT). The paint textures are several GB, so they are not part of the update and come from the sources. Saved zero-offset stickers are drawn at the weapon's default slot positions; free offsets use the first slot as their game-coordinate origin. Sticker size follows the weapon's slot scale, with separate legacy and HD layouts. These numeric CS2 layouts are bundled in `assets/js/skins3d-sticker-layouts.json` (from [the redesign's game markup data](https://github.com/FireFOXXCZ/cs2-weaponpaints-website-redesign/blob/main/data/sticker-markup.json)); surface placement remains an approximation of the in-game rendering.
 
 **Chat Logger**
 

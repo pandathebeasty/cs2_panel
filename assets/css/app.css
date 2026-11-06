@@ -2211,6 +2211,22 @@ input[type=radio]:not(.native-control):disabled {
 }
 .skins-3d-reset:hover { color: var(--accent); border-color: var(--accent); }
 .skins-modal.is-3d-loading .skins-3d-reset { display: none; }
+.skins-3d-fallback {
+    position: absolute; top: 50%; left: 50%; width: 76%; height: 76%;
+    display: none; object-fit: contain; pointer-events: none;
+    transform: translate(-50%, -50%);
+    animation: skins3dFade .25s ease;
+}
+@keyframes skins3dFade { from { opacity: 0; } }
+.skins-modal.is-3d-2d .skins-3d-fallback { display: block; }
+.skins-modal.is-3d-2d .skins-3d-canvas,
+.skins-modal.is-3d-2d .skins-3d-reset { display: none; }
+.skins-3d-notex {
+    position: absolute; left: 8px; bottom: 8px; display: none; padding: 3px 8px;
+    font-size: 11px; color: var(--text-dim); pointer-events: none;
+    border: 1px solid var(--border); border-radius: var(--radius-sm); background: var(--bg-2);
+}
+.skins-modal.is-3d-notex .skins-3d-notex { display: block; }
 .skins-slot.is-active { border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent); }
 .skins-place { margin-top: 12px; display: flex; flex-direction: column; gap: 8px; }
 .skins-place[hidden] { display: none; }

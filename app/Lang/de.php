@@ -1418,6 +1418,7 @@ return [
     'skins.slot_n'                => 'Slot {0}',
     'skins.clear_slot'            => 'Leeren',
     'skins.view_reset' => 'Ansicht zurücksetzen',
+    'skins.texture_missing' => '3D-Textur nicht verfügbar',
     'skins.place_hint' => 'Sticker auswählen, dann auf das Modell klicken oder ziehen, um ihn zu platzieren.',
     'skins.rotation' => 'Drehung',
     'skins.place_default' => 'Standardposition',

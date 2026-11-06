@@ -1417,6 +1417,7 @@ return [
     'skins.slot_n'                => 'Slot {0}',
     'skins.clear_slot'            => 'Sterge',
     'skins.view_reset' => 'Resetează vizualizarea',
+    'skins.texture_missing' => 'Textură 3D indisponibilă',
     'skins.place_hint' => 'Selectează un sticker, apoi apasă sau trage pe model pentru a-l poziționa.',
     'skins.rotation' => 'Rotație',
     'skins.place_default' => 'Poziție implicită',

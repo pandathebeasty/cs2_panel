@@ -2,9 +2,9 @@
  * 3D preview for the Skins editor (loaded on demand by skins.js when enabled
  * in Settings). Renders the weapon model with the selected paint texture and
  * draws placed stickers through the model's second UV set, where the
- * WeaponPaints sticker offset (x, y) maps to uv1 = (x + 0.5, y + 0.5).
- * Any missing model/texture or missing WebGL2 resolves to false so the
- * caller keeps the 2D image.
+ * WeaponPaints free offsets are relative to the weapon's first sticker slot.
+ * Missing models or WebGL2 keep the 2D image; missing paint textures leave
+ * the base 3D model available for sticker placement.
  */
 import * as THREE from '../vendor/three/three.module.min.js';
 import { GLTFLoader } from '../vendor/three/addons/GLTFLoader.js';
@@ -13,13 +13,13 @@ import { RoomEnvironment } from '../vendor/three/addons/RoomEnvironment.js';
 import { MeshoptDecoder } from '../vendor/three/addons/meshopt_decoder.module.js';
 
 const SLOTS = 5;
-const STICKER_UV = 0.15;
 const SKIP_MATERIALS = /bare_arm|scope|glass|lens/i;
 
 let renderer = null, scene = null, camera = null, controls = null, envTex = null;
 let host = null, resizeObs = null, pivot = null, meshes = [], token = 0;
 let home = null, placing = false, activeSlot = -1, placeCb = null;
-const stickers = Array.from({ length: SLOTS }, () => ({ src: '', x: 0, y: 0, r: 0, placed: false }));
+let anchors = [], layoutPromise = null;
+const stickers = Array.from({ length: SLOTS }, () => ({ src: '', x: 0, y: 0, r: 0 }));
 const blank = new THREE.DataTexture(new Uint8Array([0, 0, 0, 0]), 1, 1);
 blank.needsUpdate = true;
 const U = { stXf: { value: Array.from({ length: SLOTS }, () => new THREE.Vector4(0, 0, 0, 0)) } };
@@ -83,11 +83,50 @@ function disposeModel() {
     meshes = [];
 }
 
-async function firstOk(urls, load) {
+async function firstOk(urls, load, label) {
+    let error = null;
     for (const url of urls) {
-        try { return await load(url); } catch (e) { /* try next mirror */ }
+        try { return await load(url); } catch (e) { error = e; }
     }
+    if (urls.length) console.warn('[Skins3D] ' + label + ' unavailable.', error);
     return null;
+}
+
+async function loadStickerLayout(defindex, legacy) {
+    if (!defindex) return [];
+    if (!layoutPromise) {
+        const url = new URL('./skins3d-sticker-layouts.json', import.meta.url);
+        url.search = new URL(import.meta.url).search;
+        layoutPromise = fetch(url).then((response) => {
+            if (!response.ok) throw new Error('Sticker layout request failed: ' + response.status);
+            return response.json();
+        }).catch((error) => {
+            layoutPromise = null;
+            console.warn('[Skins3D] Sticker layouts unavailable.', error);
+            return null;
+        });
+    }
+    const data = await layoutPromise;
+    if (!data) return [];
+    const all = data[String(defindex)] || [];
+    if (!Array.isArray(all)) {
+        console.warn('[Skins3D] Invalid sticker layout for weapon ' + defindex);
+        return [];
+    }
+    let selected = all.filter((a) => a && !!a.legacy === !!legacy);
+    if (!selected.length) selected = all.filter((a) => a && !a.legacy);
+    const slots = [];
+    for (const a of selected) {
+        if (!Number.isInteger(a.slot) || a.slot < 0
+            || !Array.isArray(a.offsets) || !Number.isFinite(a.offsets[0]) || !Number.isFinite(a.offsets[1])
+            || !Number.isFinite(a.scale) || a.scale <= 0) {
+            console.warn('[Skins3D] Invalid sticker slot for weapon ' + defindex, a);
+            return [];
+        }
+        if (a.slot >= SLOTS) continue;
+        slots[a.slot] = { x: a.offsets[0], y: a.offsets[1], scale: a.scale };
+    }
+    return slots;
 }
 
 function loadTexture(url, srgb) {
@@ -105,7 +144,7 @@ async function loadPaint(sources, folder, paint) {
     const dir = encodeURIComponent(folder) + '/' + encodeURIComponent(paint);
     const urls = [];
     sources.forEach((s) => { if (s.textures) ['webp', 'png'].forEach((ext) => urls.push(s.textures + dir + '.' + ext)); });
-    const map = await firstOk(urls, (u) => loadTexture(u, true));
+    const map = await firstOk(urls, (u) => loadTexture(u, true), 'paint ' + folder + '/' + paint);
     if (!map) return null;
     const metalUrl = map.userData.url.replace(/(\.\w+)$/, '_metal$1');
     const metal = await loadTexture(metalUrl, false).catch(() => null);
@@ -127,9 +166,9 @@ function injectStickers(material) {
             + 'vec4 stSample(sampler2D t, vec4 xf, vec2 uv) {\n'
             + '\tif (xf.w <= 0.0) return vec4(0.0);\n'
             + '\tvec2 d = uv - xf.xy; float c = cos(xf.z), sn = sin(xf.z);\n'
-            + '\tvec2 q = vec2(c * d.x + sn * d.y, -sn * d.x + c * d.y) / xf.w + 0.5;\n'
+            + '\tvec2 q = vec2(c * d.x - sn * d.y, sn * d.x + c * d.y) / xf.w + 0.5;\n'
             + '\tif (q.x < 0.0 || q.y < 0.0 || q.x > 1.0 || q.y > 1.0) return vec4(0.0);\n'
-            + '\treturn texture2D(t, q);\n}\n'
+            + '\treturn texture2D(t, vec2(q.x, 1.0 - q.y));\n}\n'
             + shader.fragmentShader.replace('#include <map_fragment>', '#include <map_fragment>\n' + blend);
     };
     material.customProgramCacheKey = () => 'cs2-stickers';
@@ -200,8 +239,9 @@ function applyPaint(tex) {
 }
 
 /**
- * Show the model for spec {sources, model, folder, paint, legacy} inside el.
- * Resolves true when the model (and paint texture, for paint > 0) loaded.
+ * Show spec {sources, model, folder, paint, legacy, defindex} inside el.
+ * Resolves true with the paint, 'untextured' with only the base model,
+ * or false when 3D is unavailable.
  */
 export async function show(el, spec) {
     const my = ++token;
@@ -222,25 +262,32 @@ export async function show(el, spec) {
     const sources = spec.sources || [];
     const modelUrls = sources.map((s) => s.models + encodeURIComponent(spec.model) + '.glb');
     const paint = String(spec.paint || '0');
-    const [gltf, tex] = await Promise.all([
-        firstOk(modelUrls, (u) => gltfLoader.loadAsync(u)),
+    const [gltf, tex, layout] = await Promise.all([
+        firstOk(modelUrls, (u) => gltfLoader.loadAsync(u), 'model ' + spec.model),
         paint !== '0' ? loadPaint(sources, spec.folder || spec.model, paint) : Promise.resolve(null),
+        loadStickerLayout(spec.defindex, !!spec.legacy),
     ]);
     if (my !== token) return false;
-    if (!gltf || (paint !== '0' && !tex)) return false;
+    if (!gltf) return false;
 
+    anchors = layout;
     const size = prepareModel(gltf, !!spec.legacy);
     if (tex) applyPaint(tex);
     frame(size);
     syncUniforms();
     renderer.domElement.style.visibility = '';
     renderer.setAnimationLoop(tick);
-    return true;
+    return paint === '0' || tex ? true : 'untextured';
 }
 
 export function hide() {
     token++;
     placing = false;
+    activeSlot = -1;
+    placeCb = null;
+    anchors = [];
+    setStickers([]);
+    if (controls) controls.enabled = true;
     if (renderer) renderer.setAnimationLoop(null);
     disposeModel();
 }
@@ -260,33 +307,53 @@ function stickerTexture(src) {
             t.flipY = false;
             t.anisotropy = Math.min(8, renderer.capabilities.getMaxAnisotropy());
             return t;
-        }).catch(() => blank));
+        }).catch((error) => {
+            texCache.delete(src);
+            console.warn('[Skins3D] Sticker texture unavailable: ' + src, error);
+            return blank;
+        }));
     }
     return texCache.get(src);
 }
 
+function stickerPlacement(s, i) {
+    const free = s.x !== 0 || s.y !== 0;
+    const a = anchors[free ? 0 : i] || anchors[0];
+    if (!a) return null;
+    return { x: a.x + (free ? s.x : 0), y: a.y + (free ? s.y : 0), size: 1 / a.scale };
+}
+
 function syncUniforms() {
     stickers.forEach((s, i) => {
-        const on = s.src && s.placed;
-        U.stXf.value[i].set(s.x + 0.5, s.y + 0.5, THREE.MathUtils.degToRad(s.r), on ? STICKER_UV : 0);
-        stickerTexture(on ? s.src : '').then((t) => { U['stTex' + i].value = t; });
+        const p = stickerPlacement(s, i);
+        const src = s.src && p ? s.src : '';
+        U.stXf.value[i].set(p ? p.x + 0.5 : 0, p ? p.y + 0.5 : 0, THREE.MathUtils.degToRad(s.r), src ? p.size : 0);
+        U['stTex' + i].value = blank;
+        const my = token;
+        stickerTexture(src).then((t) => {
+            if (my === token && stickers[i].src === src) U['stTex' + i].value = t;
+        });
     });
 }
 
-/** list: [{src, x, y, r}] per slot; x = y = 0 means the game's default spot (not drawn). */
+/** list: [{src, x, y, r}]; zero offsets draw at the slot's game-default spot. */
 export function setStickers(list) {
     for (let i = 0; i < SLOTS; i++) {
         const s = (list && list[i]) || {};
         const x = +s.x || 0, y = +s.y || 0;
-        Object.assign(stickers[i], { src: s.src || '', x, y, r: +s.r || 0, placed: x !== 0 || y !== 0 });
+        Object.assign(stickers[i], { src: s.src || '', x, y, r: +s.r || 0 });
     }
     syncUniforms();
+}
+
+export function hasStickerLayout() {
+    return !!anchors[0] && meshes.some((m) => !!m.geometry.getAttribute('uv1'));
 }
 
 /** Enable click/drag placement for one slot; cb(slot, x, y) receives game coordinates. */
 export function setPlacement(slot, cb) {
     activeSlot = slot;
-    placing = slot >= 0;
+    placing = slot >= 0 && slot < SLOTS && hasStickerLayout();
     placeCb = cb || null;
     if (renderer) renderer.domElement.style.cursor = placing ? 'crosshair' : '';
 }
@@ -298,13 +365,17 @@ function hitUv(ev) {
     ndc.set(((ev.clientX - r.left) / r.width) * 2 - 1, -((ev.clientY - r.top) / r.height) * 2 + 1);
     ray.setFromCamera(ndc, camera);
     const hits = ray.intersectObjects(meshes.filter(isShown), false);
-    for (const h of hits) if (h.uv1) return h.uv1;
+    for (const h of hits) {
+        if (h.uv1 && h.uv1.x >= 0 && h.uv1.x <= 1 && h.uv1.y >= 0 && h.uv1.y <= 1) return h.uv1;
+    }
     return null;
 }
 
 function emit(uv) {
-    const x = Math.round(Math.max(-1, Math.min(1, uv.x - 0.5)) * 10000) / 10000;
-    const y = Math.round(Math.max(-1, Math.min(1, uv.y - 0.5)) * 10000) / 10000;
+    const base = anchors[0];
+    if (!base) return;
+    const x = Math.round(Math.max(-1, Math.min(1, uv.x - 0.5 - base.x)) * 10000) / 10000;
+    const y = Math.round(Math.max(-1, Math.min(1, uv.y - 0.5 - base.y)) * 10000) / 10000;
     if (placeCb) placeCb(activeSlot, x === 0 && y === 0 ? 0.0001 : x, y);
 }
 
@@ -314,8 +385,9 @@ function bindPointer(canvas) {
         if (!placing || !pivot) return;
         down = { x: ev.clientX, y: ev.clientY };
         const s = stickers[activeSlot];
+        const p = s && stickerPlacement(s, activeSlot);
         const uv = hitUv(ev);
-        if (s && s.placed && uv && Math.hypot(uv.x - (s.x + 0.5), uv.y - (s.y + 0.5)) < STICKER_UV * 0.6) {
+        if (s && s.src && p && uv && Math.hypot(uv.x - (p.x + 0.5), uv.y - (p.y + 0.5)) < p.size * 0.6) {
             dragging = true;
             controls.enabled = false;
             canvas.setPointerCapture(ev.pointerId);

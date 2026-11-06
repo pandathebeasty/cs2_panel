@@ -1418,6 +1418,7 @@ return [
     'skins.slot_n'                => 'Слот {0}',
     'skins.clear_slot'            => 'Очистить',
     'skins.view_reset' => 'Сбросить вид',
+    'skins.texture_missing' => '3D-текстура недоступна',
     'skins.place_hint' => 'Выберите наклейку, затем нажмите или перетащите по модели, чтобы разместить её.',
     'skins.rotation' => 'Поворот',
     'skins.place_default' => 'Позиция по умолчанию',

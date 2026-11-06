@@ -28,6 +28,8 @@ use App\Core\View;
             <div class="skins-3d" id="skins3dStage" hidden>
                 <div class="skins-3d-canvas" id="skins3dCanvas"></div>
                 <div class="skins-3d-loader" aria-hidden="true"><span></span></div>
+                <span class="skins-3d-notex"><?= View::e(Lang::t('skins.texture_missing')) ?></span>
+                <img class="skins-3d-fallback" id="skins3dFallback" src="" alt="">
                 <button type="button" class="skins-3d-reset" id="skins3dReset" title="<?= View::e(Lang::t('skins.view_reset')) ?>" aria-label="<?= View::e(Lang::t('skins.view_reset')) ?>">
                     <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 4v5h5"/></svg>
                 </button>

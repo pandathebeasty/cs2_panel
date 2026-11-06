@@ -1437,6 +1437,7 @@ return [
     'skins.slot_n'                => 'Slot {0}',
     'skins.clear_slot'            => 'Clear',
     'skins.view_reset' => 'Reset view',
+    'skins.texture_missing' => '3D texture unavailable',
     'skins.place_hint' => 'Select a sticker, then click or drag on the model to place it.',
     'skins.rotation' => 'Rotation',
     'skins.place_default' => 'Default position',
