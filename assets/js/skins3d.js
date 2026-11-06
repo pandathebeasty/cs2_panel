@@ -182,13 +182,14 @@ function injectStickers(material) {
             samplers += 'uniform sampler2D stTex' + i + ';\n';
             blend += '\t{ vec4 s = stSample(stTex' + i + ', stXf[' + i + '], vStUv); diffuseColor.rgb = mix(diffuseColor.rgb, s.rgb, s.a); }\n';
         }
+        // Sticker UVs and unflipped images share a top-left origin.
         shader.fragmentShader = 'varying vec2 vStUv;\nuniform vec4 stXf[' + SLOTS + '];\n' + samplers
             + 'vec4 stSample(sampler2D t, vec4 xf, vec2 uv) {\n'
             + '\tif (xf.w <= 0.0) return vec4(0.0);\n'
             + '\tvec2 d = uv - xf.xy; float c = cos(xf.z), sn = sin(xf.z);\n'
             + '\tvec2 q = vec2(c * d.x - sn * d.y, sn * d.x + c * d.y) / xf.w + 0.5;\n'
             + '\tif (q.x < 0.0 || q.y < 0.0 || q.x > 1.0 || q.y > 1.0) return vec4(0.0);\n'
-            + '\treturn texture2D(t, vec2(q.x, 1.0 - q.y));\n}\n'
+            + '\treturn texture2D(t, q);\n}\n'
             + shader.fragmentShader.replace('#include <map_fragment>', '#include <map_fragment>\n' + blend);
     };
     material.customProgramCacheKey = () => 'cs2-stickers';
