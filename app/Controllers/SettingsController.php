@@ -202,6 +202,9 @@ final class SettingsController extends Controller
                 // WeaponPaints "Skins" module.
                 'skins_enabled'   => Settings::bool('skins_enabled', false),
                 'wp_prefix'       => Settings::get('wp_prefix', \App\Core\Config::get('weaponpaints.prefix', 'wp_')),
+                'wp_3d_enabled'   => Settings::bool('wp_3d_enabled', false),
+                'wp_3d_sources'   => (string) Settings::get('wp_3d_sources', ''),
+                'wp_3d_local'     => \App\Core\Skins3D::hasLocalModels(),
                 'chat_logs_enabled' => ChatLogModel::enabled(),
                 'chat_logs_table'   => Settings::get('chat_logs_table', 'chat_logs'),
                 'extdb'             => self::integrationDbView(),
@@ -426,6 +429,8 @@ final class SettingsController extends Controller
         // WeaponPaints "Skins" module (standalone toggle + configurable table prefix).
         Settings::set('skins_enabled', $this->input('skins_enabled') ? '1' : '0');
         Settings::set('wp_prefix', trim((string) $this->input('wp_prefix', 'wp_')) ?: 'wp_');
+        Settings::set('wp_3d_enabled', $this->input('wp_3d_enabled') ? '1' : '0');
+        Settings::set('wp_3d_sources', implode("\n", \App\Core\Skins3D::parseSources((string) $this->input('wp_3d_sources', ''))));
         Settings::set('chat_logs_enabled', $this->input('chat_logs_enabled') ? '1' : '0');
         Settings::set('chat_logs_table', trim($chatTable));
         foreach ($extDb as $key => $value) {
@@ -504,6 +509,7 @@ final class SettingsController extends Controller
             'k4_reward_easy' => 'Mission rewards', 'k4_reward_medium' => 'Mission rewards',
             'k4_reward_hard' => 'Mission rewards', 'k4_reward_weekly' => 'Mission rewards',
             'skins_enabled' => 'Skins enabled', 'wp_prefix' => 'Skins table prefix',
+            'wp_3d_enabled' => 'Skins 3D preview', 'wp_3d_sources' => 'Skins 3D sources',
             'chat_logs_enabled' => 'Chat logs enabled', 'chat_logs_table' => 'Chat Logger table',
             'benefits_enabled' => 'Benefits page enabled',
             'contests_enabled' => 'Contests enabled', 'contest_webhook' => 'Contest webhook',

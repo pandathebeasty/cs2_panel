@@ -97,7 +97,7 @@ The selected theme applies to every visitor. Each visitor can still switch light
 | Item | What it does |
 |---|---|
 | Check | Looks for a new release on GitHub now (otherwise checked automatically at most every 6 hours). |
-| Update | Opens the update dialog. **Code** (code, interface, translations, database migrations) is always updated. **Maps** (`assets/img/maps`) and **Skins data** (`app/Data/weaponpaints`) are optional because they are large; tick them only when a release changes them. |
+| Update | Opens the update dialog. **Code** (code, interface, translations, database migrations) is always updated. **Maps** (`assets/img/maps`) and **Skins data** (`app/Data/weaponpaints`) are optional because they are large; tick them only when a release changes them. **3D models** (`assets/3d`, ~200 MB) is optional and only needed for the Skins 3D preview. |
 | Rollback | Restores the code snapshot taken before the last update. |
 
 Your `config/config.php`, uploads, personal themes, backups and all settings are kept on update.
@@ -248,6 +248,10 @@ A page appears only when it is ticked, K4-System is the selected plugin and its 
 | Enable Skins | Off | Players build their WeaponPaints loadout from the panel. |
 | Skins Table Prefix | `wp_` | The part before `player_skins` in the table names. |
 | Check for Updates | — | Downloads the latest item lists and rarity colours now. Also refreshed automatically every week. |
+| Enable 3D preview | Off | The skin editor shows the 3D model with the selected paint, and stickers can be placed and rotated on it. If WebGL2, the model or the paint texture is missing, the normal 2D image is shown. |
+| Custom 3D sources | empty | Optional base URLs, one per line (at most 5). Each one must contain `models/{weapon}.glb` and `textures/{weapon}/{paint}.webp` (or `.png`, with an optional `{paint}_metal` map). Gloves use the defindex instead of the weapon name. |
+
+The 3D files are looked up in this order: local models (`assets/3d/models`, installed with the **3D models** update part), the custom sources, then the public LielXD mirror (MIT). The paint textures are several GB, so they are not part of the update and come from the sources. Sticker placement is approximate; a sticker without a placement stays at the game's default position.
 
 **Chat Logger**
 

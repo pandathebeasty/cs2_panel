@@ -2182,6 +2182,45 @@ input[type=radio]:not(.native-control):disabled {
 .skins-modal-titles { min-width: 0; }
 .skins-modal-weapon { font-size: 11px; color: var(--text-dim); margin: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .skins-modal-paint { font-size: 14px; font-weight: 700; margin: 2px 0 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+/* Optional 3D preview stage + sticker placement */
+.skins-modal { transition: max-width .2s ease; }
+.skins-modal.has-3d { max-width: 640px; }
+.skins-3d {
+    position: relative; height: 280px; margin: 14px 18px 12px; overflow: hidden;
+    border: 1px solid var(--border); border-radius: var(--radius-sm);
+    background: radial-gradient(ellipse at 50% 40%, var(--bg-3), var(--bg) 85%);
+}
+.skins-3d[hidden] { display: none; }
+.skins-3d-canvas { position: absolute; inset: 0; touch-action: none; }
+.skins-3d-canvas canvas { display: block; width: 100% !important; height: 100% !important; outline: none; cursor: grab; }
+.skins-3d-canvas canvas:active { cursor: grabbing; }
+.skins-3d-loader { position: absolute; inset: 0; display: none; align-items: center; justify-content: center; pointer-events: none; }
+.skins-modal.is-3d-loading .skins-3d-loader { display: flex; }
+.skins-3d-loader span {
+    width: 28px; height: 28px; border-radius: 50%;
+    border: 3px solid var(--border); border-top-color: var(--accent);
+    animation: skins3dSpin .8s linear infinite;
+}
+@keyframes skins3dSpin { to { transform: rotate(360deg); } }
+.skins-3d-reset {
+    position: absolute; top: 8px; right: 8px; width: 30px; height: 30px; padding: 0;
+    display: flex; align-items: center; justify-content: center; cursor: pointer;
+    border: 1px solid var(--border); border-radius: var(--radius-sm);
+    background: var(--bg-2); color: var(--text-dim); transition: color .15s, border-color .15s;
+}
+.skins-3d-reset:hover { color: var(--accent); border-color: var(--accent); }
+.skins-modal.is-3d-loading .skins-3d-reset { display: none; }
+.skins-slot.is-active { border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent); }
+.skins-place { margin-top: 12px; display: flex; flex-direction: column; gap: 8px; }
+.skins-place[hidden] { display: none; }
+.skins-place .hint { margin: 0; text-align: center; }
+.skins-place-row { display: flex; align-items: center; gap: 10px; }
+.skins-place-row label { font-size: 12px; font-weight: 700; color: var(--text-dim); margin: 0; }
+.skins-place-row input[type="range"] { flex: 1; min-width: 0; accent-color: var(--accent); }
+.skins-place-row output { width: 42px; text-align: right; font-size: 12px; font-variant-numeric: tabular-nums; color: var(--text-dim); }
+.skins-place-row input:disabled, .skins-place-row button:disabled { opacity: .45; cursor: not-allowed; }
+@media (max-width: 560px) { .skins-3d { height: 220px; margin: 10px 12px; } }
 .skins-modal-body { display: flex; flex-direction: column; gap: 14px; }
 .skins-team-btns { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
 .skins-team-btn {

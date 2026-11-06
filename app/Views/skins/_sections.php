@@ -516,7 +516,9 @@ foreach ($weapons as $defindex => $default) {
     }
 
     $paints = [];
+    $modelName = '';
     foreach (($skins[$defindex] ?? []) as $paintId => $paint) {
+        $modelName = $modelName !== '' ? $modelName : (string) ($paint['weapon_name'] ?? '');
         $equippedTeams = [];
         foreach ($effRows as $tId => $eq) {
             if ($eq['weapon_paint_id'] === $paintId) {
@@ -540,10 +542,12 @@ foreach ($weapons as $defindex => $default) {
             'nametag'   => $firstEq ? (string) ($firstEq['weapon_nametag'] ?? '') : '',
             'stickers'  => $firstEq ? array_values($firstEq['stickers'] ?? []) : [],
             'keychain'  => $firstEq ? ($firstEq['keychain'] ?? ['id' => 0, 'x' => 0, 'y' => 0]) : ['id' => 0, 'x' => 0, 'y' => 0],
+            'lg'        => !empty($paint['legacy']) ? 1 : 0,
         ];
     }
     $weaponCatalog[(string) $defindex] = [
         'display'    => $default['display_name'],
+        'model'      => $modelName,
         'forcedTeam' => $forcedTeam,
         'paints'     => $paints,
     ];
@@ -610,6 +614,8 @@ foreach ($weapons as $defindex => $default) {
                         data-knife-card
                         data-defindex="<?= (int) $knifeDefindex ?>"
                         data-paintid="<?= (int) $paintId ?>"
+                        data-model="<?= View::e((string) ($paint['weapon_name'] ?? $knifeType['weapon_name'])) ?>"
+                        data-legacy="<?= !empty($paint['legacy']) ? '1' : '0' ?>"
                         data-weapon-name="<?= View::e($knifeType['paint_name']) ?>"
                         data-paint-name="<?= View::e(trim((string) $paint['paint_name'])) ?>"
                         data-image="<?= View::e($paint['image_url']) ?>"
@@ -692,6 +698,7 @@ foreach ($weapons as $defindex => $default) {
                         data-glove-card
                         data-defindex="<?= (int) $gloveDefindex ?>"
                         data-paintid="<?= (int) $paintId ?>"
+                        data-model="<?= (int) $gloveDefindex ?>"
                         data-weapon-name="<?= View::e($gloveType['paint_name']) ?>"
                         data-paint-name="<?= View::e(trim((string) $paint['paint_name'])) ?>"
                         data-image="<?= View::e($paint['image_url']) ?>"

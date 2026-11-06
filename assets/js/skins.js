@@ -272,6 +272,7 @@
                 + ' data-wear="' + escapeHtml(String(p.wear)) + '" data-seed="' + escapeHtml(String(p.seed)) + '"'
                 + ' data-stattrak="' + escapeHtml(String(p.stattrak)) + '" data-stattrak-count="' + escapeHtml(String(p.stCount)) + '"'
                 + ' data-nametag="' + escapeHtml(p.nametag) + '" data-team="' + dataTeam + '" data-forced-team="' + forced + '"'
+                + ' data-model="' + escapeHtml(w.model || "") + '" data-legacy="' + (p.lg ? "1" : "0") + '"'
                 + " data-stickers='" + escapeAttr(JSON.stringify(p.stickers || [])) + "' data-keychain='" + escapeAttr(JSON.stringify(p.keychain || { id: 0 })) + "'>"
                 + badges
                 + '<div class="skins-card-img"><img src="' + escapeHtml(p.image) + '" alt="" loading="lazy" decoding="async">' + wear + (isCur ? cardStickerOverlay(p.stickers, p.keychain) : "") + "</div>"
@@ -543,6 +544,7 @@
         setModalTab("skin"); // always start on the Skin tab
 
         modal.classList.add("open");
+        start3d(cfg);
     }
 
                                                                                     
@@ -551,9 +553,10 @@
     var tabBtnKeychain = document.getElementById("skinsTabBtnKeychain");
     var stickerSlotsRow = document.getElementById("skinsStickerSlots");
     var STICKERS = null, KEYCHAINS = null;
-    // In-modal working state: 5 sticker slot ids + keychain id. No positioning —
-    // the game applies each item at its default spot.
+    // In-modal working state: 5 sticker slot ids + keychain id. Sticker
+    // offsets (x, y, rotation) stay 0 = game default unless placed in 3D.
     var slotState = [0, 0, 0, 0, 0];
+    var posState = [0, 0, 0, 0, 0].map(function () { return { x: 0, y: 0, r: 0 }; });
     var kcState = 0;
 
     function stickerCatalog() {
@@ -587,6 +590,7 @@
         var id = slotState[idx] || 0;
         var idIn = slot.querySelector('input[name="stickers[' + idx + ']"]');
         if (idIn) idIn.value = id;
+        writeStickerPos(idx);
         var imgWrap = slot.querySelector(".skins-slot-img");
         var item = id > 0 ? findItem(stickerCatalog(), id) : null;
         if (item && item.image) {
@@ -618,6 +622,8 @@
         for (var i = 0; i < 5; i++) {
             var s = (cfg.stickers || [])[i];
             slotState[i] = (s && typeof s === "object") ? (parseInt(s.id, 10) || 0) : (parseInt(s, 10) || 0);
+            var obj = (s && typeof s === "object") ? s : {};
+            posState[i] = { x: parseFloat(obj.x) || 0, y: parseFloat(obj.y) || 0, r: parseFloat(obj.r) || 0 };
         }
         var kc = cfg.keychain;
         kcState = (kc && typeof kc === "object") ? (parseInt(kc.id, 10) || 0) : (parseInt(kc, 10) || 0);
@@ -629,12 +635,14 @@
                            
     function setModalTab(name) {
         if (!modalTabs) return;
+        currentModalTab = name;
         modalTabs.querySelectorAll(".skins-modal-tab").forEach(function (b) {
             b.classList.toggle("active", b.dataset.mtab === name);
         });
         document.querySelectorAll(".skins-tabpanel").forEach(function (p) {
             p.style.display = p.dataset.mpanel === name ? "" : "none";
         });
+        updatePlacement();
     }
     if (modalTabs) {
         modalTabs.addEventListener("click", function (e) {
@@ -642,6 +650,113 @@
             if (b && b.style.display !== "none") setModalTab(b.dataset.mtab);
         });
     }
+
+    // Optional 3D preview (Settings → Skins). The viewer module is loaded on
+    // first use; any failure (no WebGL2, missing model or paint texture) keeps
+    // the regular 2D image.
+    var CFG3D = window.SKINS_3D || null;
+    var stage3d = document.getElementById("skins3dStage");
+    var canvas3d = document.getElementById("skins3dCanvas");
+    var modalBox = modal ? modal.querySelector(".skins-modal") : null;
+    var placeBar = document.getElementById("skinsPlaceBar");
+    var placeRot = document.getElementById("skinsPlaceRot");
+    var placeRotOut = document.getElementById("skinsPlaceRotOut");
+    var placeReset = document.getElementById("skinsPlaceReset");
+    var currentModalTab = "skin";
+    var viewer = null, viewerPromise = null, view3dOn = false, view3dSeq = 0, activeSticker = -1;
+
+    function writeStickerPos(idx) {
+        var input = modal ? modal.querySelector('input[name="sticker_pos[' + idx + ']"]') : null;
+        var p = posState[idx];
+        if (input) input.value = slotState[idx] > 0 ? (p.x + ";" + p.y + ";" + p.r) : "0;0;0";
+    }
+    function resetStickerPos(idx) { posState[idx] = { x: 0, y: 0, r: 0 }; writeStickerPos(idx); }
+
+    function loadViewer() {
+        if (!viewerPromise) {
+            viewerPromise = import(CFG3D.module).then(function (m) { viewer = m; return m; })
+                .catch(function (err) { viewerPromise = null; if (window.console) console.warn(err); return null; });
+        }
+        return viewerPromise;
+    }
+    function stop3d() {
+        view3dOn = false;
+        activeSticker = -1;
+        if (stage3d) stage3d.hidden = true;
+        if (modalBox) modalBox.classList.remove("has-3d", "is-3d-loading");
+        if (viewer) viewer.hide();
+        updatePlacement();
+    }
+    function start3d(cfg) {
+        stop3d();
+        var seq = ++view3dSeq;
+        if (!CFG3D || !stage3d || !canvas3d || !modalBox || !cfg.model3d || !cfg.paint3d) return;
+        stage3d.hidden = false;
+        modalBox.classList.add("has-3d", "is-3d-loading");
+        loadViewer().then(function (m) {
+            if (!m || seq !== view3dSeq) return false;
+            return m.show(canvas3d, {
+                sources: CFG3D.sources || [], model: cfg.model3d, folder: cfg.folder3d || cfg.model3d,
+                paint: cfg.paint3d, legacy: !!cfg.legacy3d
+            });
+        }).then(function (ok) {
+            if (seq !== view3dSeq) return;
+            if (!ok) { stop3d(); return; }
+            view3dOn = true;
+            modalBox.classList.remove("is-3d-loading");
+            sync3dStickers();
+            updatePlacement();
+        }).catch(function () { if (seq === view3dSeq) stop3d(); });
+    }
+    function sync3dStickers() {
+        if (!view3dOn || !viewer) return;
+        viewer.setStickers(slotState.map(function (id, i) {
+            var item = id > 0 ? findItem(stickerCatalog(), id) : null;
+            return { src: item && item.image ? item.image : "", x: posState[i].x, y: posState[i].y, r: posState[i].r };
+        }));
+    }
+    function onStickerPlaced(idx, x, y) {
+        if (idx < 0 || !slotState[idx]) return;
+        posState[idx].x = x;
+        posState[idx].y = y;
+        writeStickerPos(idx);
+        sync3dStickers();
+        updatePlacement();
+    }
+    function updatePlacement() {
+        var on = view3dOn && currentModalTab === "stickers";
+        if (activeSticker >= 0 && !slotState[activeSticker]) activeSticker = -1;
+        if (placeBar) placeBar.hidden = !on;
+        if (stickerSlotsRow) {
+            stickerSlotsRow.querySelectorAll("[data-sticker-slot]").forEach(function (s) {
+                s.classList.toggle("is-active", on && parseInt(s.dataset.stickerSlot, 10) === activeSticker);
+            });
+        }
+        var a = on ? activeSticker : -1;
+        if (placeRot) {
+            placeRot.disabled = a < 0;
+            placeRot.value = a >= 0 ? posState[a].r : 0;
+        }
+        if (placeRotOut) placeRotOut.textContent = (a >= 0 ? Math.round(posState[a].r) : 0) + "\u00b0";
+        if (placeReset) placeReset.disabled = a < 0 || (!posState[a].x && !posState[a].y && !posState[a].r);
+        if (viewer && view3dOn) viewer.setPlacement(a, onStickerPlaced);
+    }
+    if (placeRot) placeRot.addEventListener("input", function () {
+        if (activeSticker < 0) return;
+        posState[activeSticker].r = parseFloat(placeRot.value) || 0;
+        writeStickerPos(activeSticker);
+        sync3dStickers();
+        if (placeRotOut) placeRotOut.textContent = Math.round(posState[activeSticker].r) + "\u00b0";
+        if (placeReset) placeReset.disabled = false;
+    });
+    if (placeReset) placeReset.addEventListener("click", function () {
+        if (activeSticker < 0) return;
+        resetStickerPos(activeSticker);
+        sync3dStickers();
+        updatePlacement();
+    });
+    var reset3d = document.getElementById("skins3dReset");
+    if (reset3d) reset3d.addEventListener("click", function () { if (viewer) viewer.resetView(); });
 
                                
     var pickerOverlay = document.getElementById("skinsPickerOverlay");
@@ -757,10 +872,14 @@
                 kcState = id; paintKeychainSlot();
             } else if (pickerScope === "all") {
                                                             
-                for (var i = 0; i < 5; i++) { slotState[i] = id; paintStickerSlot(i); }
+                for (var i = 0; i < 5; i++) { slotState[i] = id; resetStickerPos(i); paintStickerSlot(i); }
             } else if (pickerSlotIndex !== null) {
+                if (slotState[pickerSlotIndex] !== id) resetStickerPos(pickerSlotIndex);
                 slotState[pickerSlotIndex] = id; paintStickerSlot(pickerSlotIndex);
+                if (view3dOn && id > 0) activeSticker = pickerSlotIndex;
             }
+            sync3dStickers();
+            updatePlacement();
             closePicker();
         });
     }
@@ -772,13 +891,25 @@
             if (clearS) {
                 e.stopPropagation();
                 var idx = parseInt(clearS.getAttribute("data-sticker-clear"), 10);
-                slotState[idx] = 0; paintStickerSlot(idx);
+                slotState[idx] = 0; resetStickerPos(idx); paintStickerSlot(idx);
+                sync3dStickers(); updatePlacement();
                 return;
             }
             var clearK = e.target.closest("[data-keychain-clear]");
             if (clearK) { e.stopPropagation(); kcState = 0; paintKeychainSlot(); return; }
             var sSlot = e.target.closest("[data-sticker-slot]");
-            if (sSlot) { openPicker("sticker", parseInt(sSlot.dataset.stickerSlot, 10)); return; }
+            if (sSlot) {
+                var si = parseInt(sSlot.dataset.stickerSlot, 10);
+                // With 3D: the first click on a filled slot selects it for placement,
+                // a second click opens the picker.
+                if (view3dOn && slotState[si] > 0 && activeSticker !== si) {
+                    activeSticker = si;
+                    updatePlacement();
+                    return;
+                }
+                openPicker("sticker", si);
+                return;
+            }
             var kSlot = e.target.closest("[data-keychain-slot]");
             if (kSlot) { openPicker("keychain", null); return; }
         });
@@ -788,7 +919,7 @@
         if (e.key === "Escape" && pickerOverlay && pickerOverlay.classList.contains("open")) closePicker();
     });
 
-    function closeModal() { modal.classList.remove("open"); }
+    function closeModal() { view3dSeq++; stop3d(); modal.classList.remove("open"); }
 
     if (modal) {
         // No backdrop-click close — only the × button, Cancel, or Escape close
@@ -827,7 +958,8 @@
                 wear: skinCard.dataset.wear, seed: skinCard.dataset.seed, team: skinCard.dataset.team,
                 hasPaintFields: true, forcedTeam: skinCard.dataset.forcedTeam,
                 stattrak: skinCard.dataset.stattrak, stattrakCount: skinCard.dataset.stattrakCount, nametag: skinCard.dataset.nametag,
-                stickers: stks, keychain: kc
+                stickers: stks, keychain: kc,
+                model3d: skinCard.dataset.model, paint3d: skinCard.dataset.paintid, legacy3d: skinCard.dataset.legacy === "1"
             });
             return;
         }
@@ -838,7 +970,8 @@
                 image: knifeCard.dataset.image, weaponName: knifeCard.dataset.weaponName, paintName: knifeCard.dataset.paintName,
                 forma: kHasPaint ? "knife-" + knifeCard.dataset.defindex + "-" + knifeCard.dataset.paintid : "knife-" + knifeCard.dataset.defindex,
                 wear: knifeCard.dataset.wear, seed: knifeCard.dataset.seed, team: knifeCard.dataset.team,
-                hasPaintFields: kHasPaint, stattrak: knifeCard.dataset.stattrak, stattrakCount: knifeCard.dataset.stattrakCount, nametag: knifeCard.dataset.nametag
+                hasPaintFields: kHasPaint, stattrak: knifeCard.dataset.stattrak, stattrakCount: knifeCard.dataset.stattrakCount, nametag: knifeCard.dataset.nametag,
+                model3d: kHasPaint ? knifeCard.dataset.model : "", paint3d: knifeCard.dataset.paintid, legacy3d: knifeCard.dataset.legacy === "1"
             });
             return;
         }
@@ -849,7 +982,8 @@
                 image: gloveCard.dataset.image, weaponName: gloveCard.dataset.weaponName, paintName: gloveCard.dataset.paintName,
                 forma: gHasPaint ? "glove-" + gloveCard.dataset.defindex + "-" + gloveCard.dataset.paintid : "glove-" + gloveCard.dataset.defindex,
                 wear: gloveCard.dataset.wear, seed: gloveCard.dataset.seed, team: gloveCard.dataset.team,
-                hasPaintFields: gHasPaint, isGlove: true
+                hasPaintFields: gHasPaint, isGlove: true,
+                model3d: gHasPaint ? gloveCard.dataset.model : "", paint3d: gloveCard.dataset.paintid
             });
             return;
         }
@@ -1093,7 +1227,9 @@
                 } else if (tagEl) { tagEl.remove(); }
 
                 try {
-                    target.dataset.stickers = JSON.stringify(slotState.map(function (id) { return { id: id, x: 0, y: 0 }; }));
+                    target.dataset.stickers = JSON.stringify(slotState.map(function (id, i) {
+                        return id > 0 ? { id: id, x: posState[i].x, y: posState[i].y, r: posState[i].r } : { id: 0, x: 0, y: 0, r: 0 };
+                    }));
                     target.dataset.keychain = JSON.stringify({ id: kcState, x: 0, y: 0 });
                     if (wearInput) target.dataset.wear = wearInput.value;
                     if (seedInput) target.dataset.seed = seedInput.value;

@@ -432,23 +432,26 @@ final class WeaponPaintsModel
             : null;
 
         // Stickers (5 slots) + keychain live inline on the skin row when the
-        // columns exist. We only let the player choose the ITEM id; placement
-        // fields (offset/wear/rotation/seed) stay 0 so the game applies them at
-        // the default position — matching how css-bans' simple picker works.
-        //   weapon_sticker_N := "id;schema;x;y;wear;rotation;scale" (0 = empty)
+        // columns exist. x/y = 0 lets the game use the default slot position;
+        // any other value is a free placement picked in the 3D preview.
+        //   weapon_sticker_N := "id;schema;x;y;wear;scale;rotation" (0 = empty)
         //   weapon_keychain  := "id;x;y;z;seed"                     (0 = empty)
         if (self::hasStickerColumns()) {
             $stickerIds = self::sanitizeStickerIds($post['stickers'] ?? []);
+            $stickerPos = is_array($post['sticker_pos'] ?? null) ? $post['sticker_pos'] : [];
             $keychainId = isset($post['keychain']) && ctype_digit((string) $post['keychain']) ? (int) $post['keychain'] : 0;
 
-            // Position fields are left at 0 so the game applies each item at its
-            // DEFAULT position (per the plugin). We only choose the item id.
             $stickerCols = [];
             $stickerVals = [];
             for ($i = 0; $i < self::STICKER_SLOTS; $i++) {
                 $stickerCols[] = '`weapon_sticker_' . $i . '`';
                 $id = $stickerIds[$i] ?? 0;
-                $stickerVals[] = $id > 0 ? ($id . ';0;0;0;0;0;0') : '0;0;0;0;0;0;0';
+                if ($id > 0) {
+                    [$x, $y, $r] = self::stickerPlacement($stickerPos[$i] ?? '');
+                    $stickerVals[] = $id . ';0;' . $x . ';' . $y . ';0;0;' . $r;
+                } else {
+                    $stickerVals[] = '0;0;0;0;0;0;0';
+                }
             }
             $keychainVal = $keychainId > 0 ? ($keychainId . ';0;0;0;0') : '0;0;0;0;0';
 
@@ -493,6 +496,22 @@ final class WeaponPaintsModel
     }
 
     /**
+     * Posted "x;y;rotation" for one sticker slot, clamped and formatted with a
+     * dot decimal separator (the plugin parses with InvariantCulture).
+     * @return array{0:string,1:string,2:string}
+     */
+    private static function stickerPlacement(mixed $raw): array
+    {
+        $p = explode(';', is_string($raw) ? $raw : '');
+        $num = static function (mixed $v, float $min, float $max, int $dp): string {
+            $f = is_numeric($v) ? max($min, min($max, (float) $v)) : 0.0;
+            $s = rtrim(rtrim(number_format($f, $dp, '.', ''), '0'), '.');
+            return $s === '' || $s === '-0' ? '0' : $s;
+        };
+        return [$num($p[0] ?? 0, -1.0, 1.0, 4), $num($p[1] ?? 0, -1.0, 1.0, 4), $num($p[2] ?? 0, -360.0, 360.0, 1)];
+    }
+
+    /**
      * Parse a stored sticker/keychain column value ("id;...") into just its
      * item id (0 when empty/malformed).
      */
@@ -506,14 +525,14 @@ final class WeaponPaintsModel
     }
 
     /**
-     * Parse a sticker column ("id;schema;x;y;...") OR keychain ("id;x;y;z;seed")
-     * into ['id'=>int,'x'=>float,'y'=>float]. For stickers x/y are fields 2,3;
-     * for keychains x/y are fields 1,2. 0/empty => id 0.
-     * @return array{id:int,x:float,y:float}
+     * Parse a sticker column ("id;schema;x;y;wear;scale;rotation") OR keychain
+     * ("id;x;y;z;seed") into ['id','x','y','r']. For stickers x/y are fields 2,3
+     * and rotation is field 6; for keychains x/y are fields 1,2. 0/empty => id 0.
+     * @return array{id:int,x:float,y:float,r:float}
      */
     public static function parseSlot(mixed $value, bool $keychain = false): array
     {
-        $out = ['id' => 0, 'x' => 0.0, 'y' => 0.0];
+        $out = ['id' => 0, 'x' => 0.0, 'y' => 0.0, 'r' => 0.0];
         if ($value === null || $value === '') {
             return $out;
         }
@@ -529,6 +548,7 @@ final class WeaponPaintsModel
         } else {
             $out['x'] = isset($p[2]) && is_numeric($p[2]) ? (float) $p[2] : 0.0;
             $out['y'] = isset($p[3]) && is_numeric($p[3]) ? (float) $p[3] : 0.0;
+            $out['r'] = isset($p[6]) && is_numeric($p[6]) ? (float) $p[6] : 0.0;
         }
         return $out;
     }

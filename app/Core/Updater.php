@@ -185,6 +185,7 @@ final class Updater
         'core'  => 'cs2-panel-core.zip',
         'maps'  => 'cs2-panel-maps.zip',
         'skins' => 'cs2-panel-skins.zip',
+        'models' => 'cs2-panel-models.zip',
     ];
 
                                                                             
@@ -626,7 +627,11 @@ final class Updater
     public const OPTIONAL_PARTS = [
         'maps'  => ['assets/img/maps', 'public/assets/img/maps'],
         'skins' => ['app/Data/weaponpaints'],
+        'models' => ['assets/3d', 'public/assets/3d'],
     ];
+
+    /** Parts shipped only as a release asset (never in the git zipball). */
+    private const ASSET_ONLY_PARTS = ['models'];
 
     /** @param string[] $parts selected optional parts (prepare step only) */
     public static function step(string $id, array $parts = [], bool $reinstall = false): array
@@ -677,6 +682,8 @@ final class Updater
                         foreach ($selectedParts as $part) {
                             if (!empty($assets[$part]['url'])) {
                                 $downloads[$part] = (string) $assets[$part]['url'];
+                            } elseif (in_array($part, self::ASSET_ONLY_PARTS, true)) {
+                                $log[] = 'The release has no ' . self::RELEASE_ASSETS[$part] . '; skipped.';
                             } else {
                                 // A selected part without its own archive: use the full zipball.
                                 $downloads = [];
@@ -1045,7 +1052,7 @@ final class Updater
         if ($zip->open($file, \ZipArchive::CREATE | \ZipArchive::OVERWRITE) !== true) {
             return null;
         }
-        $exclude = ['app/Data/weaponpaints', 'assets/img/maps', 'assets/img/uploads'];
+        $exclude = ['app/Data/weaponpaints', 'assets/img/maps', 'assets/img/uploads', 'assets/3d'];
         foreach (self::codeRoots() as $prefix => $source) {
             if (!is_dir($source)) {
                 continue;

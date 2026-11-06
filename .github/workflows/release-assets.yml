@@ -46,7 +46,7 @@ jobs:
           git archive --format=tar HEAD | tar -x -C "dist/$ROOT"
           cd dist
           zip -qr -9 cs2-panel-core.zip "$ROOT" \
-            -x "$ROOT/assets/img/maps/*" "$ROOT/public/assets/img/maps/*" "$ROOT/app/Data/weaponpaints/*" "$ROOT/.github/*"
+            -x "$ROOT/assets/img/maps/*" "$ROOT/public/assets/img/maps/*" "$ROOT/app/Data/weaponpaints/*" "$ROOT/assets/3d/*" "$ROOT/.github/*"
           maps=""
           for d in "$ROOT/assets/img/maps" "$ROOT/public/assets/img/maps"; do
             if [ -d "$d" ]; then maps="$maps $d"; fi
@@ -54,6 +54,23 @@ jobs:
           if [ -n "$maps" ]; then zip -qr -9 cs2-panel-maps.zip $maps; fi
           if [ -d "$ROOT/app/Data/weaponpaints" ]; then zip -qr -9 cs2-panel-skins.zip "$ROOT/app/Data/weaponpaints"; fi
           ls -lh ./*.zip
+
+      # Optional 3D models for the Skins preview (MIT, LielXD/CS2-WeaponPaints-Website).
+      # Too large for git, so they ship only as a release asset; textures stay on the mirror.
+      - name: Build 3D models archive
+        continue-on-error: true
+        run: |
+          set -euo pipefail
+          ROOT=cs2_panel
+          git clone -q --depth 1 --filter=blob:none --sparse https://github.com/LielXD/CS2-WeaponPaints-Website.git lielxd
+          git -C lielxd sparse-checkout set --no-cone '/src/[[]models]/*' '/LICENSE'
+          mkdir -p "dist/m/$ROOT/assets/3d/models"
+          cp lielxd/src/\[models\]/*.glb "dist/m/$ROOT/assets/3d/models/"
+          cp lielxd/LICENSE "dist/m/$ROOT/assets/3d/LICENSE-models.txt"
+          echo "{\"source\":\"LielXD/CS2-WeaponPaints-Website\",\"commit\":\"$(git -C lielxd rev-parse HEAD)\"}" > "dist/m/$ROOT/assets/3d/manifest.json"
+          (cd dist/m && zip -qr -1 ../cs2-panel-models.zip "$ROOT")
+          rm -rf dist/m lielxd
+          ls -lh dist/cs2-panel-models.zip
 
       - name: Upload to the release
         run: |

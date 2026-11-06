@@ -614,6 +614,13 @@ $L = fn(string $k) => View::e(Lang::t($k));
                     </div>
                     <p class="hint" style="margin-top:6px"><?= $L('settings.skins_rarity_hint') ?></p>
                 </div>
+                <div class="check" style="margin-top:14px"><input type="checkbox" name="wp_3d_enabled" id="wp_3d_en" <?= $s['wp_3d_enabled'] ? 'checked' : '' ?>><label for="wp_3d_en"><?= $L('settings.wp_3d_enable') ?></label></div>
+                <p class="hint" style="margin-top:6px"><?= $L('settings.wp_3d_hint') ?></p>
+                <div class="field" style="margin-top:10px">
+                    <label for="wp_3d_sources"><?= $L('settings.wp_3d_sources') ?></label>
+                    <textarea name="wp_3d_sources" id="wp_3d_sources" rows="2" placeholder="https://cdn.example.com/cs2-3d/"><?= View::e($s['wp_3d_sources']) ?></textarea>
+                    <p class="hint" style="margin-top:6px"><?= $L('settings.wp_3d_sources_hint') ?> <span class="badge <?= $s['wp_3d_local'] ? 'badge-active' : 'badge-expired' ?>"><?= $L($s['wp_3d_local'] ? 'settings.wp_3d_local_yes' : 'settings.wp_3d_local_no') ?></span></p>
+                </div>
                 <?php $extdbBlock('weaponpaints'); ?>
             </div>
 
@@ -2130,6 +2137,10 @@ $L = fn(string $k) => View::e(Lang::t($k));
                 <div class="check" style="margin-top:12px">
                     <input type="checkbox" id="update-part-skins" name="update_parts" value="skins">
                     <label for="update-part-skins"><strong><?= $L('update.part_skins') ?></strong><br><span class="muted"><?= $L('update.part_skins_hint') ?></span></label>
+                </div>
+                <div class="check" style="margin-top:12px">
+                    <input type="checkbox" id="update-part-models" name="update_parts" value="models"<?= !empty($s['wp_3d_enabled']) && empty($s['wp_3d_local']) ? ' checked' : '' ?>>
+                    <label for="update-part-models"><strong><?= $L('update.part_models') ?></strong><br><span class="muted"><?= $L('update.part_models_hint') ?></span></label>
                 </div>
                 <p class="hint" style="margin-top:14px"><?= $L('update.parts_note') ?></p>
             </div>

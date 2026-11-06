@@ -102,6 +102,9 @@ $stickerOverlay = static function (array $stickers, array $keychain) use ($stick
 <script id="stickerData" type="application/json"><?= json_encode($allStickers ?? [], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG | JSON_HEX_AMP) ?></script>
 <script id="keychainData" type="application/json"><?= json_encode($allKeychains ?? [], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG | JSON_HEX_AMP) ?></script>
 <script>window.SKINS_STICKERS_ENABLED = <?= !empty($stickersEnabled) ? 'true' : 'false' ?>;</script>
+<?php $skins3d = \App\Core\Skins3D::clientConfig(); if ($skins3d !== null): ?>
+<script>window.SKINS_3D = <?= json_encode($skins3d, JSON_UNESCAPED_SLASHES | JSON_HEX_TAG | JSON_HEX_AMP) ?>;</script>
+<?php endif; ?>
 
 <script>
 window.SKINS_I18N = {

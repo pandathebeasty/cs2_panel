@@ -743,6 +743,7 @@ final class WeaponPaintsData
                 'weapon_name' => $skin['weapon_name'],
                 'paint_name' => $skin['paint_name'],
                 'image_url' => $skin['image'],
+                'legacy' => !empty($skin['legacy_model']),
                 // Rarity colour straight from rarity_colors.json (not hardcoded).
                 'color' => self::paintColor($paint),
             ];

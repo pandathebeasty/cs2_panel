@@ -25,6 +25,14 @@ use App\Core\View;
                 <button type="button" class="modal-close" id="skinsModalClose">&times;</button>
             </div>
 
+            <div class="skins-3d" id="skins3dStage" hidden>
+                <div class="skins-3d-canvas" id="skins3dCanvas"></div>
+                <div class="skins-3d-loader" aria-hidden="true"><span></span></div>
+                <button type="button" class="skins-3d-reset" id="skins3dReset" title="<?= View::e(Lang::t('skins.view_reset')) ?>" aria-label="<?= View::e(Lang::t('skins.view_reset')) ?>">
+                    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 4v5h5"/></svg>
+                </button>
+            </div>
+
             <!-- Tabs: Skin / Stickers / Keychain. Stickers & Keychain tabs are
                  shown by JS only for weapon skins when the backend supports it. -->
             <div class="skins-modal-tabs" id="skinsModalTabs">
@@ -98,18 +106,28 @@ use App\Core\View;
                     </div>
                     </div><!-- /panel skin -->
 
-                    <!-- Stickers tab: 5 slots. Click a slot to pick a sticker;
-                         it is applied at the default position by the game. -->
+                    <!-- Stickers tab: 5 slots. Click a slot to pick a sticker. With the
+                         3D preview, a selected sticker can be placed on the model. -->
                     <div class="skins-tabpanel" data-mpanel="stickers" style="display:none">
                         <div class="skins-slot-row" id="skinsStickerSlots">
                             <?php for ($i = 0; $i < 5; $i++): ?>
                                 <button type="button" class="skins-slot" data-sticker-slot="<?= $i ?>" title="<?= View::e(Lang::t('skins.slot_n', [$i + 1])) ?>">
                                     <input type="hidden" name="stickers[<?= $i ?>]" value="0">
+                                    <input type="hidden" name="sticker_pos[<?= $i ?>]" value="0;0;0">
                                     <span class="skins-slot-img"></span>
                                     <span class="skins-slot-num"><?= $i + 1 ?></span>
                                     <span class="skins-slot-clear" data-sticker-clear="<?= $i ?>" title="<?= View::e(Lang::t('skins.clear_slot')) ?>">&times;</span>
                                 </button>
                             <?php endfor; ?>
+                        </div>
+                        <div class="skins-place" id="skinsPlaceBar" hidden>
+                            <p class="hint" id="skinsPlaceHint"><?= View::e(Lang::t('skins.place_hint')) ?></p>
+                            <div class="skins-place-row">
+                                <label for="skinsPlaceRot"><?= View::e(Lang::t('skins.rotation')) ?></label>
+                                <input type="range" id="skinsPlaceRot" min="-180" max="180" step="1" value="0">
+                                <output id="skinsPlaceRotOut">0°</output>
+                                <button type="button" class="btn btn-ghost btn-sm" id="skinsPlaceReset"><?= View::e(Lang::t('skins.place_default')) ?></button>
+                            </div>
                         </div>
                     </div>
 
