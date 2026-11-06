@@ -25,6 +25,7 @@ const jsonCache = new Map();
 const charmCache = new Map();
 const kcTexCache = new Map();
 const kcRay = new THREE.Raycaster();
+let surfGrid = null;
 const stickers = Array.from({ length: SLOTS }, () => ({ src: '', x: 0, y: 0, r: 0 }));
 const blank = new THREE.DataTexture(new Uint8Array([0, 0, 0, 0]), 1, 1);
 blank.needsUpdate = true;
@@ -78,6 +79,7 @@ function tick() {
 function disposeModel() {
     removeKeychain();
     modelRoot = null;
+    surfGrid = null;
     if (!pivot) return;
     scene.remove(pivot);
     pivot.traverse((o) => {
@@ -462,29 +464,100 @@ function measureKeychain(k) {
     return k;
 }
 
-// Outermost weapon surface on the sticker side (-Z) at a height, across a width
-function surfaceAt(x, y, half, single) {
+/*
+ * Side height map of the weapon in modelRoot space: per (x, y) cell the outermost
+ * surface on the sticker side (lowest z). Built once per model by rasterizing its
+ * triangles, so charm placement never raycasts the full mesh while dragging.
+ */
+function surfaceGrid() {
+    if (surfGrid && surfGrid.root === modelRoot) return surfGrid;
+    surfGrid = null;
+    if (!modelRoot || !meshes.length) return null;
+    scene.updateMatrixWorld(true);
+    const toRoot = modelRoot.matrixWorld.clone().invert();
+    const shown = meshes.filter(isShown);
+    const box = new THREE.Box3();
+    const parts = shown.map((m) => {
+        const mat = toRoot.clone().multiply(m.matrixWorld);
+        const pos = m.geometry.attributes.position;
+        const pts = new Float32Array(pos.count * 3);
+        const v = new THREE.Vector3();
+        for (let i = 0; i < pos.count; i++) {
+            v.fromBufferAttribute(pos, i).applyMatrix4(mat);
+            pts[i * 3] = v.x; pts[i * 3 + 1] = v.y; pts[i * 3 + 2] = v.z;
+            box.expandByPoint(v);
+        }
+        return { pts, index: m.geometry.index, count: pos.count };
+    });
+    if (box.isEmpty()) return null;
+    const size = box.getSize(new THREE.Vector3());
+    const cell = Math.max(0.04, Math.max(size.x, size.y) / 640);
+    const w = Math.ceil(size.x / cell) + 1, h = Math.ceil(size.y / cell) + 1;
+    const z = new Float32Array(w * h).fill(Infinity);
+    const x0 = box.min.x, y0 = box.min.y;
+    const put = (cx, cy, val) => { const i = cy * w + cx; if (val < z[i]) z[i] = val; };
+    for (const { pts, index, count } of parts) {
+        const tris = index ? index.count / 3 : count / 3;
+        for (let t = 0; t < tris; t++) {
+            const a = (index ? index.getX(t * 3) : t * 3) * 3;
+            const b = (index ? index.getX(t * 3 + 1) : t * 3 + 1) * 3;
+            const c = (index ? index.getX(t * 3 + 2) : t * 3 + 2) * 3;
+            const ax = (pts[a] - x0) / cell, ay = (pts[a + 1] - y0) / cell, az = pts[a + 2];
+            const bx = (pts[b] - x0) / cell, by = (pts[b + 1] - y0) / cell, bz = pts[b + 2];
+            const cx = (pts[c] - x0) / cell, cy = (pts[c + 1] - y0) / cell, cz = pts[c + 2];
+            put(Math.round(ax), Math.round(ay), az);
+            put(Math.round(bx), Math.round(by), bz);
+            put(Math.round(cx), Math.round(cy), cz);
+            const area = (bx - ax) * (cy - ay) - (cx - ax) * (by - ay);
+            if (Math.abs(area) < 1e-9) continue;
+            const minX = Math.max(0, Math.ceil(Math.min(ax, bx, cx))), maxX = Math.min(w - 1, Math.floor(Math.max(ax, bx, cx)));
+            const minY = Math.max(0, Math.ceil(Math.min(ay, by, cy))), maxY = Math.min(h - 1, Math.floor(Math.max(ay, by, cy)));
+            for (let py = minY; py <= maxY; py++) {
+                for (let px = minX; px <= maxX; px++) {
+                    const u = ((bx - px) * (cy - py) - (cx - px) * (by - py)) / area;
+                    const v = ((cx - px) * (ay - py) - (ax - px) * (cy - py)) / area;
+                    const s = 1 - u - v;
+                    if (u < -1e-6 || v < -1e-6 || s < -1e-6) continue;
+                    put(px, py, u * az + v * bz + s * cz);
+                }
+            }
+        }
+    }
+    surfGrid = { root: modelRoot, z, w, h, x0, y0, cell };
+    return surfGrid;
+}
+
+// Outermost weapon surface (lowest z) in a cell and its direct neighbours, or Infinity
+function gridAt(g, x, y) {
+    const cx = Math.round((x - g.x0) / g.cell), cy = Math.round((y - g.y0) / g.cell);
     let outer = Infinity;
-    for (const fx of single ? [0] : [-1, -0.5, 0, 0.5, 1]) {
-        const from = modelRoot.localToWorld(new THREE.Vector3(x + fx * half, y, -100));
-        const to = modelRoot.localToWorld(new THREE.Vector3(x + fx * half, y, 100));
-        kcRay.set(from, to.sub(from).normalize());
-        const hit = kcRay.intersectObjects(meshes, false)[0];
-        if (hit) outer = Math.min(outer, modelRoot.worldToLocal(hit.point.clone()).z);
+    for (let dy = -1; dy <= 1; dy++) {
+        const yy = cy + dy;
+        if (yy < 0 || yy >= g.h) continue;
+        for (let dx = -1; dx <= 1; dx++) {
+            const xx = cx + dx;
+            if (xx >= 0 && xx < g.w) outer = Math.min(outer, g.z[yy * g.w + xx]);
+        }
     }
     return outer;
 }
 
-// The ring sits on the weapon surface; the charm leans out just enough not to sink into the model.
-// Quick mode (while dragging) only seats the ring; the lean is refined once the pointer settles.
-function fitKeychain(k, quick) {
+// Outermost weapon surface on the sticker side (-Z) at a height, across a width
+function surfaceAt(x, y, half) {
+    const g = surfaceGrid();
+    if (!g) return Infinity;
+    let outer = Infinity;
+    for (const fx of [-1, -0.5, 0, 0.5, 1]) outer = Math.min(outer, gridAt(g, x + fx * half, y));
+    return outer;
+}
+
+// The ring sits on the weapon surface; the charm leans out just enough not to sink into the model
+function fitKeychain(k) {
     if (!modelRoot || !meshes.length || !k.hang) return;
     const p = k.group.position;
-    scene.updateMatrixWorld(true);
-    const top = surfaceAt(p.x, p.y, quick ? 0 : 0.15, quick);
+    const top = surfaceAt(p.x, p.y, 0.15);
     const off = Number.isFinite(top) ? Math.min(0, top - p.z) : 0;
     k.swing.position.z = off;
-    if (quick) return;
     const ringZ = p.z + off;
     const surf = k.hang.bands.map((band) => ({ ...band, outer: surfaceAt(p.x, p.y - band.L, k.hang.half) }));
     let lean = 0;
@@ -694,52 +767,64 @@ function roundCoordinate(value) {
     return Math.round(value * 10000) / 10000;
 }
 
+const toRootMatrix = new THREE.Matrix4();
+const localRay = new THREE.Ray();
+
+// Pointer position on the weapon's mount plane, checked against the side height map.
+// Falls back to a mesh raycast only when the view is nearly edge-on to that plane.
 function keychainPositionAt(ev) {
     if (!hasKeychainPlacement()) return null;
     setPointerRay(ev);
-    const hit = ray.intersectObjects(meshes.filter(isShown), false)[0];
-    if (!hit) return null;
-    const local = modelRoot.worldToLocal(hit.point.clone());
-    const pos = { x: roundCoordinate(local.x), y: roundCoordinate(-local.z), z: roundCoordinate(local.y) };
+    const l = kcLimits;
+    const g = surfaceGrid();
+    let x, y, z;
+    toRootMatrix.copy(modelRoot.matrixWorld).invert();
+    localRay.copy(ray.ray).applyMatrix4(toRootMatrix);
+    const d = localRay.direction.normalize();
+    if (g && Math.abs(d.z) > 0.2) {
+        const plane = -(l[2] + l[3]) / 2;
+        const t = (plane - localRay.origin.z) / d.z;
+        if (t <= 0) return null;
+        x = localRay.origin.x + d.x * t;
+        z = localRay.origin.y + d.y * t;
+        const outer = gridAt(g, x, z);
+        if (!Number.isFinite(outer)) return null;
+        y = -outer;
+    } else {
+        const hit = ray.intersectObjects(meshes.filter(isShown), false)[0];
+        if (!hit) return null;
+        const local = modelRoot.worldToLocal(hit.point.clone());
+        x = local.x; y = -local.z; z = local.y;
+    }
+    const pos = { x: roundCoordinate(x), y: roundCoordinate(y), z: roundCoordinate(z) };
     if (!Number.isFinite(pos.x) || !Number.isFinite(pos.y) || !Number.isFinite(pos.z)
-        || pos.x < kcLimits[0] || pos.x > kcLimits[1]
-        || pos.z < kcLimits[4] || pos.z > kcLimits[5]) return null;
+        || pos.x < l[0] || pos.x > l[1]
+        || pos.z < l[4] || pos.z > l[5]) return null;
     // Game Y bounds describe the embedded mount, not the outer weapon hull.
-    pos.y = Math.max(kcLimits[2], Math.min(kcLimits[3], pos.y));
+    pos.y = Math.max(l[2], Math.min(l[3], pos.y));
     return pos;
 }
 
-function hitKeychain(ev) {
+// exact: also make sure the weapon is not in front of the charm (one full raycast, used on press only)
+function hitKeychain(ev, exact) {
     if (!kc) return false;
     setPointerRay(ev);
     const charm = ray.intersectObject(kc.group, true)[0];
+    if (!charm || !exact) return !!charm;
     const weapon = ray.intersectObjects(meshes.filter(isShown), false)[0];
-    return !!charm && (!weapon || charm.distance <= weapon.distance + 0.02);
+    return !weapon || charm.distance <= weapon.distance + 0.02;
 }
 
-let kcFitTimer = 0;
-function settleKeychain(k) {
-    clearTimeout(kcFitTimer);
-    kcFitTimer = setTimeout(() => { if (kc === k) fitKeychain(k); }, 140);
-}
-
-function moveKeychain(ev, quick) {
+function moveKeychain(ev) {
     const pos = keychainPositionAt(ev);
     if (!pos) {
         renderer.domElement.style.cursor = 'not-allowed';
-        if (!quick && kc) { clearTimeout(kcFitTimer); fitKeychain(kc); }
         return;
     }
     const previous = kc.position;
     kc.group.position.copy(keychainLocal(pos));
     kc.position = pos;
-    if (quick) {
-        fitKeychain(kc, true);
-        settleKeychain(kc);
-    } else {
-        clearTimeout(kcFitTimer);
-        fitKeychain(kc);
-    }
+    fitKeychain(kc);
     if (previous) kc.swing.rotation.z = Math.max(-0.6, Math.min(0.6, kc.swing.rotation.z * 0.7 + (pos.x - previous.x) * 0.25));
     renderer.domElement.style.cursor = dragKind === 'keychain' ? 'grabbing' : 'crosshair';
     if (kcPlaceCb) kcPlaceCb(pos.x, pos.y, pos.z);
@@ -771,8 +856,8 @@ function emit(uv) {
 
 function bindPointer(canvas) {
     let moveFrame = 0, lastMove = null, hoverFrame = 0, lastHover = null;
-    const move = (ev, quick) => {
-        if (dragKind === 'keychain') moveKeychain(ev, quick);
+    const move = (ev) => {
+        if (dragKind === 'keychain') moveKeychain(ev);
         else if (dragKind === 'sticker') {
             const uv = hitUv(ev);
             if (uv) emit(uv);
@@ -781,7 +866,7 @@ function bindPointer(canvas) {
     canvas.addEventListener('pointerdown', (ev) => {
         if ((!placing && !kcPlacing) || !pivot || ev.button !== 0 || ev.isPrimary === false) return;
         pointerDown = { id: ev.pointerId, x: ev.clientX, y: ev.clientY, moved: false, kind: kcPlacing ? 'keychain' : 'sticker' };
-        if (kcPlacing && hitKeychain(ev)) {
+        if (kcPlacing && hitKeychain(ev, true)) {
             dragKind = 'keychain';
         } else if (placing) {
             const s = stickers[activeSlot];
@@ -808,7 +893,7 @@ function bindPointer(canvas) {
                 const pointer = pointerDown;
                 moveFrame = requestAnimationFrame(() => {
                     moveFrame = 0;
-                    if (pointerDown === pointer && dragKind) move(lastMove, true);
+                    if (pointerDown === pointer && dragKind) move(lastMove);
                 });
             }
         } else if (kcPlacing && !pointerDown) {
