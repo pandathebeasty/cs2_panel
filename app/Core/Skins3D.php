@@ -9,12 +9,16 @@ namespace App\Core;
  *
  * Models (.glb) and paint textures are looked up in order: the local
  * assets/3d/ folder (installed by the optional "3D models" update part),
- * the custom mirrors from Settings, then the public LielXD mirror (MIT).
+ * the custom mirrors from Settings, then the public FireFOXXCZ mirror (full
+ * texture set, including newer skins) and finally the LielXD mirror (MIT).
  * Each mirror must expose models/{name}.glb and textures/{name}/{paint}.{webp|png}.
  */
 final class Skins3D
 {
-    public const DEFAULT_MIRROR = 'https://raw.githubusercontent.com/LielXD/CS2-WeaponPaints-Website/refs/heads/main/src/';
+    public const DEFAULT_MIRRORS = [
+        'https://raw.githubusercontent.com/FireFOXXCZ/cs2-weaponpaints-website-redesign/main/assets/weapons/',
+        'https://raw.githubusercontent.com/LielXD/CS2-WeaponPaints-Website/refs/heads/main/src/',
+    ];
     private const MAX_SOURCES = 5;
 
     public static function enabled(): bool
@@ -71,7 +75,9 @@ final class Skins3D
         foreach (self::parseSources((string) Settings::get('wp_3d_sources', '')) as $base) {
             $sources[] = ['models' => $base . 'models/', 'textures' => $base . 'textures/'];
         }
-        $sources[] = ['models' => self::DEFAULT_MIRROR . '%5Bmodels%5D/', 'textures' => self::DEFAULT_MIRROR . '%5Btextures%5D/'];
+        foreach (self::DEFAULT_MIRRORS as $mirror) {
+            $sources[] = ['models' => $mirror . '%5Bmodels%5D/', 'textures' => $mirror . '%5Btextures%5D/'];
+        }
 
         $file = PUBLIC_PATH . '/assets/js/skins3d.js';
         $ver = Version::current() . (is_file($file) ? '.' . filemtime($file) : '');
