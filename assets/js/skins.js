@@ -604,6 +604,7 @@
         if (!slot) return;
         var idIn = document.getElementById("skinsKeychainInput");
         if (idIn) idIn.value = kcState || 0;
+        writeKeychainPos();
         var imgWrap = slot.querySelector(".skins-slot-img");
         var item = kcState > 0 ? findItem(keychainCatalog(), kcState) : null;
         if (item && item.image) {
@@ -665,8 +666,10 @@
     var placeRot = document.getElementById("skinsPlaceRot");
     var placeRotOut = document.getElementById("skinsPlaceRotOut");
     var placeReset = document.getElementById("skinsPlaceReset");
+    var keychainPlaceBar = document.getElementById("skinsKeychainPlaceBar");
+    var keychainPlaceReset = document.getElementById("skinsKeychainPlaceReset");
     var currentModalTab = "skin";
-    var viewer = null, viewerPromise = null, view3dOn = false, view3dSeq = 0, activeSticker = -1;
+    var viewer = null, viewerPromise = null, view3dOn = false, view3dSeq = 0, keychainSeq = 0, activeSticker = -1;
 
     function writeStickerPos(idx) {
         var input = modal ? modal.querySelector('input[name="sticker_pos[' + idx + ']"]') : null;
@@ -674,6 +677,10 @@
         if (input) input.value = slotState[idx] > 0 ? (p.x + ";" + p.y + ";" + p.r) : "0;0;0";
     }
     function resetStickerPos(idx) { posState[idx] = { x: 0, y: 0, r: 0 }; writeStickerPos(idx); }
+    function writeKeychainPos() {
+        var input = document.getElementById("skinsKeychainPosInput");
+        if (input) input.value = kcState > 0 ? (kcPos.x + ";" + kcPos.y + ";" + kcPos.z) : "0;0;0";
+    }
 
     function loadViewer() {
         if (!viewerPromise) {
@@ -729,8 +736,24 @@
     function sync3dKeychain() {
         if (!view3dOn || !viewer || !viewer.setKeychain) return;
         var item = kcState > 0 ? findItem(keychainCatalog(), kcState) : null;
+        var seq = view3dSeq, id = kcState, request = ++keychainSeq;
+        viewer.setKeychainPlacement(false, null);
         viewer.setKeychain(item ? { id: kcState, image: item.image || "", x: kcPos.x, y: kcPos.y, z: kcPos.z } : null)
+            .then(function (pos) {
+                if (!view3dOn || seq !== view3dSeq || id !== kcState || request !== keychainSeq) return;
+                if (pos && (kcPos.x || kcPos.y || kcPos.z)) {
+                    kcPos = pos;
+                    writeKeychainPos();
+                }
+                updatePlacement();
+            })
             .catch(function (err) { if (window.console) console.warn(err); });
+    }
+    function onKeychainPlaced(x, y, z) {
+        if (!kcState) return;
+        kcPos = { x: x, y: y, z: z };
+        writeKeychainPos();
+        if (keychainPlaceReset) keychainPlaceReset.disabled = false;
     }
     function sync3dStickers() {
         if (!view3dOn || !viewer) return;
@@ -748,9 +771,14 @@
         updatePlacement();
     }
     function updatePlacement() {
-        var on = view3dOn && viewer && viewer.hasStickerLayout() && currentModalTab === "stickers";
+        var on = view3dOn && !isSaving && viewer && viewer.hasStickerLayout() && currentModalTab === "stickers";
+        var keychainOn = view3dOn && !isSaving && viewer && viewer.hasKeychainPlacement() && kcState > 0 && currentModalTab === "keychain";
         if (activeSticker >= 0 && !slotState[activeSticker]) activeSticker = -1;
         if (placeBar) placeBar.hidden = !on;
+        if (keychainPlaceBar) keychainPlaceBar.hidden = !keychainOn;
+        if (keychainPlaceReset) keychainPlaceReset.disabled = !keychainOn || (!kcPos.x && !kcPos.y && !kcPos.z);
+        var keychainSlot = modal ? modal.querySelector("[data-keychain-slot]") : null;
+        if (keychainSlot) keychainSlot.classList.toggle("is-active", !!keychainOn);
         if (stickerSlotsRow) {
             stickerSlotsRow.querySelectorAll("[data-sticker-slot]").forEach(function (s) {
                 s.classList.toggle("is-active", on && parseInt(s.dataset.stickerSlot, 10) === activeSticker);
@@ -763,7 +791,10 @@
         }
         if (placeRotOut) placeRotOut.textContent = (a >= 0 ? Math.round(posState[a].r) : 0) + "\u00b0";
         if (placeReset) placeReset.disabled = a < 0 || (!posState[a].x && !posState[a].y && !posState[a].r);
-        if (viewer && view3dOn) viewer.setPlacement(a, onStickerPlaced);
+        if (viewer && view3dOn) {
+            viewer.setPlacement(a, onStickerPlaced);
+            viewer.setKeychainPlacement(!!keychainOn, onKeychainPlaced);
+        }
     }
     if (placeRot) placeRot.addEventListener("input", function () {
         if (activeSticker < 0) return;
@@ -777,6 +808,13 @@
         if (activeSticker < 0) return;
         resetStickerPos(activeSticker);
         sync3dStickers();
+        updatePlacement();
+    });
+    if (keychainPlaceReset) keychainPlaceReset.addEventListener("click", function () {
+        if (isSaving) return;
+        kcPos = { x: 0, y: 0, z: 0 };
+        writeKeychainPos();
+        sync3dKeychain();
         updatePlacement();
     });
     var reset3d = document.getElementById("skins3dReset");
@@ -921,7 +959,7 @@
                 return;
             }
             var clearK = e.target.closest("[data-keychain-clear]");
-            if (clearK) { e.stopPropagation(); kcState = 0; kcPos = { x: 0, y: 0, z: 0 }; paintKeychainSlot(); sync3dKeychain(); return; }
+            if (clearK) { e.stopPropagation(); if (isSaving) return; kcState = 0; kcPos = { x: 0, y: 0, z: 0 }; paintKeychainSlot(); sync3dKeychain(); updatePlacement(); return; }
             var sSlot = e.target.closest("[data-sticker-slot]");
             if (sSlot) {
                 var si = parseInt(sSlot.dataset.stickerSlot, 10);
@@ -936,7 +974,7 @@
                 return;
             }
             var kSlot = e.target.closest("[data-keychain-slot]");
-            if (kSlot) { openPicker("keychain", null); return; }
+            if (kSlot) { if (!isSaving) openPicker("keychain", null); return; }
         });
     }
 
@@ -1256,7 +1294,7 @@
                     target.dataset.stickers = JSON.stringify(slotState.map(function (id, i) {
                         return id > 0 ? { id: id, x: posState[i].x, y: posState[i].y, r: posState[i].r } : { id: 0, x: 0, y: 0, r: 0 };
                     }));
-                    target.dataset.keychain = JSON.stringify({ id: kcState, x: 0, y: 0 });
+                    target.dataset.keychain = JSON.stringify({ id: kcState, x: kcPos.x, y: kcPos.y, z: kcPos.z });
                     if (wearInput) target.dataset.wear = wearInput.value;
                     if (seedInput) target.dataset.seed = seedInput.value;
                     target.dataset.stattrak = (stattrakToggle && stattrakToggle.checked) ? "1" : "0";
@@ -1274,19 +1312,25 @@
             if (isSaving) return;
             isSaving = true;
             setSubmitLoading(true);
+            updatePlacement();
 
             var formData = new FormData(configForm);
             formData.set("ajax", "1");
+            var saveError = t("toast_save_failed");
 
             fetch(BASE + "/skins/save", {
                 method: "POST", credentials: "same-origin",
                 headers: { "X-Requested-With": "XMLHttpRequest" },
                 body: formData
             }).then(function (res) {
-                if (!res.ok) throw new Error("Save request failed");
-                return res.json();
+                return res.json().then(function (data) {
+                    if (!res.ok || !data || data.status !== "success") {
+                        if (data && typeof data.message === "string") saveError = data.message;
+                        throw new Error(saveError);
+                    }
+                    return data;
+                });
             }).then(function (data) {
-                if (!data || data.status !== "success") throw new Error("Save failed");
                 // Decide whether a full re-render is actually needed BEFORE the
                 // modal state is cleared. The local patch already reflects the
                 // common case fully; only team-specific equips (T/CT) can split
@@ -1340,9 +1384,10 @@
                 }
             }).catch(function (err) {
                 if (window.console) console.error(err);
-                showToast(t("toast_save_failed"), "error");
+                showToast(saveError, "error");
                 isSaving = false;
                 setSubmitLoading(false);
+                updatePlacement();
             });
         });
     }

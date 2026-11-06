@@ -7,6 +7,7 @@ namespace App\Models;
 use App\Core\Config;
 use App\Core\Database;
 use App\Core\Settings;
+use App\Core\Skins3D;
 use App\Core\WeaponPaintsData;
 
 /**
@@ -225,6 +226,15 @@ final class WeaponPaintsModel
         }
 
         $ex = explode('-', (string) $post['forma']);
+        $keychainId = $post['keychain'] ?? '0';
+        if ((is_string($keychainId) || is_int($keychainId))
+            && ctype_digit((string) $keychainId) && (int) $keychainId > 0 && self::hasStickerColumns()) {
+            $isWeapon = ctype_digit($ex[0] ?? '');
+            $defindex = $isWeapon ? (int) $ex[0] : 0;
+            $paintId = $isWeapon ? (int) ($ex[1] ?? 0) : 0;
+            // Validate before any DELETE/UPDATE, so a rejected position cannot erase the loadout.
+            $post['keychain_pos'] = implode(';', self::keychainPlacement($post['keychain_pos'] ?? '0;0;0', $defindex, $paintId));
+        }
         $team = isset($post['team']) ? (int) $post['team'] : WeaponPaintsData::TEAM_BOTH;
         if (!in_array($team, [WeaponPaintsData::TEAM_BOTH, WeaponPaintsData::TEAM_T, WeaponPaintsData::TEAM_CT], true)) {
             $team = WeaponPaintsData::TEAM_BOTH;
@@ -453,7 +463,7 @@ final class WeaponPaintsModel
                     $stickerVals[] = '0;0;0;0;0;0;0';
                 }
             }
-            $keychainVal = $keychainId > 0 ? ($keychainId . ';0;0;0;0') : '0;0;0;0;0';
+            $keychainVal = $keychainId > 0 ? ($keychainId . ';' . ($post['keychain_pos'] ?? '0;0;0') . ';0') : '0;0;0;0;0';
 
             $cols = '`steamid`, `weapon_defindex`, `weapon_paint_id`, `weapon_wear`, `weapon_seed`, `weapon_team`, `weapon_stattrak`, `weapon_stattrak_count`, `weapon_nametag`, '
                 . implode(', ', $stickerCols) . ', `weapon_keychain`';
@@ -475,6 +485,43 @@ final class WeaponPaintsModel
              VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
             [$steamid, $defindex, $paintId, $wear, $seed, $team, $stattrak, $stattrakCount, $nametag], self::DB
         );
+    }
+
+    /** @return float[] Validated keychain coordinates; all zero keeps the game-default position. */
+    private static function keychainPlacement(mixed $raw, int $defindex, int $paintId): array
+    {
+        if (!is_string($raw)) {
+            throw new \InvalidArgumentException('Invalid keychain position format.');
+        }
+        $parts = explode(';', $raw);
+        if (count($parts) !== 3) {
+            throw new \InvalidArgumentException('A keychain position must have three coordinates.');
+        }
+        $position = [];
+        foreach ($parts as $value) {
+            if (!is_numeric($value) || !is_finite((float) $value)) {
+                throw new \InvalidArgumentException('Keychain coordinates must be finite numbers.');
+            }
+            $position[] = round((float) $value, 4);
+        }
+        if ($position === [0.0, 0.0, 0.0]) {
+            return $position;
+        }
+
+        $skins = WeaponPaintsData::skinsFromJson();
+        if (!isset($skins[$defindex][$paintId])) {
+            throw new \InvalidArgumentException('Keychain placement requires a valid weapon skin.');
+        }
+        $limits = Skins3D::keychainLimits($defindex, !empty($skins[$defindex][$paintId]['legacy']));
+        if ($limits === null) {
+            throw new \InvalidArgumentException('This weapon has no keychain placement limits.');
+        }
+        foreach ($position as $axis => $value) {
+            if ($value < $limits[$axis * 2] || $value > $limits[$axis * 2 + 1]) {
+                throw new \InvalidArgumentException('Keychain position is outside the limits for weapon ' . $defindex);
+            }
+        }
+        return $position;
     }
 
     /**

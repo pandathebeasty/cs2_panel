@@ -38,6 +38,50 @@ final class Skins3D
         return is_dir(self::localDir() . '/models');
     }
 
+    /** @return float[]|null [xmin, xmax, ymin, ymax, zmin, zmax], or null for an unsupported weapon. */
+    public static function keychainLimits(int $defindex, bool $legacy): ?array
+    {
+        static $data = null;
+        if ($data === null) {
+            $file = PUBLIC_PATH . '/assets/js/skins3d-keychains.json';
+            if (!is_readable($file)) {
+                throw new \UnexpectedValueException('Keychain limits file is unavailable.');
+            }
+            $contents = file_get_contents($file);
+            if ($contents === false) {
+                throw new \UnexpectedValueException('Could not read keychain limits.');
+            }
+            $decoded = json_decode($contents, true);
+            if (json_last_error() !== JSON_ERROR_NONE || !is_array($decoded['limits'] ?? null)) {
+                throw new \UnexpectedValueException('Invalid keychain limits data.');
+            }
+            $data = $decoded['limits'];
+        }
+
+        $weapon = $data[$defindex] ?? null;
+        if ($weapon === null) {
+            return null;
+        }
+        if (!is_array($weapon)) {
+            throw new \UnexpectedValueException('Invalid keychain limits for weapon ' . $defindex);
+        }
+        $limits = $legacy && isset($weapon['legacy']) ? $weapon['legacy'] : ($weapon['hd'] ?? null);
+        if (!is_array($limits) || array_keys($limits) !== range(0, 5)) {
+            throw new \UnexpectedValueException('Invalid keychain limits for weapon ' . $defindex);
+        }
+        foreach ($limits as $value) {
+            if ((!is_int($value) && !is_float($value)) || !is_finite((float) $value)) {
+                throw new \UnexpectedValueException('Invalid keychain bounds for weapon ' . $defindex);
+            }
+        }
+        for ($i = 0; $i < 6; $i += 2) {
+            if ($limits[$i] > $limits[$i + 1]) {
+                throw new \UnexpectedValueException('Reversed keychain bounds for weapon ' . $defindex);
+            }
+        }
+        return array_map('floatval', $limits);
+    }
+
     /** Valid http(s) base URLs (one per line or comma separated), each ending in "/". @return string[] */
     public static function parseSources(string $raw): array
     {

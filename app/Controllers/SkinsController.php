@@ -6,6 +6,7 @@ namespace App\Controllers;
 
 use App\Core\Auth;
 use App\Core\Controller;
+use App\Core\Lang;
 use App\Core\WeaponPaintsData;
 use App\Models\WeaponPaintsModel;
 
@@ -140,7 +141,18 @@ final class SkinsController extends Controller
         }
 
         $steamid = (string) (Auth::steamId() ?? '');
-        WeaponPaintsModel::save($_POST, $steamid);
+        try {
+            WeaponPaintsModel::save($_POST, $steamid);
+        } catch (\InvalidArgumentException | \UnexpectedValueException $exception) {
+            error_log('[Skins] Keychain placement rejected: ' . $exception->getMessage());
+            $unavailable = $exception instanceof \UnexpectedValueException;
+            $message = Lang::t($unavailable ? 'skins.keychain_limits_unavailable' : 'skins.keychain_position_invalid');
+            if ($this->isAjax()) {
+                $this->json(['status' => 'error', 'message' => $message], $unavailable ? 503 : 400);
+            }
+            $this->flash('error', $message);
+            $this->redirect('/skins');
+        }
 
         if ($this->isAjax()) {
             $this->json(['status' => 'success']);

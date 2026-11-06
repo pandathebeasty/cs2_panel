@@ -138,9 +138,16 @@ use App\Core\View;
                         <div class="skins-slot-row">
                             <button type="button" class="skins-slot skins-slot-keychain" data-keychain-slot title="<?= View::e(Lang::t('skins.keychain')) ?>">
                                 <input type="hidden" name="keychain" id="skinsKeychainInput" value="0">
+                                <input type="hidden" name="keychain_pos" id="skinsKeychainPosInput" value="0;0;0">
                                 <span class="skins-slot-img"></span>
                                 <span class="skins-slot-clear" data-keychain-clear title="<?= View::e(Lang::t('skins.clear_slot')) ?>">&times;</span>
                             </button>
+                        </div>
+                        <div class="skins-place" id="skinsKeychainPlaceBar" hidden>
+                            <p class="hint"><?= View::e(Lang::t('skins.keychain_place_hint')) ?></p>
+                            <div class="skins-place-row">
+                                <button type="button" class="btn btn-ghost btn-sm" id="skinsKeychainPlaceReset"><?= View::e(Lang::t('skins.place_default')) ?></button>
+                            </div>
                         </div>
                     </div>
                 </div>

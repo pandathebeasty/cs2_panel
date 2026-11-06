@@ -20,6 +20,7 @@ let renderer = null, scene = null, camera = null, controls = null, envTex = null
 let host = null, resizeObs = null, pivot = null, meshes = [], token = 0;
 let home = null, placing = false, activeSlot = -1, placeCb = null;
 let anchors = [], modelRoot = null, kc = null, kcLimits = null, kcSources = [], kcSeq = 0;
+let kcPlacing = false, kcPlaceCb = null, pointerDown = null, dragKind = '';
 const jsonCache = new Map();
 const charmCache = new Map();
 const kcTexCache = new Map();
@@ -121,7 +122,13 @@ async function loadKeychainLimits(defindex, legacy) {
     const data = defindex ? await loadJson('skins3d-keychains.json') : null;
     const l = data && data.limits && data.limits[String(defindex)];
     const v = l && ((legacy && l.legacy) || l.hd);
-    return Array.isArray(v) && v.length === 6 && v.every(Number.isFinite) ? v : null;
+    if (!l) return null;
+    if (!Array.isArray(v) || v.length !== 6 || !v.every(Number.isFinite)
+        || v[0] > v[1] || v[2] > v[3] || v[4] > v[5]) {
+        console.warn('[Skins3D] Invalid keychain limits for weapon ' + defindex);
+        return null;
+    }
+    return v;
 }
 
 async function loadStickerLayout(defindex, legacy) {
@@ -312,6 +319,9 @@ export function hide() {
     placing = false;
     activeSlot = -1;
     placeCb = null;
+    kcPlacing = false;
+    kcPlaceCb = null;
+    finishPointerInteraction();
     anchors = [];
     kcSeq++;
     kcLimits = null;
@@ -551,6 +561,7 @@ function disposeKeychain(k) {
 }
 
 function removeKeychain() {
+    if (dragKind === 'keychain') finishPointerInteraction();
     if (!kc) return;
     if (kc.group.parent) kc.group.parent.remove(kc.group);
     disposeKeychain(kc);
@@ -560,7 +571,7 @@ function removeKeychain() {
 // Damped pendulum: swings sideways and outwards (never into the weapon) and reacts to turning the view
 function stepKeychain() {
     const k = kc;
-    if (!k) return;
+    if (!k || dragKind === 'keychain') return;
     const now = performance.now();
     const dt = Math.min(0.05, (now - (k.last || now)) / 1000);
     k.last = now;
@@ -595,14 +606,16 @@ function stepKeychain() {
 /**
  * item: {id, image, x, y, z} in game keychain coordinates (all zero = the
  * weapon's default spot), or null to remove the charm.
+ * Returns the displayed {x, y, z}, or null when no charm is shown.
  */
 export async function setKeychain(item) {
+    if (dragKind === 'keychain') finishPointerInteraction();
     const my = ++kcSeq;
     const id = item ? parseInt(item.id, 10) || 0 : 0;
-    if (!modelRoot || !id) { removeKeychain(); return; }
-    let pos = { x: +item.x || 0, y: +item.y || 0, z: +item.z || 0 };
+    if (!modelRoot || !id) { removeKeychain(); return null; }
+    let pos = { x: roundCoordinate(+item.x || 0), y: roundCoordinate(+item.y || 0), z: roundCoordinate(+item.z || 0) };
     pos = pos.x || pos.y || pos.z ? clampKeychain(pos) : defaultKeychain();
-    if (!pos) { removeKeychain(); return; }
+    if (!pos) { removeKeychain(); return null; }
 
     const source = id + '|' + (item.image || '');
     if (!kc || kc.source !== source) {
@@ -617,18 +630,31 @@ export async function setKeychain(item) {
             const tex = await charmTexture(item.image);
             if (tex) built = buildKeychainImage(tex);
         }
-        if (my !== kcSeq || !modelRoot) { if (built) disposeKeychain(built); return; }
+        if (my !== kcSeq || !modelRoot) { if (built) disposeKeychain(built); return null; }
         removeKeychain();
-        if (!built) return;
+        if (!built) return null;
         kc = built;
         kc.source = source;
         modelRoot.add(kc.group);
     }
     kc.group.position.copy(keychainLocal(pos));
+    kc.position = pos;
     fitKeychain(kc);
     kc.vz += 6.6;
     kc.vx += 2.75;
     kc.vt += 4.4;
+    return { x: pos.x, y: pos.y, z: pos.z };
+}
+
+export function hasKeychainPlacement() {
+    return !!kc && !!kcLimits && !!modelRoot && meshes.length > 0;
+}
+
+export function setKeychainPlacement(enabled, cb) {
+    kcPlacing = !!enabled && hasKeychainPlacement();
+    if (!kcPlacing && dragKind === 'keychain') finishPointerInteraction();
+    kcPlaceCb = kcPlacing ? cb : null;
+    updatePointerCursor();
 }
 
 export function hasStickerLayout() {
@@ -637,23 +663,85 @@ export function hasStickerLayout() {
 
 /** Enable click/drag placement for one slot; cb(slot, x, y) receives game coordinates. */
 export function setPlacement(slot, cb) {
+    if (slot !== activeSlot && dragKind === 'sticker') finishPointerInteraction();
     activeSlot = slot;
     placing = slot >= 0 && slot < SLOTS && hasStickerLayout();
     placeCb = cb || null;
-    if (renderer) renderer.domElement.style.cursor = placing ? 'crosshair' : '';
+    updatePointerCursor();
 }
 
 const ray = new THREE.Raycaster();
 const ndc = new THREE.Vector2();
-function hitUv(ev) {
+function setPointerRay(ev) {
     const r = renderer.domElement.getBoundingClientRect();
     ndc.set(((ev.clientX - r.left) / r.width) * 2 - 1, -((ev.clientY - r.top) / r.height) * 2 + 1);
+    scene.updateMatrixWorld(true);
     ray.setFromCamera(ndc, camera);
+}
+
+function hitUv(ev) {
+    setPointerRay(ev);
     const hits = ray.intersectObjects(meshes.filter(isShown), false);
     for (const h of hits) {
         if (h.uv1 && h.uv1.x >= 0 && h.uv1.x <= 1 && h.uv1.y >= 0 && h.uv1.y <= 1) return h.uv1;
     }
     return null;
+}
+
+function roundCoordinate(value) {
+    return Math.round(value * 10000) / 10000;
+}
+
+function keychainPositionAt(ev) {
+    if (!hasKeychainPlacement()) return null;
+    setPointerRay(ev);
+    const hit = ray.intersectObjects(meshes.filter(isShown), false)[0];
+    if (!hit) return null;
+    const local = modelRoot.worldToLocal(hit.point.clone());
+    const pos = { x: roundCoordinate(local.x), y: roundCoordinate(-local.z), z: roundCoordinate(local.y) };
+    if (!Number.isFinite(pos.x) || !Number.isFinite(pos.y) || !Number.isFinite(pos.z)
+        || pos.x < kcLimits[0] || pos.x > kcLimits[1]
+        || pos.y < kcLimits[2] || pos.y > kcLimits[3]
+        || pos.z < kcLimits[4] || pos.z > kcLimits[5]) return null;
+    return pos;
+}
+
+function hitKeychain(ev) {
+    if (!kc) return false;
+    setPointerRay(ev);
+    const charm = ray.intersectObject(kc.group, true)[0];
+    const weapon = ray.intersectObjects(meshes.filter(isShown), false)[0];
+    return !!charm && (!weapon || charm.distance <= weapon.distance + 0.02);
+}
+
+function moveKeychain(ev) {
+    const pos = keychainPositionAt(ev);
+    if (!pos) {
+        renderer.domElement.style.cursor = 'not-allowed';
+        return;
+    }
+    const previous = kc.position;
+    kc.group.position.copy(keychainLocal(pos));
+    kc.position = pos;
+    fitKeychain(kc);
+    if (previous) kc.swing.rotation.z = Math.max(-0.6, Math.min(0.6, kc.swing.rotation.z * 0.7 + (pos.x - previous.x) * 0.25));
+    renderer.domElement.style.cursor = dragKind === 'keychain' ? 'grabbing' : 'crosshair';
+    if (kcPlaceCb) kcPlaceCb(pos.x, pos.y, pos.z);
+}
+
+function updatePointerCursor() {
+    if (renderer) renderer.domElement.style.cursor = dragKind ? 'grabbing' : (placing || kcPlacing ? 'crosshair' : '');
+}
+
+function finishPointerInteraction() {
+    const pointer = pointerDown;
+    pointerDown = null;
+    if (dragKind && controls) controls.enabled = true;
+    dragKind = '';
+    if (pointer && renderer && renderer.domElement.hasPointerCapture(pointer.id)) {
+        renderer.domElement.releasePointerCapture(pointer.id);
+    }
+    updatePointerCursor();
 }
 
 function emit(uv) {
@@ -665,34 +753,67 @@ function emit(uv) {
 }
 
 function bindPointer(canvas) {
-    let down = null, dragging = false;
-    canvas.addEventListener('pointerdown', (ev) => {
-        if (!placing || !pivot) return;
-        down = { x: ev.clientX, y: ev.clientY };
-        const s = stickers[activeSlot];
-        const p = s && stickerPlacement(s, activeSlot);
-        const uv = hitUv(ev);
-        if (s && s.src && p && uv && Math.hypot(uv.x - (p.x + 0.5), uv.y - (p.y + 0.5)) < p.size * 0.6) {
-            dragging = true;
-            controls.enabled = false;
-            canvas.setPointerCapture(ev.pointerId);
-        }
-    });
-    canvas.addEventListener('pointermove', (ev) => {
-        if (!dragging) return;
-        const uv = hitUv(ev);
-        if (uv) emit(uv);
-    });
-    const end = (ev) => {
-        if (dragging) {
-            dragging = false;
-            controls.enabled = true;
-        } else if (down && placing && Math.hypot(ev.clientX - down.x, ev.clientY - down.y) < 5) {
+    let moveFrame = 0, lastMove = null;
+    const move = (ev) => {
+        if (dragKind === 'keychain') moveKeychain(ev);
+        else if (dragKind === 'sticker') {
             const uv = hitUv(ev);
             if (uv) emit(uv);
         }
-        down = null;
     };
-    canvas.addEventListener('pointerup', end);
-    canvas.addEventListener('pointercancel', () => { dragging = false; controls.enabled = true; down = null; });
+    canvas.addEventListener('pointerdown', (ev) => {
+        if ((!placing && !kcPlacing) || !pivot || ev.button !== 0 || ev.isPrimary === false) return;
+        pointerDown = { id: ev.pointerId, x: ev.clientX, y: ev.clientY, moved: false, kind: kcPlacing ? 'keychain' : 'sticker' };
+        if (kcPlacing && hitKeychain(ev)) {
+            dragKind = 'keychain';
+        } else if (placing) {
+            const s = stickers[activeSlot];
+            const p = s && stickerPlacement(s, activeSlot);
+            const uv = hitUv(ev);
+            if (s && s.src && p && uv && Math.hypot(uv.x - (p.x + 0.5), uv.y - (p.y + 0.5)) < p.size * 0.6) dragKind = 'sticker';
+        }
+        if (dragKind) {
+            ev.preventDefault();
+            ev.stopImmediatePropagation();
+            controls.enabled = false;
+            canvas.setPointerCapture(ev.pointerId);
+            updatePointerCursor();
+        }
+    }, true);
+    canvas.addEventListener('pointermove', (ev) => {
+        if (pointerDown && pointerDown.id === ev.pointerId && Math.hypot(ev.clientX - pointerDown.x, ev.clientY - pointerDown.y) >= 5) pointerDown.moved = true;
+        if (dragKind && pointerDown && pointerDown.id === ev.pointerId) {
+            ev.preventDefault();
+            ev.stopImmediatePropagation();
+            lastMove = ev;
+            if (!moveFrame) {
+                const pointer = pointerDown;
+                moveFrame = requestAnimationFrame(() => {
+                    moveFrame = 0;
+                    if (pointerDown === pointer && dragKind) move(lastMove);
+                });
+            }
+        } else if (kcPlacing) {
+            canvas.style.cursor = hitKeychain(ev) ? 'grab' : (keychainPositionAt(ev) ? 'crosshair' : 'not-allowed');
+        }
+    }, true);
+    const end = (ev) => {
+        if (!pointerDown || pointerDown.id !== ev.pointerId) return;
+        if (dragKind) {
+            ev.stopImmediatePropagation();
+            move(ev);
+            if (dragKind === 'keychain' && kc) { kc.vz += 4.2; kc.vx += 1.75; kc.last = performance.now(); }
+        } else if (!pointerDown.moved && Math.hypot(ev.clientX - pointerDown.x, ev.clientY - pointerDown.y) < 5) {
+            if (pointerDown.kind === 'keychain' && kcPlacing) moveKeychain(ev);
+            else if (placing) {
+                const uv = hitUv(ev);
+                if (uv) emit(uv);
+            }
+        }
+        finishPointerInteraction();
+    };
+    canvas.addEventListener('pointerup', end, true);
+    canvas.addEventListener('pointercancel', (ev) => { if (pointerDown && pointerDown.id === ev.pointerId) finishPointerInteraction(); }, true);
+    canvas.addEventListener('lostpointercapture', (ev) => { if (pointerDown && pointerDown.id === ev.pointerId) finishPointerInteraction(); });
+    canvas.addEventListener('pointerleave', () => { if (!dragKind) updatePointerCursor(); });
 }
