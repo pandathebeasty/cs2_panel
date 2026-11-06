@@ -463,9 +463,9 @@ function measureKeychain(k) {
 }
 
 // Outermost weapon surface on the sticker side (-Z) at a height, across a width
-function surfaceAt(x, y, half) {
+function surfaceAt(x, y, half, single) {
     let outer = Infinity;
-    for (const fx of [-1, -0.5, 0, 0.5, 1]) {
+    for (const fx of single ? [0] : [-1, -0.5, 0, 0.5, 1]) {
         const from = modelRoot.localToWorld(new THREE.Vector3(x + fx * half, y, -100));
         const to = modelRoot.localToWorld(new THREE.Vector3(x + fx * half, y, 100));
         kcRay.set(from, to.sub(from).normalize());
@@ -475,14 +475,16 @@ function surfaceAt(x, y, half) {
     return outer;
 }
 
-// The ring sits on the weapon surface; the charm leans out just enough not to sink into the model
-function fitKeychain(k) {
+// The ring sits on the weapon surface; the charm leans out just enough not to sink into the model.
+// Quick mode (while dragging) only seats the ring; the lean is refined once the pointer settles.
+function fitKeychain(k, quick) {
     if (!modelRoot || !meshes.length || !k.hang) return;
     const p = k.group.position;
     scene.updateMatrixWorld(true);
-    const top = surfaceAt(p.x, p.y, 0.15);
+    const top = surfaceAt(p.x, p.y, quick ? 0 : 0.15, quick);
     const off = Number.isFinite(top) ? Math.min(0, top - p.z) : 0;
     k.swing.position.z = off;
+    if (quick) return;
     const ringZ = p.z + off;
     const surf = k.hang.bands.map((band) => ({ ...band, outer: surfaceAt(p.x, p.y - band.L, k.hang.half) }));
     let lean = 0;
@@ -561,7 +563,7 @@ function disposeKeychain(k) {
 }
 
 function removeKeychain() {
-    if (dragKind === 'keychain') finishPointerInteraction();
+    if (pointerDown && pointerDown.kind === 'keychain') finishPointerInteraction();
     if (!kc) return;
     if (kc.group.parent) kc.group.parent.remove(kc.group);
     disposeKeychain(kc);
@@ -609,7 +611,7 @@ function stepKeychain() {
  * Returns the displayed {x, y, z}, or null when no charm is shown.
  */
 export async function setKeychain(item) {
-    if (dragKind === 'keychain') finishPointerInteraction();
+    if (pointerDown && pointerDown.kind === 'keychain') finishPointerInteraction();
     const my = ++kcSeq;
     const id = item ? parseInt(item.id, 10) || 0 : 0;
     if (!modelRoot || !id) { removeKeychain(); return null; }
@@ -652,7 +654,7 @@ export function hasKeychainPlacement() {
 
 export function setKeychainPlacement(enabled, cb) {
     kcPlacing = !!enabled && hasKeychainPlacement();
-    if (!kcPlacing && dragKind === 'keychain') finishPointerInteraction();
+    if (!kcPlacing && pointerDown && pointerDown.kind === 'keychain') finishPointerInteraction();
     kcPlaceCb = kcPlacing ? cb : null;
     updatePointerCursor();
 }
@@ -701,8 +703,9 @@ function keychainPositionAt(ev) {
     const pos = { x: roundCoordinate(local.x), y: roundCoordinate(-local.z), z: roundCoordinate(local.y) };
     if (!Number.isFinite(pos.x) || !Number.isFinite(pos.y) || !Number.isFinite(pos.z)
         || pos.x < kcLimits[0] || pos.x > kcLimits[1]
-        || pos.y < kcLimits[2] || pos.y > kcLimits[3]
         || pos.z < kcLimits[4] || pos.z > kcLimits[5]) return null;
+    // Game Y bounds describe the embedded mount, not the outer weapon hull.
+    pos.y = Math.max(kcLimits[2], Math.min(kcLimits[3], pos.y));
     return pos;
 }
 
@@ -714,16 +717,29 @@ function hitKeychain(ev) {
     return !!charm && (!weapon || charm.distance <= weapon.distance + 0.02);
 }
 
-function moveKeychain(ev) {
+let kcFitTimer = 0;
+function settleKeychain(k) {
+    clearTimeout(kcFitTimer);
+    kcFitTimer = setTimeout(() => { if (kc === k) fitKeychain(k); }, 140);
+}
+
+function moveKeychain(ev, quick) {
     const pos = keychainPositionAt(ev);
     if (!pos) {
         renderer.domElement.style.cursor = 'not-allowed';
+        if (!quick && kc) { clearTimeout(kcFitTimer); fitKeychain(kc); }
         return;
     }
     const previous = kc.position;
     kc.group.position.copy(keychainLocal(pos));
     kc.position = pos;
-    fitKeychain(kc);
+    if (quick) {
+        fitKeychain(kc, true);
+        settleKeychain(kc);
+    } else {
+        clearTimeout(kcFitTimer);
+        fitKeychain(kc);
+    }
     if (previous) kc.swing.rotation.z = Math.max(-0.6, Math.min(0.6, kc.swing.rotation.z * 0.7 + (pos.x - previous.x) * 0.25));
     renderer.domElement.style.cursor = dragKind === 'keychain' ? 'grabbing' : 'crosshair';
     if (kcPlaceCb) kcPlaceCb(pos.x, pos.y, pos.z);
@@ -735,10 +751,11 @@ function updatePointerCursor() {
 
 function finishPointerInteraction() {
     const pointer = pointerDown;
+    const wasDragging = !!dragKind;
     pointerDown = null;
-    if (dragKind && controls) controls.enabled = true;
+    if (wasDragging && controls) controls.enabled = true;
     dragKind = '';
-    if (pointer && renderer && renderer.domElement.hasPointerCapture(pointer.id)) {
+    if (wasDragging && pointer && renderer && renderer.domElement.hasPointerCapture(pointer.id)) {
         renderer.domElement.releasePointerCapture(pointer.id);
     }
     updatePointerCursor();
@@ -753,9 +770,9 @@ function emit(uv) {
 }
 
 function bindPointer(canvas) {
-    let moveFrame = 0, lastMove = null;
-    const move = (ev) => {
-        if (dragKind === 'keychain') moveKeychain(ev);
+    let moveFrame = 0, lastMove = null, hoverFrame = 0, lastHover = null;
+    const move = (ev, quick) => {
+        if (dragKind === 'keychain') moveKeychain(ev, quick);
         else if (dragKind === 'sticker') {
             const uv = hitUv(ev);
             if (uv) emit(uv);
@@ -785,23 +802,31 @@ function bindPointer(canvas) {
         if (dragKind && pointerDown && pointerDown.id === ev.pointerId) {
             ev.preventDefault();
             ev.stopImmediatePropagation();
+            if (dragKind === 'keychain' && !pointerDown.moved) return;
             lastMove = ev;
             if (!moveFrame) {
                 const pointer = pointerDown;
                 moveFrame = requestAnimationFrame(() => {
                     moveFrame = 0;
-                    if (pointerDown === pointer && dragKind) move(lastMove);
+                    if (pointerDown === pointer && dragKind) move(lastMove, true);
                 });
             }
-        } else if (kcPlacing) {
-            canvas.style.cursor = hitKeychain(ev) ? 'grab' : (keychainPositionAt(ev) ? 'crosshair' : 'not-allowed');
+        } else if (kcPlacing && !pointerDown) {
+            lastHover = ev;
+            if (!hoverFrame) {
+                hoverFrame = requestAnimationFrame(() => {
+                    hoverFrame = 0;
+                    if (!kcPlacing || dragKind || pointerDown) return;
+                    canvas.style.cursor = hitKeychain(lastHover) ? 'grab' : (keychainPositionAt(lastHover) ? 'crosshair' : 'not-allowed');
+                });
+            }
         }
     }, true);
     const end = (ev) => {
         if (!pointerDown || pointerDown.id !== ev.pointerId) return;
         if (dragKind) {
             ev.stopImmediatePropagation();
-            move(ev);
+            if (pointerDown.moved || dragKind === 'sticker') move(ev);
             if (dragKind === 'keychain' && kc) { kc.vz += 4.2; kc.vx += 1.75; kc.last = performance.now(); }
         } else if (!pointerDown.moved && Math.hypot(ev.clientX - pointerDown.x, ev.clientY - pointerDown.y) < 5) {
             if (pointerDown.kind === 'keychain' && kcPlacing) moveKeychain(ev);

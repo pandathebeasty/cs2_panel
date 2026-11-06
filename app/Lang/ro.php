@@ -1382,7 +1382,7 @@ return [
     'settings.wp_prefix'          => 'Prefix Tabele Skinuri',
     'settings.wp_prefix_hint'     => 'Prefixul tabelelor WeaponPaints (partea dinaintea player_skins). Implicit wp_.',
     'settings.wp_3d_enable' => 'Activează previzualizarea 3D în editorul de skinuri',
-    'settings.wp_3d_hint' => 'Afișează skinul în 3D și permite poziționarea stickerelor și a brelocului în limitele armei. Fără model sau WebGL2 se folosește imaginea 2D; fără textură rămâne modelul 3D simplu.',
+    'settings.wp_3d_hint' => 'Afișează skinul în 3D, permite poziționarea stickerelor și limitează montarea brelocului la zona permisă a armei. Fără model sau WebGL2 se folosește imaginea 2D; fără textură rămâne modelul 3D simplu.',
     'settings.wp_3d_sources' => 'Surse 3D personalizate (opțional)',
     'settings.wp_3d_sources_hint' => 'Un URL pe linie, care conține models/ și textures/. Ordine: modele locale, aceste URL-uri, mirror public.',
     'settings.wp_3d_local_yes' => 'Modele locale instalate',

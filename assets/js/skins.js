@@ -669,7 +669,7 @@
     var keychainPlaceBar = document.getElementById("skinsKeychainPlaceBar");
     var keychainPlaceReset = document.getElementById("skinsKeychainPlaceReset");
     var currentModalTab = "skin";
-    var viewer = null, viewerPromise = null, view3dOn = false, view3dSeq = 0, keychainSeq = 0, activeSticker = -1;
+    var viewer = null, viewerPromise = null, view3dOn = false, view3dSeq = 0, keychainSeq = 0, keychainReady = false, activeSticker = -1;
 
     function writeStickerPos(idx) {
         var input = modal ? modal.querySelector('input[name="sticker_pos[' + idx + ']"]') : null;
@@ -691,6 +691,7 @@
     }
     function stop3d() {
         view3dOn = false;
+        keychainReady = false;
         activeSticker = -1;
         if (stage3d) stage3d.hidden = true;
         if (modalBox) modalBox.classList.remove("has-3d", "is-3d-loading", "is-3d-2d", "is-3d-notex");
@@ -737,10 +738,13 @@
         if (!view3dOn || !viewer || !viewer.setKeychain) return;
         var item = kcState > 0 ? findItem(keychainCatalog(), kcState) : null;
         var seq = view3dSeq, id = kcState, request = ++keychainSeq;
+        keychainReady = false;
         viewer.setKeychainPlacement(false, null);
+        updatePlacement();
         viewer.setKeychain(item ? { id: kcState, image: item.image || "", x: kcPos.x, y: kcPos.y, z: kcPos.z } : null)
             .then(function (pos) {
                 if (!view3dOn || seq !== view3dSeq || id !== kcState || request !== keychainSeq) return;
+                keychainReady = !!pos;
                 if (pos && (kcPos.x || kcPos.y || kcPos.z)) {
                     kcPos = pos;
                     writeKeychainPos();
@@ -772,7 +776,7 @@
     }
     function updatePlacement() {
         var on = view3dOn && !isSaving && viewer && viewer.hasStickerLayout() && currentModalTab === "stickers";
-        var keychainOn = view3dOn && !isSaving && viewer && viewer.hasKeychainPlacement() && kcState > 0 && currentModalTab === "keychain";
+        var keychainOn = view3dOn && keychainReady && !isSaving && viewer && viewer.hasKeychainPlacement() && kcState > 0 && currentModalTab === "keychain";
         if (activeSticker >= 0 && !slotState[activeSticker]) activeSticker = -1;
         if (placeBar) placeBar.hidden = !on;
         if (keychainPlaceBar) keychainPlaceBar.hidden = !keychainOn;

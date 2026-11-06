@@ -1402,7 +1402,7 @@ return [
     'settings.wp_prefix'          => 'Skins Table Prefix',
     'settings.wp_prefix_hint'     => 'The WeaponPaints table prefix (the part before player_skins). Default wp_.',
     'settings.wp_3d_enable' => 'Enable 3D preview in the Skins editor',
-    'settings.wp_3d_hint' => 'Shows the selected skin in 3D and allows sticker and keychain placement within the weapon limits. Missing models or WebGL2 use the 2D image; missing textures leave the plain 3D model.',
+    'settings.wp_3d_hint' => 'Shows the selected skin in 3D with sticker placement and bounded keychain placement. Missing models or WebGL2 use the 2D image; missing textures leave the plain 3D model.',
     'settings.wp_3d_sources' => 'Custom 3D sources (optional)',
     'settings.wp_3d_sources_hint' => 'One URL per line, containing models/ and textures/. Order: local models, these URLs, public mirror.',
     'settings.wp_3d_local_yes' => 'Local models installed',

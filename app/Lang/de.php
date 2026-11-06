@@ -1383,7 +1383,7 @@ return [
     'settings.wp_prefix'          => 'Skins-Tabellenpraefix',
     'settings.wp_prefix_hint'     => 'Das WeaponPaints-Tabellenpraefix (der Teil vor player_skins). Standard wp_.',
     'settings.wp_3d_enable' => '3D-Vorschau im Skin-Editor aktivieren',
-    'settings.wp_3d_hint' => 'Zeigt den Skin in 3D und erlaubt das Platzieren von Stickern und Anhängern innerhalb der Waffengrenzen. Ohne Modell oder WebGL2 wird das 2D-Bild verwendet; ohne Textur bleibt das schlichte 3D-Modell.',
+    'settings.wp_3d_hint' => 'Zeigt den Skin in 3D, erlaubt das Platzieren von Stickern und begrenzt Anhänger auf den erlaubten Waffenbereich. Ohne Modell oder WebGL2 wird das 2D-Bild verwendet; ohne Textur bleibt das schlichte 3D-Modell.',
     'settings.wp_3d_sources' => 'Eigene 3D-Quellen (optional)',
     'settings.wp_3d_sources_hint' => 'Eine URL pro Zeile mit models/ und textures/. Reihenfolge: lokale Modelle, diese URLs, öffentlicher Mirror.',
     'settings.wp_3d_local_yes' => 'Lokale Modelle installiert',
