@@ -526,9 +526,9 @@ final class WeaponPaintsModel
 
     /**
      * Parse a sticker column ("id;schema;x;y;wear;scale;rotation") OR keychain
-     * ("id;x;y;z;seed") into ['id','x','y','r']. For stickers x/y are fields 2,3
-     * and rotation is field 6; for keychains x/y are fields 1,2. 0/empty => id 0.
-     * @return array{id:int,x:float,y:float,r:float}
+     * ("id;x;y;z;seed") into ['id','x','y','r'] (+ 'z' for keychains). For stickers x/y are fields 2,3
+     * and rotation is field 6; for keychains x/y/z are fields 1,2,3. 0/empty => id 0.
+     * @return array{id:int,x:float,y:float,r:float,z?:float}
      */
     public static function parseSlot(mixed $value, bool $keychain = false): array
     {
@@ -545,6 +545,7 @@ final class WeaponPaintsModel
         if ($keychain) {
             $out['x'] = isset($p[1]) && is_numeric($p[1]) ? (float) $p[1] : 0.0;
             $out['y'] = isset($p[2]) && is_numeric($p[2]) ? (float) $p[2] : 0.0;
+            $out['z'] = isset($p[3]) && is_numeric($p[3]) ? (float) $p[3] : 0.0;
         } else {
             $out['x'] = isset($p[2]) && is_numeric($p[2]) ? (float) $p[2] : 0.0;
             $out['y'] = isset($p[3]) && is_numeric($p[3]) ? (float) $p[3] : 0.0;

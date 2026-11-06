@@ -67,9 +67,14 @@ jobs:
           mkdir -p "dist/m/$ROOT/assets/3d/models"
           cp lielxd/src/\[models\]/*.glb "dist/m/$ROOT/assets/3d/models/"
           cp lielxd/LICENSE "dist/m/$ROOT/assets/3d/LICENSE-models.txt"
+          # Charm models for the 3D preview (FireFOXXCZ/cs2-weaponpaints-website-redesign)
+          git clone -q --depth 1 --filter=blob:none --sparse https://github.com/FireFOXXCZ/cs2-weaponpaints-website-redesign.git ffx
+          git -C ffx sparse-checkout set --no-cone '/assets/3d/keychains/*'
+          mkdir -p "dist/m/$ROOT/assets/3d/keychains"
+          cp ffx/assets/3d/keychains/*.glb "dist/m/$ROOT/assets/3d/keychains/"
           echo "{\"source\":\"LielXD/CS2-WeaponPaints-Website\",\"commit\":\"$(git -C lielxd rev-parse HEAD)\"}" > "dist/m/$ROOT/assets/3d/manifest.json"
           (cd dist/m && zip -qr -1 ../cs2-panel-models.zip "$ROOT")
-          rm -rf dist/m lielxd
+          rm -rf dist/m lielxd ffx
           ls -lh dist/cs2-panel-models.zip
 
       - name: Upload to the release

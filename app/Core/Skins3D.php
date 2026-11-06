@@ -19,6 +19,8 @@ final class Skins3D
         'https://raw.githubusercontent.com/FireFOXXCZ/cs2-weaponpaints-website-redesign/main/assets/weapons/',
         'https://raw.githubusercontent.com/LielXD/CS2-WeaponPaints-Website/refs/heads/main/src/',
     ];
+    /** Charm models (keychains/{file}.glb), used after the local and custom copies. */
+    public const KEYCHAIN_MIRROR = 'https://raw.githubusercontent.com/FireFOXXCZ/cs2-weaponpaints-website-redesign/main/assets/3d/keychains/';
     private const MAX_SOURCES = 5;
 
     public static function enabled(): bool
@@ -58,7 +60,7 @@ final class Skins3D
 
     /**
      * Client config for skins3d.js; null when the preview is disabled.
-     * @return array{module:string, sources:array<int,array{models:string, textures:?string}>}|null
+     * @return array{module:string, sources:array<int,array{models:string, textures:?string}>, keychains:string[]}|null
      */
     public static function clientConfig(): ?array
     {
@@ -79,11 +81,21 @@ final class Skins3D
             $sources[] = ['models' => $mirror . '%5Bmodels%5D/', 'textures' => $mirror . '%5Btextures%5D/'];
         }
 
+        $keychains = [];
+        if (is_dir(self::localDir() . '/keychains')) {
+            $keychains[] = Url::to('/assets/3d/keychains/');
+        }
+        foreach (self::parseSources((string) Settings::get('wp_3d_sources', '')) as $base) {
+            $keychains[] = $base . 'keychains/';
+        }
+        $keychains[] = self::KEYCHAIN_MIRROR;
+
         $file = PUBLIC_PATH . '/assets/js/skins3d.js';
         $ver = Version::current() . (is_file($file) ? '.' . filemtime($file) : '');
         return [
-            'module'  => Url::to('/assets/js/skins3d.js') . '?v=' . rawurlencode($ver),
-            'sources' => $sources,
+            'module'    => Url::to('/assets/js/skins3d.js') . '?v=' . rawurlencode($ver),
+            'sources'   => $sources,
+            'keychains' => $keychains,
         ];
     }
 }

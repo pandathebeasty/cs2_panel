@@ -3,6 +3,7 @@
  * in Settings). Renders the weapon model with the selected paint texture and
  * draws placed stickers through the model's second UV set, where the
  * WeaponPaints free offsets are relative to the weapon's first sticker slot.
+ * A saved charm hangs from its game position (or the weapon's default spot).
  * Missing models or WebGL2 keep the 2D image; missing paint textures leave
  * the base 3D model available for sticker placement.
  */
@@ -18,7 +19,11 @@ const SKIP_MATERIALS = /bare_arm|scope|glass|lens/i;
 let renderer = null, scene = null, camera = null, controls = null, envTex = null;
 let host = null, resizeObs = null, pivot = null, meshes = [], token = 0;
 let home = null, placing = false, activeSlot = -1, placeCb = null;
-let anchors = [], layoutPromise = null;
+let anchors = [], modelRoot = null, kc = null, kcLimits = null, kcSources = [], kcSeq = 0;
+const jsonCache = new Map();
+const charmCache = new Map();
+const kcTexCache = new Map();
+const kcRay = new THREE.Raycaster();
 const stickers = Array.from({ length: SLOTS }, () => ({ src: '', x: 0, y: 0, r: 0 }));
 const blank = new THREE.DataTexture(new Uint8Array([0, 0, 0, 0]), 1, 1);
 blank.needsUpdate = true;
@@ -65,10 +70,13 @@ function resize() {
 
 function tick() {
     controls.update();
+    stepKeychain();
     renderer.render(scene, camera);
 }
 
 function disposeModel() {
+    removeKeychain();
+    modelRoot = null;
     if (!pivot) return;
     scene.remove(pivot);
     pivot.traverse((o) => {
@@ -92,21 +100,33 @@ async function firstOk(urls, load, label) {
     return null;
 }
 
-async function loadStickerLayout(defindex, legacy) {
-    if (!defindex) return [];
-    if (!layoutPromise) {
-        const url = new URL('./skins3d-sticker-layouts.json', import.meta.url);
+function loadJson(name) {
+    if (!jsonCache.has(name)) {
+        const url = new URL('./' + name, import.meta.url);
         url.search = new URL(import.meta.url).search;
-        layoutPromise = fetch(url).then((response) => {
-            if (!response.ok) throw new Error('Sticker layout request failed: ' + response.status);
+        jsonCache.set(name, fetch(url).then((response) => {
+            if (!response.ok) throw new Error(name + ' request failed: ' + response.status);
             return response.json();
         }).catch((error) => {
-            layoutPromise = null;
-            console.warn('[Skins3D] Sticker layouts unavailable.', error);
+            jsonCache.delete(name);
+            console.warn('[Skins3D] ' + name + ' unavailable.', error);
             return null;
-        });
+        }));
     }
-    const data = await layoutPromise;
+    return jsonCache.get(name);
+}
+
+/** Game keychain limits [xmin, xmax, ymin, ymax, zmin, zmax] for the weapon, or null. */
+async function loadKeychainLimits(defindex, legacy) {
+    const data = defindex ? await loadJson('skins3d-keychains.json') : null;
+    const l = data && data.limits && data.limits[String(defindex)];
+    const v = l && ((legacy && l.legacy) || l.hd);
+    return Array.isArray(v) && v.length === 6 && v.every(Number.isFinite) ? v : null;
+}
+
+async function loadStickerLayout(defindex, legacy) {
+    if (!defindex) return [];
+    const data = await loadJson('skins3d-sticker-layouts.json');
     if (!data) return [];
     const all = data[String(defindex)] || [];
     if (!Array.isArray(all)) {
@@ -199,6 +219,7 @@ function prepareModel(gltf, legacy) {
     meshes.forEach((m) => box.expandByObject(m));
     const center = box.getCenter(new THREE.Vector3());
     root.position.sub(center);
+    modelRoot = root;
     pivot = new THREE.Group();
     pivot.add(root);
     pivot.rotation.y = Math.PI;
@@ -212,17 +233,18 @@ function isShown(o) {
 }
 
 function frame(size) {
-    const radius = Math.max(size.x, size.y, size.z) / 2;
-    const fit = radius / Math.tan(THREE.MathUtils.degToRad(camera.fov / 2));
-    const dist = fit * (camera.aspect < 1.4 ? 1.35 / Math.max(0.6, camera.aspect / 1.4) : 1.15);
-    home = new THREE.Vector3(0, radius * 0.18, dist);
+    // Fit the side view to the stage: the weapon's length to the width, its height to the height
+    const tanV = Math.tan(THREE.MathUtils.degToRad(camera.fov / 2));
+    const fit = Math.max((size.y / 2) / tanV, (size.x / 2) / (tanV * camera.aspect));
+    const dist = fit * 1.12 + size.z / 2;
+    home = new THREE.Vector3(0, size.y * 0.12, dist);
     camera.position.copy(home);
     camera.near = dist / 100;
     camera.far = dist * 20;
     camera.updateProjectionMatrix();
     controls.target.set(0, 0, 0);
     controls.minDistance = dist * 0.35;
-    controls.maxDistance = dist * 2.2;
+    controls.maxDistance = dist * 2.8;
     controls.update();
 }
 
@@ -256,21 +278,25 @@ export async function show(el, spec) {
     }
     resize();
     disposeModel();
+    kcSeq++;
     renderer.setAnimationLoop(null);
     renderer.domElement.style.visibility = 'hidden';
 
     const sources = spec.sources || [];
     const modelUrls = sources.map((s) => s.models + encodeURIComponent(spec.model) + '.glb');
     const paint = String(spec.paint || '0');
-    const [gltf, tex, layout] = await Promise.all([
+    const [gltf, tex, layout, limits] = await Promise.all([
         firstOk(modelUrls, (u) => gltfLoader.loadAsync(u), 'model ' + spec.model),
         paint !== '0' ? loadPaint(sources, spec.folder || spec.model, paint) : Promise.resolve(null),
         loadStickerLayout(spec.defindex, !!spec.legacy),
+        loadKeychainLimits(spec.defindex, !!spec.legacy),
     ]);
     if (my !== token) return false;
     if (!gltf) return false;
 
     anchors = layout;
+    kcLimits = limits;
+    kcSources = Array.isArray(spec.keychains) ? spec.keychains : [];
     const size = prepareModel(gltf, !!spec.legacy);
     if (tex) applyPaint(tex);
     frame(size);
@@ -286,6 +312,8 @@ export function hide() {
     activeSlot = -1;
     placeCb = null;
     anchors = [];
+    kcSeq++;
+    kcLimits = null;
     setStickers([]);
     if (controls) controls.enabled = true;
     if (renderer) renderer.setAnimationLoop(null);
@@ -344,6 +372,262 @@ export function setStickers(list) {
         Object.assign(stickers[i], { src: s.src || '', x, y, r: +s.r || 0 });
     }
     syncUniforms();
+}
+
+/*
+ * Charms. Game keychain coordinates (inches; X forward, Y left, Z up) are the
+ * weapon model's own space, held by the glTF scene as (X, Z, -Y). The charm's
+ * own model (meters) comes from the keychain sources; without one its picture
+ * hangs on a ring.
+ */
+function keychainLocal(p) {
+    return new THREE.Vector3(p.x, p.z, -p.y);
+}
+
+function clampKeychain(p) {
+    const l = kcLimits;
+    if (!l) return p;
+    p.x = Math.max(l[0], Math.min(l[1], p.x));
+    p.y = Math.max(l[2], Math.min(l[3], p.y));
+    p.z = Math.max(l[4], Math.min(l[5], p.z));
+    return p;
+}
+
+// A spot on the sticker side of the weapon inside the game limits
+function defaultKeychain() {
+    const l = kcLimits;
+    if (!modelRoot || !l) return null;
+    scene.updateMatrixWorld(true);
+    for (const fz of [0.7, 0.55, 0.85, 0.4]) {
+        for (const fx of [0.5, 0.42, 0.58, 0.34, 0.66, 0.26, 0.74]) {
+            const x = l[0] + fx * (l[1] - l[0]);
+            const z = l[4] + fz * (l[5] - l[4]);
+            const from = modelRoot.localToWorld(new THREE.Vector3(x, z, -100));
+            const to = modelRoot.localToWorld(new THREE.Vector3(x, z, 0));
+            kcRay.set(from, to.sub(from).normalize());
+            const hit = kcRay.intersectObjects(meshes, false)[0];
+            if (!hit) continue;
+            const y = -modelRoot.worldToLocal(hit.point.clone()).z;
+            if (y < l[2] - 0.5 || y > l[3] + 0.5) continue;
+            return clampKeychain({ x, y, z });
+        }
+    }
+    return clampKeychain({ x: (l[0] + l[1]) / 2, y: l[3], z: (l[4] + l[5]) / 2 });
+}
+
+function keychainFrame() {
+    const group = new THREE.Group();
+    const swing = new THREE.Group();
+    group.add(swing);
+    const metal = new THREE.MeshStandardMaterial({ color: 0xc9ccd2, metalness: 1, roughness: 0.28 });
+    return { group, swing, metal, vz: 0, vx: 0, vt: 0, t: 0, rest: 0 };
+}
+
+// Reach of the hanging part: how far down and sideways, and its back face per height band
+function measureKeychain(k) {
+    k.swing.updateMatrixWorld(true);
+    const b = new THREE.Box3().setFromObject(k.swing);
+    const down = Math.max(0.5, -b.min.y);
+    const BANDS = 6;
+    const back = new Array(BANDS).fill(-Infinity);
+    const v = new THREE.Vector3();
+    k.swing.traverse((child) => {
+        if (!child.isMesh || !child.geometry || !child.geometry.attributes.position) return;
+        const pos = child.geometry.attributes.position;
+        const step = Math.max(1, Math.floor(pos.count / 4000));
+        for (let i = 0; i < pos.count; i += step) {
+            v.fromBufferAttribute(pos, i).applyMatrix4(child.matrixWorld);
+            const f = -v.y / down;
+            if (f < 0.3 || f > 1.001) continue;
+            const band = Math.min(BANDS - 1, Math.floor(f * BANDS));
+            back[band] = Math.max(back[band], v.z);
+        }
+    });
+    k.hang = {
+        down,
+        half: Math.max(0.2, Math.abs(b.min.x), Math.abs(b.max.x)),
+        bands: back.map((z, i) => (Number.isFinite(z) ? { L: ((i + 0.5) / BANDS) * down, z } : null)).filter(Boolean),
+    };
+    return k;
+}
+
+// Outermost weapon surface on the sticker side (-Z) at a height, across a width
+function surfaceAt(x, y, half) {
+    let outer = Infinity;
+    for (const fx of [-1, -0.5, 0, 0.5, 1]) {
+        const from = modelRoot.localToWorld(new THREE.Vector3(x + fx * half, y, -100));
+        const to = modelRoot.localToWorld(new THREE.Vector3(x + fx * half, y, 100));
+        kcRay.set(from, to.sub(from).normalize());
+        const hit = kcRay.intersectObjects(meshes, false)[0];
+        if (hit) outer = Math.min(outer, modelRoot.worldToLocal(hit.point.clone()).z);
+    }
+    return outer;
+}
+
+// The ring sits on the weapon surface; the charm leans out just enough not to sink into the model
+function fitKeychain(k) {
+    if (!modelRoot || !meshes.length || !k.hang) return;
+    const p = k.group.position;
+    scene.updateMatrixWorld(true);
+    const top = surfaceAt(p.x, p.y, 0.15);
+    const off = Number.isFinite(top) ? Math.min(0, top - p.z) : 0;
+    k.swing.position.z = off;
+    const ringZ = p.z + off;
+    const surf = k.hang.bands.map((band) => ({ ...band, outer: surfaceAt(p.x, p.y - band.L, k.hang.half) }));
+    let lean = 0;
+    for (let a = 0; a <= 0.9; a += 0.015) {
+        lean = a;
+        if (surf.every((s) => !Number.isFinite(s.outer) || ringZ + s.z * Math.cos(a) - s.L * Math.sin(a) <= s.outer - 0.02)) break;
+    }
+    k.rest = lean;
+    if (k.swing.rotation.x < k.rest) k.swing.rotation.x = k.rest;
+}
+
+function buildKeychainImage(texture) {
+    const k = keychainFrame();
+    const { swing, metal } = k;
+    swing.add(new THREE.Mesh(new THREE.TorusGeometry(0.16, 0.035, 8, 24), metal));
+    for (let i = 0; i < 3; i++) {
+        const link = new THREE.Mesh(new THREE.TorusGeometry(0.085, 0.022, 6, 16), metal);
+        link.position.y = -0.22 - i * 0.14;
+        if (i % 2) link.rotation.y = Math.PI / 2;
+        swing.add(link);
+    }
+    const h = 1.3;
+    const w = h * ((texture.image && texture.image.width || 1) / (texture.image && texture.image.height || 1));
+    const plane = new THREE.Mesh(
+        new THREE.PlaneGeometry(w, h),
+        new THREE.MeshStandardMaterial({ map: texture, transparent: true, alphaTest: 0.05, side: THREE.DoubleSide, roughness: 0.5, metalness: 0.1 })
+    );
+    plane.rotation.y = Math.PI;
+    plane.position.y = -0.6 - h / 2 + 0.08;
+    swing.add(plane);
+    return measureKeychain(Object.assign(k, { body: plane, bodyTurn: Math.PI }));
+}
+
+function buildKeychainModel(model) {
+    const k = keychainFrame();
+    model.scale.setScalar(39.37);
+    model.rotation.y = Math.PI / 2;
+    k.swing.add(model);
+    model.traverse((child) => {
+        if (child.isMesh) child.material = Array.isArray(child.material) ? child.material.map((m) => m.clone()) : child.material.clone();
+    });
+    return measureKeychain(Object.assign(k, { body: model, bodyTurn: Math.PI / 2 }));
+}
+
+function charmModel(file) {
+    if (!charmCache.has(file)) {
+        const urls = kcSources.map((base) => base + encodeURIComponent(file) + '.glb');
+        charmCache.set(file, firstOk(urls, (u) => gltfLoader.loadAsync(u), 'charm ' + file).then((g) => {
+            if (!g) charmCache.delete(file);
+            return g ? g.scene : null;
+        }));
+    }
+    return charmCache.get(file).then((model) => (model ? model.clone(true) : null));
+}
+
+function charmTexture(src) {
+    if (!kcTexCache.has(src)) {
+        kcTexCache.set(src, texLoader.loadAsync(src).then((t) => {
+            t.colorSpace = THREE.SRGBColorSpace;
+            return t;
+        }).catch((error) => {
+            kcTexCache.delete(src);
+            console.warn('[Skins3D] Charm image unavailable: ' + src, error);
+            return null;
+        }));
+    }
+    return kcTexCache.get(src);
+}
+
+// Textures stay cached for the next use; only geometry and materials are freed
+function disposeKeychain(k) {
+    k.group.traverse((child) => {
+        if (child.geometry) child.geometry.dispose();
+        if (child.material) (Array.isArray(child.material) ? child.material : [child.material]).forEach((m) => m.dispose());
+    });
+}
+
+function removeKeychain() {
+    if (!kc) return;
+    if (kc.group.parent) kc.group.parent.remove(kc.group);
+    disposeKeychain(kc);
+    kc = null;
+}
+
+// Damped pendulum: swings sideways and outwards (never into the weapon) and reacts to turning the view
+function stepKeychain() {
+    const k = kc;
+    if (!k) return;
+    const now = performance.now();
+    const dt = Math.min(0.05, (now - (k.last || now)) / 1000);
+    k.last = now;
+    const az = controls.getAzimuthalAngle();
+    const pol = controls.getPolarAngle();
+    if (k.az !== undefined) {
+        let d = az - k.az;
+        if (d > Math.PI) d -= Math.PI * 2;
+        if (d < -Math.PI) d += Math.PI * 2;
+        k.vz += d * 7;
+        k.vx += Math.abs(d) * 2.5 + (pol - k.pol) * 5;
+        k.vt += d * 9;
+    }
+    k.az = az;
+    k.pol = pol;
+    if (!dt) return;
+    const r = k.swing.rotation;
+    for (let i = 0; i < 2; i++) {
+        const h = dt / 2;
+        k.vz += (-150 * r.z - 3.2 * k.vz) * h;
+        k.vx += (-150 * r.x - 3.2 * k.vx) * h;
+        k.vt += (-60 * k.t - 2.6 * k.vt) * h;
+        r.z = Math.max(-1, Math.min(1, r.z + k.vz * h));
+        r.x += k.vx * h;
+        k.t = Math.max(-0.8, Math.min(0.8, k.t + k.vt * h));
+        if (r.x < k.rest) { r.x = k.rest; k.vx = Math.abs(k.vx) * 0.35; }
+        if (r.x > k.rest + 0.9) { r.x = k.rest + 0.9; k.vx = -Math.abs(k.vx) * 0.3; }
+    }
+    if (k.body) k.body.rotation.y = k.bodyTurn + k.t;
+}
+
+/**
+ * item: {id, image, x, y, z} in game keychain coordinates (all zero = the
+ * weapon's default spot), or null to remove the charm.
+ */
+export async function setKeychain(item) {
+    const my = ++kcSeq;
+    const id = item ? parseInt(item.id, 10) || 0 : 0;
+    if (!modelRoot || !id) { removeKeychain(); return; }
+    let pos = { x: +item.x || 0, y: +item.y || 0, z: +item.z || 0 };
+    pos = pos.x || pos.y || pos.z ? clampKeychain(pos) : defaultKeychain();
+    if (!pos) { removeKeychain(); return; }
+
+    const source = id + '|' + (item.image || '');
+    if (!kc || kc.source !== source) {
+        const data = await loadJson('skins3d-keychains.json');
+        const file = data && data.models && data.models[String(id)];
+        let built = null;
+        if (file && kcSources.length) {
+            const model = await charmModel(file);
+            if (model) built = buildKeychainModel(model);
+        }
+        if (!built && item.image) {
+            const tex = await charmTexture(item.image);
+            if (tex) built = buildKeychainImage(tex);
+        }
+        if (my !== kcSeq || !modelRoot) { if (built) disposeKeychain(built); return; }
+        removeKeychain();
+        if (!built) return;
+        kc = built;
+        kc.source = source;
+        modelRoot.add(kc.group);
+    }
+    kc.group.position.copy(keychainLocal(pos));
+    fitKeychain(kc);
+    kc.vz += 6.6;
+    kc.vx += 2.75;
+    kc.vt += 4.4;
 }
 
 export function hasStickerLayout() {

@@ -558,6 +558,7 @@
     var slotState = [0, 0, 0, 0, 0];
     var posState = [0, 0, 0, 0, 0].map(function () { return { x: 0, y: 0, r: 0 }; });
     var kcState = 0;
+    var kcPos = { x: 0, y: 0, z: 0 };
 
     function stickerCatalog() {
         if (STICKERS === null) {
@@ -627,6 +628,7 @@
         }
         var kc = cfg.keychain;
         kcState = (kc && typeof kc === "object") ? (parseInt(kc.id, 10) || 0) : (parseInt(kc, 10) || 0);
+        kcPos = (kc && typeof kc === "object") ? { x: parseFloat(kc.x) || 0, y: parseFloat(kc.y) || 0, z: parseFloat(kc.z) || 0 } : { x: 0, y: 0, z: 0 };
         for (var j = 0; j < 5; j++) paintStickerSlot(j);
         paintKeychainSlot();
         if (!show) setModalTab("skin");
@@ -710,7 +712,8 @@
             if (!m || seq !== view3dSeq) return false;
             return m.show(canvas3d, {
                 sources: CFG3D.sources || [], model: cfg.model3d, folder: cfg.folder3d || cfg.model3d,
-                paint: cfg.paint3d, legacy: !!cfg.legacy3d, defindex: cfg.defindex3d
+                paint: cfg.paint3d, legacy: !!cfg.legacy3d, defindex: cfg.defindex3d,
+                keychains: CFG3D.keychains || []
             });
         }).then(function (ok) {
             if (seq !== view3dSeq) return;
@@ -719,8 +722,15 @@
             modalBox.classList.remove("is-3d-loading");
             modalBox.classList.toggle("is-3d-notex", ok === "untextured");
             sync3dStickers();
+            sync3dKeychain();
             updatePlacement();
         }).catch(fail);
+    }
+    function sync3dKeychain() {
+        if (!view3dOn || !viewer || !viewer.setKeychain) return;
+        var item = kcState > 0 ? findItem(keychainCatalog(), kcState) : null;
+        viewer.setKeychain(item ? { id: kcState, image: item.image || "", x: kcPos.x, y: kcPos.y, z: kcPos.z } : null)
+            .catch(function (err) { if (window.console) console.warn(err); });
     }
     function sync3dStickers() {
         if (!view3dOn || !viewer) return;
@@ -883,7 +893,8 @@
             if (!tile) return;
             var id = parseInt(tile.getAttribute("data-pick-id"), 10) || 0;
             if (pickerMode === "keychain") {
-                kcState = id; paintKeychainSlot();
+                if (kcState !== id) kcPos = { x: 0, y: 0, z: 0 };
+                kcState = id; paintKeychainSlot(); sync3dKeychain();
             } else if (pickerScope === "all") {
                                                             
                 for (var i = 0; i < 5; i++) { slotState[i] = id; resetStickerPos(i); paintStickerSlot(i); }
@@ -910,7 +921,7 @@
                 return;
             }
             var clearK = e.target.closest("[data-keychain-clear]");
-            if (clearK) { e.stopPropagation(); kcState = 0; paintKeychainSlot(); return; }
+            if (clearK) { e.stopPropagation(); kcState = 0; kcPos = { x: 0, y: 0, z: 0 }; paintKeychainSlot(); sync3dKeychain(); return; }
             var sSlot = e.target.closest("[data-sticker-slot]");
             if (sSlot) {
                 var si = parseInt(sSlot.dataset.stickerSlot, 10);
