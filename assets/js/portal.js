@@ -289,7 +289,7 @@
             anchors: false,
             prevent: function (node) {
                 if (node.closest('.modal-overlay, dialog, .portal-drawer, .x-modal-layer')) return true;
-                var region = node.closest('.dropdown-menu, .panel-nav-panel, .rcon-out, .err-trace, .install-form-scroll, .chat-log-text');
+                var region = node.closest('.dropdown-menu, .panel-nav-panel, .rcon-out, .err-trace, .install-form-scroll, .chat-log-text, .x-file-list');
                 if (!region || region.scrollHeight <= region.clientHeight) return false;
                 var overflow = getComputedStyle(region).overflowY;
                 return overflow === 'auto' || overflow === 'scroll';
