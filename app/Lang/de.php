@@ -268,6 +268,7 @@ return [
     'steam.required_title' => 'Anmeldung erforderlich',
     'steam.required_msg' => 'Melde dich mit Steam an, um diesen Inhalt zu sehen. Den Rest des Panels kannst du ohne Konto weiter ansehen.',
     'footer.support_developer' => 'Entwickler unterstützen',
+    'footer.version' => 'Version: {version}',
     'auth.subtitle'    => 'Melde dich mit deinem Steam-Konto an.',
 
                                 

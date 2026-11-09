@@ -438,6 +438,7 @@ return [
     'steam.required_title' => 'Login Required',
     'steam.required_msg' => 'Log in with Steam to view this content. You can keep browsing the rest of the panel without an account.',
     'footer.support_developer' => 'Support Developer',
+    'footer.version' => 'Version: {version}',
     'auth.subtitle'    => 'Sign in with your Steam account to access the admin panel.',
     'auth.failed'      => 'Steam authentication failed.',
     'auth.no_access'   => 'Your Steam account does not have access to the panel.',

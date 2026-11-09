@@ -424,6 +424,7 @@ return [
     'steam.required_title' => 'Autentificare Necesară',
     'steam.required_msg' => 'Conectează-te cu Steam pentru a vedea acest conținut. Poți naviga în continuare în restul panoului fără cont.',
     'footer.support_developer' => 'Susține Dezvoltatorul',
+    'footer.version' => 'Versiune: {version}',
     'auth.subtitle'    => 'Autentifica-te cu contul tau Steam pentru a accesa panelul.',
     'auth.failed'      => 'Autentificarea Steam a esuat.',
     'auth.no_access'   => 'Contul tau Steam nu are acces la panel.',

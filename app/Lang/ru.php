@@ -268,6 +268,7 @@ return [
     'steam.required_title' => 'Требуется вход',
     'steam.required_msg' => 'Войдите через Steam, чтобы увидеть это содержимое. Остальную часть панели можно просматривать без аккаунта.',
     'footer.support_developer' => 'Поддержать разработчика',
+    'footer.version' => 'Версия: {version}',
     'auth.subtitle'    => 'Войдите через Steam для доступа к панели.',
 
                                 

@@ -27,7 +27,7 @@ final class Brand
     public const MARK = 'data-brand="cs2panel-credit"';
 
     /**
-     * Footer credit and developer support link, with the current year.
+     * Footer credit, installed version and developer support link, with the current year.
      * Call this from the layout footer instead of writing the credit by hand.
      */
     public static function footer(): string
@@ -37,10 +37,12 @@ final class Brand
         $name = htmlspecialchars(self::AUTHOR, ENT_QUOTES, 'UTF-8');
         $supportUrl = htmlspecialchars(self::SUPPORT_URL, ENT_QUOTES, 'UTF-8');
         $supportLabel = htmlspecialchars(Lang::t('footer.support_developer'), ENT_QUOTES, 'UTF-8');
+        $versionLabel = htmlspecialchars(Lang::t('footer.version', ['version' => Version::current()]), ENT_QUOTES, 'UTF-8');
 
         return '<span class="brand-footer"><span ' . self::MARK . '>Powered by '
             . '<a href="' . $url . '" target="_blank" rel="noopener">' . $name . '</a>. '
             . '&middot; ' . $year . '</span>'
+            . '<span class="footer-version">' . $versionLabel . '</span>'
             . '<a class="developer-support" href="' . $supportUrl . '" target="_blank" rel="noopener noreferrer">'
             . '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'
             . '<path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1.1-1.1a5.5 5.5 0 0 0-7.8 7.8L12 21l8.8-8.6a5.5 5.5 0 0 0 0-7.8Z"/></svg>'

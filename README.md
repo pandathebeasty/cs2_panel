@@ -2,7 +2,7 @@
 
 A PHP admin and community panel for Counter-Strike 2 servers. It sits on top of the MySQL/MariaDB tables that popular CounterStrikeSharp plugins already use, so there is no separate game-side component to install. No framework and no build step for the PHP side: a small front controller, a router, plain PHP views and PDO.
 
-Version: see [VERSION](VERSION).
+Version: see [VERSION](VERSION). The installed version is also displayed in the panel footer and follows this file automatically.
 
 Live demo: [gobans.ro/GO](https://gobans.ro/GO)
 
