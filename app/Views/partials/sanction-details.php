@@ -29,6 +29,10 @@ $detailsBadge = match ($detailsStatus) {
     default => 'expired',
 };
 $lifted = in_array($storedStatus, ['UNBANNED', 'UNMUTED'], true);
+$removalDate = $removal['created'] ?? $removal['created_at'] ?? null;
+if (trim((string) $removalDate) === '' && $lifted && in_array($sanctionKind, ['bans', 'mutes'], true)) {
+    $removalDate = $sanction['ends'] ?? null;
+}
 ?>
 <div class="sanction-details-summary">
     <span class="sanction-details-id"><?= View::e($detailsType) ?> #<?= (int) $sanction['id'] ?></span>
@@ -71,7 +75,7 @@ $lifted = in_array($storedStatus, ['UNBANNED', 'UNMUTED'], true);
                 trim((string) ($removal['removal_admin_name'] ?? '')) ?: $notRecorded
             ) ?></dd></div>
             <div><dt><?= $detailsText('sanctions.admin_steamid') ?></dt><dd class="mono"><?= $recordedValue($removal['removal_admin_steamid'] ?? null) ?></dd></div>
-            <div><dt><?= $detailsText('sanctions.removed_at') ?></dt><dd><?= $recordedValue($removal['created'] ?? $removal['created_at'] ?? null) ?></dd></div>
+            <div><dt><?= $detailsText('sanctions.removed_at') ?></dt><dd><?= $recordedValue($removalDate) ?></dd></div>
             <?php if ($removal !== null): ?>
                 <div><dt><?= $detailsText('sanctions.removal_id') ?></dt><dd>#<?= (int) $removal['id'] ?> / <?= $detailsText('common.admin') ?> #<?= (int) $removal['admin_id'] ?></dd></div>
             <?php endif; ?>
