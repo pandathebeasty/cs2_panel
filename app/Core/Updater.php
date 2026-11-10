@@ -817,7 +817,9 @@ final class Updater
                     $from = (string) ($st['from'] ?? Version::current());
                     @file_put_contents(BASE_PATH . '/VERSION', $ver . "\n");
                     $log[] = 'Updated VERSION to ' . $ver . '.';
-                    if (!empty($st['code_backup'])) {
+                    // A same-version reinstall (e.g. adding 3D models) keeps the rollback to the previous version.
+                    $keepRollback = Version::compare($from, $ver) === 0 && self::rollbackInfo() !== null;
+                    if (!empty($st['code_backup']) && !$keepRollback) {
                         self::writeJsonAtomic(self::rollbackFile(), [
                             'from'        => $from,
                             'to'          => $ver,
@@ -1108,6 +1110,12 @@ final class Updater
         if (!is_array($info) || empty($info['code_backup'])) {
             return null;
         }
+        if (Version::compare((string) ($info['from'] ?? ''), (string) ($info['to'] ?? '')) === 0) {
+            $info = self::olderCodeBackup((string) ($info['to'] ?? ''));
+            if ($info === null) {
+                return null;
+            }
+        }
         $code = BASE_PATH . '/db_backups/' . basename((string) $info['code_backup']);
         if (!is_file($code) || Version::compare(Version::current(), (string) ($info['to'] ?? '')) !== 0) {
             return null;
@@ -1121,6 +1129,43 @@ final class Updater
             'at'          => (int) ($info['at'] ?? 0),
             'has_db'      => $db !== '' && is_file(BASE_PATH . '/db_backups/' . basename($db)),
         ];
+    }
+
+    /**
+     * Rollback record rebuilt from the newest code backup of an older version,
+     * used when a same-version reinstall overwrote the real rollback record.
+     * The database backup taken in the same update (up to 1h earlier) is paired.
+     * @return array{from:string,to:string,code_backup:string,db_backup:string,at:int}|null
+     */
+    private static function olderCodeBackup(string $to): ?array
+    {
+        $best = null;
+        $bestTime = 0;
+        $bestVer = '';
+        foreach (glob(BASE_PATH . '/db_backups/code_*.zip') ?: [] as $file) {
+            if (!preg_match('/^code_(\d+(?:\.\d+)*)_/', basename($file), $m) || Version::compare($m[1], $to) >= 0) {
+                continue;
+            }
+            $time = (int) @filemtime($file);
+            if ($time > $bestTime) {
+                $best = $file;
+                $bestTime = $time;
+                $bestVer = $m[1];
+            }
+        }
+        if ($best === null) {
+            return null;
+        }
+        $db = '';
+        $dbTime = 0;
+        foreach (glob(BASE_PATH . '/db_backups/backup_*.sql*') ?: [] as $file) {
+            $time = (int) @filemtime($file);
+            if ($time <= $bestTime && $time >= $bestTime - 3600 && $time > $dbTime) {
+                $db = basename($file);
+                $dbTime = $time;
+            }
+        }
+        return ['from' => $bestVer, 'to' => $to, 'code_backup' => basename($best), 'db_backup' => $db, 'at' => $bestTime];
     }
 
     /**
