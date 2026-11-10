@@ -222,6 +222,7 @@ Set `memory_limit = 256M` and `max_execution_time = 300` in the PHP-FPM pool, be
 
 - **From the panel:** Settings → Updates or `/update` (owner only). The panel checks GitHub releases at most every 6 hours, takes a code snapshot for rollback, then applies the update in small steps so it works within shared hosting time limits.
 - **Kept on update:** `config/config.php`, `db_backups/`, uploads, personal themes and settings stored in the database. New settings are added with their defaults, `config/config.php` is synced automatically, and new migrations run on the next request.
+- **Custom files:** updates overlay release files without deleting extra files. Files at release-owned paths are still overwritten. The code snapshot includes `app/`, `database/`, `assets/` (with uploads and personal themes) and `VERSION`; map images, the skins catalog and 3D models are excluded. Rollback removes only unchanged PHP/SQL files shipped by that update and absent from the code backup; custom files and modified additions are kept. Older rollback records without a file manifest skip deletion, so newer classes or migrations may remain and require manual review. Preservation notices appear in the update log.
 - **Manual update:** upload the new `cs2-panel-core.zip` contents over the existing files, without deleting `config/`, `db_backups/` or `assets/img/uploads/`.
 
 ### Troubleshooting

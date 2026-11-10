@@ -826,6 +826,7 @@ final class Updater
                             'code_backup' => (string) $st['code_backup'],
                             'db_backup'   => (string) ($st['db_backup'] ?? ''),
                             'at'          => time(),
+                            'installed_files' => self::rollbackCleanupFiles((string) ($st['root'] ?? '')),
                         ]);
                     }
                     self::rrmdir(self::workDir());
@@ -1037,8 +1038,8 @@ final class Updater
 
     /**
      * Zip the code that an update overwrites (app/, database/, assets/ and
-     * VERSION) so it can be rolled back. The heavy data folders (map images,
-     * skin catalog) and user uploads are left out.
+     * VERSION) so it can be rolled back, including user uploads. The heavy data
+     * folders (map images, skin catalog, 3D models) are left out.
      */
     private static function backupCode(): ?string
     {
@@ -1054,7 +1055,7 @@ final class Updater
         if ($zip->open($file, \ZipArchive::CREATE | \ZipArchive::OVERWRITE) !== true) {
             return null;
         }
-        $exclude = ['app/Data/weaponpaints', 'assets/img/maps', 'assets/img/uploads', 'assets/3d'];
+        $exclude = ['app/Data/weaponpaints', 'assets/img/maps', 'assets/3d'];
         foreach (self::codeRoots() as $prefix => $source) {
             if (!is_dir($source)) {
                 continue;
@@ -1095,10 +1096,38 @@ final class Updater
         return BASE_PATH . '/db_backups/last_update.json';
     }
 
+    private static function isRollbackCodeFile(string $name): bool
+    {
+        return !str_contains($name, '\\') && !str_contains($name, "\0") && !str_contains($name, '..')
+            && preg_match('~\A(?:app/(?!Data/).+\.php|database/.+\.sql)\z~', $name) === 1;
+    }
+
+    /** @return array<string,string> release-relative code path => SHA-256 */
+    private static function rollbackCleanupFiles(string $root): array
+    {
+        if ($root === '' || !is_dir($root)) {
+            throw new \RuntimeException('Extracted files missing; cannot record rollback files.');
+        }
+        $files = [];
+        $prefixLength = strlen(rtrim(str_replace('\\', '/', $root), '/')) + 1;
+        foreach (self::applyList($root) as [$source]) {
+            $name = substr(str_replace('\\', '/', $source), $prefixLength);
+            if (!self::isRollbackCodeFile($name)) {
+                continue;
+            }
+            $hash = @hash_file('sha256', $source);
+            if ($hash === false) {
+                throw new \RuntimeException('Cannot read ' . $name . ' for the rollback file manifest.');
+            }
+            $files[$name] = $hash;
+        }
+        return $files;
+    }
+
     /**
      * The last completed update that can be rolled back, when its code backup
      * still exists and the panel still runs the version it installed.
-     * @return array{from:string,to:string,code_backup:string,db_backup:string,at:int,has_db:bool}|null
+     * @return array{from:string,to:string,code_backup:string,db_backup:string,at:int,has_db:bool,installed_files:?array<string,string>}|null
      */
     public static function rollbackInfo(): ?array
     {
@@ -1128,6 +1157,7 @@ final class Updater
             'db_backup'   => $db !== '' ? basename($db) : '',
             'at'          => (int) ($info['at'] ?? 0),
             'has_db'      => $db !== '' && is_file(BASE_PATH . '/db_backups/' . basename($db)),
+            'installed_files' => is_array($info['installed_files'] ?? null) ? $info['installed_files'] : null,
         ];
     }
 
@@ -1170,8 +1200,8 @@ final class Updater
 
     /**
      * Restore the code (and optionally the database) saved before the last
-     * update. Files added by the newer version under app/ and database/ are
-     * removed so its migrations and classes do not linger.
+     * update. Only unchanged code files shipped by that update and absent
+     * from the backup are removed; unknown or customized files are kept.
      * @return array{ok:bool,message:string,log:string[]}
      */
     public static function rollback(bool $restoreDb): array
@@ -1183,6 +1213,12 @@ final class Updater
             return ['ok' => false, 'message' => 'No update to roll back.', 'log' => []];
         }
         $log = [];
+        foreach ($info['installed_files'] ?? [] as $name => $hash) {
+            if (!is_string($name) || !self::isRollbackCodeFile($name) || !is_string($hash)
+                || preg_match('/\A[a-f0-9]{64}\z/', $hash) !== 1) {
+                return ['ok' => false, 'message' => 'Invalid rollback file manifest; no files were restored or removed.', 'log' => $log];
+            }
+        }
         $zip = new \ZipArchive();
         if ($zip->open(BASE_PATH . '/db_backups/' . $info['code_backup']) !== true) {
             return ['ok' => false, 'message' => 'Cannot open the code backup.', 'log' => $log];
@@ -1202,7 +1238,8 @@ final class Updater
             } else {
                 continue;
             }
-            $kept[str_replace('\\', '/', $dest)] = true;
+            $key = str_replace('\\', '/', $dest);
+            $kept[DIRECTORY_SEPARATOR === '\\' ? strtolower($key) : $key] = true;
             $data = $zip->getFromIndex($i);
             if ($data === false) {
                 continue;
@@ -1219,17 +1256,40 @@ final class Updater
         $log[] = 'Restored the code of v' . $info['from'] . '.';
 
         $removed = 0;
-        foreach (['app' => ['php'], 'database' => ['sql']] as $prefix => $extensions) {
-            $it = new \RecursiveIteratorIterator(
-                new \RecursiveDirectoryIterator($roots[$prefix], \FilesystemIterator::SKIP_DOTS)
-            );
-            foreach ($it as $f) {
-                /** @var \SplFileInfo $f */
-                $path = str_replace('\\', '/', $f->getPathname());
-                if ($f->isFile() && in_array(strtolower($f->getExtension()), $extensions, true)
-                    && !str_contains($path, '/app/Data/') && !isset($kept[$path])) {
-                    @unlink($path) && $removed++;
+        if ($info['installed_files'] === null) {
+            $log[] = 'No update file manifest is available; files absent from the backup were kept. Newer classes or migrations may need manual review.';
+        } else {
+            foreach ($info['installed_files'] as $name => $expectedHash) {
+                $parts = explode('/', $name);
+                $path = $roots[array_shift($parts)];
+                $linked = is_link($path);
+                foreach ($parts as $part) {
+                    $path .= '/' . $part;
+                    $linked = $linked || is_link($path);
                 }
+                $key = str_replace('\\', '/', $path);
+                if (isset($kept[DIRECTORY_SEPARATOR === '\\' ? strtolower($key) : $key])) {
+                    continue;
+                }
+                if ($linked) {
+                    $log[] = 'Kept linked file: ' . $name . '.';
+                    continue;
+                }
+                if (!is_file($path)) {
+                    continue;
+                }
+                $hash = @hash_file('sha256', $path);
+                if ($hash === false) {
+                    return ['ok' => false, 'message' => 'Code restored, but cannot read ' . $name . ' for rollback cleanup.', 'log' => $log];
+                }
+                if (!hash_equals($expectedHash, $hash)) {
+                    $log[] = 'Kept customized file: ' . $name . '.';
+                    continue;
+                }
+                if (!@unlink($path)) {
+                    return ['ok' => false, 'message' => 'Code restored, but cannot remove ' . $name . ' (check permissions).', 'log' => $log];
+                }
+                $removed++;
             }
         }
         if ($removed > 0) {

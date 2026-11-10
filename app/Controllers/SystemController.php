@@ -249,6 +249,7 @@ final class SystemController extends Controller
             $this->redirect('/settings#updates');
         }
         $result = Updater::rollback((bool) $this->input('restore_db'));
+        $_SESSION['update_log'] = $result['log'];
         $this->flash($result['ok'] ? 'success' : 'error', $result['message']);
         $this->redirect('/settings#updates');
     }
