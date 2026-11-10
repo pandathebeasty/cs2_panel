@@ -1385,6 +1385,8 @@ return [
     'settings.wp_prefix_hint'     => 'Das WeaponPaints-Tabellenpraefix (der Teil vor player_skins). Standard wp_.',
     'settings.wp_3d_enable' => '3D-Vorschau im Skin-Editor aktivieren',
     'settings.wp_3d_hint' => 'Zeigt den Skin in 3D, erlaubt das Platzieren von Stickern und begrenzt Anhänger auf den erlaubten Waffenbereich. Ohne Modell oder WebGL2 wird das 2D-Bild verwendet; ohne Textur bleibt das schlichte 3D-Modell.',
+    'settings.wp_any_team' => 'Jeden Skin für beide Teams erlauben',
+    'settings.wp_any_team_hint' => 'Aus (Standard): teamexklusive Waffen bleiben in ihrem Team (z. B. AK-47 T, M4A4 CT). An: jeder Waffenskin kann für T, CT oder beide gesetzt werden. Beim erneuten Ausschalten werden Skins im falschen Team für diese Waffen entfernt.',
     'settings.wp_3d_sources' => 'Eigene 3D-Quellen (optional)',
     'settings.wp_3d_sources_hint' => 'Eine URL pro Zeile mit models/ und textures/. Reihenfolge: lokale Modelle, diese URLs, öffentlicher Mirror.',
     'settings.wp_3d_local_yes' => 'Lokale Modelle installiert',

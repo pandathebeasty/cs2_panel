@@ -268,6 +268,7 @@ final class Settings
             'wp_prefix'          => (string) Config::get('weaponpaints.prefix', 'wp_'),
             'wp_3d_enabled'      => '0',
             'wp_3d_sources'      => '',
+            'wp_any_team'        => '0',
             'chat_logs_enabled'  => '0',
             'chat_logs_table'    => (string) Config::get('chat_logger.table', 'chat_logs'),
             // Stats backend: which plugin provides ranks/stats/playtime.

@@ -606,6 +606,8 @@ $L = fn(string $k) => View::e(Lang::t($k));
                     <input type="text" name="wp_prefix" value="<?= View::e($s['wp_prefix']) ?>" placeholder="wp_">
                     <p class="hint" style="margin-top:6px"><?= $L('settings.wp_prefix_hint') ?></p>
                 </div>
+                <div class="check" style="margin-top:14px"><input type="checkbox" name="wp_any_team" id="wp_any_team" <?= $s['wp_any_team'] ? 'checked' : '' ?>><label for="wp_any_team"><?= $L('settings.wp_any_team') ?></label></div>
+                <p class="hint" style="margin-top:6px"><?= $L('settings.wp_any_team_hint') ?></p>
                 <div class="field" style="margin-top:14px">
                     <label><?= $L('settings.skins_rarity_title') ?></label>
                     <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">

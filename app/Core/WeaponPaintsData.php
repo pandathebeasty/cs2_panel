@@ -37,7 +37,7 @@ final class WeaponPaintsData
         39 => self::TEAM_T, 4 => self::TEAM_T,
         3 => self::TEAM_CT, 8 => self::TEAM_CT, 10 => self::TEAM_CT,
         16 => self::TEAM_CT, 27 => self::TEAM_CT, 32 => self::TEAM_CT,
-        33 => self::TEAM_CT, 34 => self::TEAM_CT, 38 => self::TEAM_CT,
+        34 => self::TEAM_CT, 38 => self::TEAM_CT,
         60 => self::TEAM_CT, 61 => self::TEAM_CT,
     ];
 
@@ -55,7 +55,13 @@ final class WeaponPaintsData
 
     public static function getForcedTeam(int $defindex): ?int
     {
-        return self::TEAM_EXCLUSIVE_WEAPONS[$defindex] ?? null;
+        return self::forcedTeamWeapons()[$defindex] ?? null;
+    }
+
+    /** Admin option: every weapon skin may be saved for T, CT or both teams. */
+    public static function anyTeamAllowed(): bool
+    {
+        return Settings::bool('wp_any_team', false);
     }
 
     /**
@@ -681,7 +687,7 @@ final class WeaponPaintsData
     /** @return array<int,int> map of forced-team weapon defindex => team id */
     public static function forcedTeamWeapons(): array
     {
-        return self::TEAM_EXCLUSIVE_WEAPONS;
+        return self::anyTeamAllowed() ? [] : self::TEAM_EXCLUSIVE_WEAPONS;
     }
 
                                                                         

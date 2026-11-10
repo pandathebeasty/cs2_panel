@@ -1404,6 +1404,8 @@ return [
     'settings.wp_prefix_hint'     => 'The WeaponPaints table prefix (the part before player_skins). Default wp_.',
     'settings.wp_3d_enable' => 'Enable 3D preview in the Skins editor',
     'settings.wp_3d_hint' => 'Shows the selected skin in 3D with sticker placement and bounded keychain placement. Missing models or WebGL2 use the 2D image; missing textures leave the plain 3D model.',
+    'settings.wp_any_team' => 'Allow every skin on both teams',
+    'settings.wp_any_team_hint' => 'Off (default): team-exclusive weapons keep their own team (e.g. AK-47 T, M4A4 CT). On: any weapon skin can be set for T, CT or both. Turning it off again removes wrong-team skins for those weapons.',
     'settings.wp_3d_sources' => 'Custom 3D sources (optional)',
     'settings.wp_3d_sources_hint' => 'One URL per line, containing models/ and textures/. Order: local models, these URLs, public mirror.',
     'settings.wp_3d_local_yes' => 'Local models installed',
