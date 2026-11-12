@@ -28,7 +28,7 @@ final class ReportModel
         }
         self::$ensured = true;
         try {
-            Database::run(
+            Database::createTable(
                 'CREATE TABLE IF NOT EXISTS `' . self::TABLE . '` (
                     `id` INT AUTO_INCREMENT PRIMARY KEY,
                     `reporter_steamid` VARCHAR(20) NOT NULL,

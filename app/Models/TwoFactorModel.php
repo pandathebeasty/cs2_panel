@@ -21,7 +21,7 @@ final class TwoFactorModel
 
     public static function ensureTable(): void
     {
-        Database::run(
+        Database::createTable(
             'CREATE TABLE IF NOT EXISTS `' . self::TABLE . '` (
                 `steamid`      VARCHAR(32) NOT NULL,
                 `secret`       VARCHAR(64) NOT NULL,

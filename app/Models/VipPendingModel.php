@@ -42,11 +42,11 @@ final class VipPendingModel
         if (DevMode::enabled()) {
             return;
         }
-        if (Database::tableExists(self::TABLE)) {
+        if (Database::tableExists(self::TABLE) && !Database::schemaRepair()) {
             return;
         }
         try {
-            Database::run(
+            Database::createTable(
                 'CREATE TABLE IF NOT EXISTS ' . self::TABLE . ' (
                     id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
                     steamid VARCHAR(32) NOT NULL,

@@ -127,7 +127,16 @@ final class Schema
 
         self::ensureTables();
 
-                                                                            
+        // A migration can fail because an older table lacked a column the
+        // repair above has just added (e.g. an index on panel_logs.target);
+        // give the still-pending ones a second chance right away.
+        try {
+            if (Migrator::pending() !== []) {
+                Migrator::runPending();
+            }
+        } catch (\Throwable $e) {
+            error_log('[CS2Panel] schema migrations retry failed: ' . $e->getMessage());
+        }
         // Pruning uses default/runtime keys and refuses to empty the settings table.
         try {
             Settings::prune();
@@ -243,12 +252,14 @@ final class Schema
 
     /**
      * Create/patch every panel-owned table through its model, so a missing
-     * migration file can never leave the panel broken. Each model guards its
-     * own errors; this only isolates them from one another.
+     * migration file can never leave the panel broken. Existing tables also
+     * get any column or index they lack (Database::createTable()). Each model
+     * guards its own errors; this only isolates them from one another.
      */
     public static function ensureTables(): void
     {
         $steps = [
+            [self::class, 'repairBaseSchema'],
             [\App\Core\Logger::class, 'ensureTable'],
             [\App\Models\PanelUserModel::class, 'ensureSchema'],
             [\App\Models\ProfileModel::class, 'ensureTable'],
@@ -267,11 +278,40 @@ final class Schema
             [\App\Models\MonitorModel::class, 'ensureTable'],
             [\App\Models\TwoFactorModel::class, 'ensureTable'],
         ];
-        foreach ($steps as [$class, $method]) {
-            try {
-                $class::$method();
-            } catch (\Throwable $e) {
-                error_log('[CS2Panel] schema ' . $class . '::' . $method . ' failed: ' . $e->getMessage());
+        Database::setSchemaRepair(true);
+        try {
+            foreach ($steps as [$class, $method]) {
+                try {
+                    $class::$method();
+                } catch (\Throwable $e) {
+                    error_log('[CS2Panel] schema ' . $class . '::' . $method . ' failed: ' . $e->getMessage());
+                }
+            }
+        } finally {
+            Database::setSchemaRepair(false);
+        }
+    }
+
+    /**
+     * Tables defined only in database/panel_schema.sql (panel_users,
+     * panel_settings, ...) have no model that creates them; repair them from
+     * that file. Only the CREATE TABLE statements are used.
+     */
+    public static function repairBaseSchema(): void
+    {
+        $sql = @file_get_contents(BASE_PATH . '/database/panel_schema.sql');
+        if (!is_string($sql) || $sql === '') {
+            return;
+        }
+        $sql = preg_replace('/--[^\r\n]*/', '', $sql) ?? $sql;
+        foreach (preg_split('/;\s*(?:\r?\n|$)/', $sql) ?: [] as $statement) {
+            $statement = trim($statement);
+            if (preg_match('/^CREATE\s+TABLE\s+IF\s+NOT\s+EXISTS\b/i', $statement)) {
+                try {
+                    Database::createTable($statement);
+                } catch (\Throwable $e) {
+                    error_log('[CS2Panel] schema base table repair failed: ' . $e->getMessage());
+                }
             }
         }
     }

@@ -104,7 +104,7 @@ final class OrderModel
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci';
 
         try {
-            Database::run($sql);
+            Database::createTable($sql);
         } catch (\Throwable $e) {
             error_log('[CS2Panel] order ensureTables failed: ' . $e->getMessage());
         }
@@ -721,7 +721,7 @@ final class OrderModel
             KEY `idx_admin_exp` (`admin_granted`, `admin_expires_at`)
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci';
         try {
-            Database::run($sql);
+            Database::createTable($sql);
         } catch (\Throwable $e) {
             error_log('[CS2Panel] order items ensureTable failed: ' . $e->getMessage());
         }

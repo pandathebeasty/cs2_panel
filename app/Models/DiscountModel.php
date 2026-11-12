@@ -22,7 +22,7 @@ final class DiscountModel
         }
         self::$ensured = true;
         try {
-            Database::run(
+            Database::createTable(
                 'CREATE TABLE IF NOT EXISTS `' . self::TABLE . '` (
                     `id` INT AUTO_INCREMENT PRIMARY KEY,
                     `code` VARCHAR(48) NOT NULL,

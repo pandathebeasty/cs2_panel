@@ -124,8 +124,8 @@ final class ContestModel
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci';
 
         try {
-            Database::run($contests);
-            Database::run($winners);
+            Database::createTable($contests);
+            Database::createTable($winners);
             self::ensureColumns();
         } catch (\Throwable $e) {
             error_log('[CS2Panel] contest ensureTables failed: ' . $e->getMessage());

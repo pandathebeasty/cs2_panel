@@ -24,7 +24,7 @@ final class Logger
         }
         $done = true;
         try {
-            Database::run(
+            Database::createTable(
                 'CREATE TABLE IF NOT EXISTS `panel_logs` (
                     `id`         INT NOT NULL AUTO_INCREMENT,
                     `actor_steamid` VARCHAR(32) NULL,

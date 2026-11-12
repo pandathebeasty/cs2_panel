@@ -40,9 +40,10 @@ final class BenefitModel
         if (DevMode::enabled()) {
             return; // dev uses in-memory SQLite; queries no-op safely
         }
-        if (!Database::tableExists(self::TABLE)) {
+        $exists = Database::tableExists(self::TABLE);
+        if (!$exists || Database::schemaRepair()) {
             try {
-                Database::run(
+                Database::createTable(
                     'CREATE TABLE IF NOT EXISTS ' . self::TABLE . ' (
                         id INT UNSIGNED NOT NULL AUTO_INCREMENT,
                         category VARCHAR(64) NOT NULL DEFAULT \'\',
@@ -59,7 +60,9 @@ final class BenefitModel
             } catch (\Throwable $e) {
                 error_log('[CS2Panel] benefits table create failed: ' . $e->getMessage());
             }
-            return;
+            if (!$exists) {
+                return;
+            }
         }
 
         // Mirror the guarded legacy migration without narrowing existing fields.

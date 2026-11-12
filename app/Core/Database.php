@@ -699,10 +699,201 @@ final class Database
         return ($alias ? ' AS `_new`' : '') . ' ON DUPLICATE KEY UPDATE ' . implode(', ', $sets);
     }
 
+    /** True while Schema::sync() repairs existing tables (see createTable()). */
+    private static bool $schemaRepair = false;
+
+    /** @var array<string,bool> column cache, cleared when columns are added */
+    private static array $columnCache = [];
+
+    public static function setSchemaRepair(bool $on): void
+    {
+        self::$schemaRepair = $on;
+    }
+
+    public static function schemaRepair(): bool
+    {
+        return self::$schemaRepair;
+    }
+
+    /**
+     * Run a "CREATE TABLE IF NOT EXISTS" statement. CREATE ... IF NOT EXISTS
+     * leaves an existing (older or foreign-made) table untouched, so during a
+     * schema sync this also adds every column and index from the definition
+     * that the existing table lacks. Normal page loads only pay for the CREATE.
+     */
+    public static function createTable(string $sql): void
+    {
+        self::run($sql);
+        if (self::$schemaRepair) {
+            self::addMissingColumns($sql);
+        }
+    }
+
+    /**
+     * Add the columns and secondary indexes of a CREATE TABLE definition that
+     * are missing from the existing table. Never drops or changes anything.
+     * Each ALTER is isolated so one failure doesn't stop the others.
+     * @return string[] what was added, e.g. "panel_logs.target"
+     */
+    public static function addMissingColumns(string $createSql): array
+    {
+        $def = self::parseCreateTable($createSql);
+        if ($def === null) {
+            return [];
+        }
+        [$table, $columns, $indexes] = $def;
+        $quotedTable = '`' . str_replace('`', '``', $table) . '`';
+
+        try {
+            $existing = [];
+            foreach (self::all(
+                'SELECT column_name AS c FROM information_schema.columns WHERE table_schema = DATABASE() AND table_name = ?',
+                [$table]
+            ) as $row) {
+                $existing[strtolower((string) $row['c'])] = true;
+            }
+        } catch (\Throwable $e) {
+            return [];
+        }
+        if ($existing === []) {
+            return [];
+        }
+
+        $added = [];
+        foreach ($columns as $name => $definition) {
+            if (isset($existing[strtolower($name)])) {
+                continue;
+            }
+            // An AUTO_INCREMENT column needs its own key; adding it to a table
+            // that already has a different primary key would fail anyway.
+            if (stripos($definition, 'AUTO_INCREMENT') !== false) {
+                error_log("[CS2Panel] schema: {$table}.{$name} is missing and must be added manually");
+                continue;
+            }
+            try {
+                self::run('ALTER TABLE ' . $quotedTable . ' ADD COLUMN `' . str_replace('`', '``', $name) . '` ' . $definition);
+                $existing[strtolower($name)] = true;
+                $added[] = $table . '.' . $name;
+            } catch (\Throwable $e) {
+                error_log("[CS2Panel] schema: adding {$table}.{$name} failed: " . $e->getMessage());
+            }
+        }
+
+        if ($indexes !== []) {
+            try {
+                $have = [];
+                foreach (self::all(
+                    'SELECT DISTINCT index_name AS i FROM information_schema.statistics WHERE table_schema = DATABASE() AND table_name = ?',
+                    [$table]
+                ) as $row) {
+                    $have[strtolower((string) $row['i'])] = true;
+                }
+                foreach ($indexes as $name => [$clause, $cols]) {
+                    if (isset($have[strtolower($name)])) {
+                        continue;
+                    }
+                    foreach ($cols as $col) {
+                        if (!isset($existing[strtolower($col)])) {
+                            continue 2;
+                        }
+                    }
+                    try {
+                        self::run('ALTER TABLE ' . $quotedTable . ' ADD ' . $clause);
+                        $added[] = $table . '.' . $name . ' (index)';
+                    } catch (\Throwable $e) {
+                        error_log("[CS2Panel] schema: adding index {$table}.{$name} failed: " . $e->getMessage());
+                    }
+                }
+            } catch (\Throwable $e) {
+                error_log("[CS2Panel] schema: index check on {$table} failed: " . $e->getMessage());
+            }
+        }
+
+        if ($added !== []) {
+            self::$columnCache = [];
+            error_log('[CS2Panel] schema: added missing ' . implode(', ', $added));
+        }
+        return $added;
+    }
+
+    /**
+     * Split a CREATE TABLE statement into its table name, column definitions
+     * and named secondary indexes. Comments, quoted strings and nested
+     * parentheses (ENUM(...), DECIMAL(5,2)) are handled.
+     * @return array{0:string,1:array<string,string>,2:array<string,array{0:string,1:string[]}>}|null
+     */
+    private static function parseCreateTable(string $sql): ?array
+    {
+        $sql = preg_replace('/--[^\r\n]*/', '', $sql) ?? $sql;
+        if (!preg_match('/CREATE\s+TABLE\s+(?:IF\s+NOT\s+EXISTS\s+)?`?([A-Za-z0-9_$]+)`?\s*\(/i', $sql, $m, PREG_OFFSET_CAPTURE)) {
+            return null;
+        }
+        $table = $m[1][0];
+        $start = $m[0][1] + strlen($m[0][0]);
+
+        $parts = [];
+        $buf = '';
+        $depth = 0;
+        $quote = '';
+        $len = strlen($sql);
+        for ($i = $start; $i < $len; $i++) {
+            $ch = $sql[$i];
+            if ($quote !== '') {
+                $buf .= $ch;
+                if ($ch === '\\' && $i + 1 < $len) {
+                    $buf .= $sql[++$i];
+                } elseif ($ch === $quote) {
+                    $quote = '';
+                }
+                continue;
+            }
+            if ($ch === "'" || $ch === '"') {
+                $quote = $ch;
+            } elseif ($ch === '(') {
+                $depth++;
+            } elseif ($ch === ')') {
+                if ($depth === 0) {
+                    break;
+                }
+                $depth--;
+            } elseif ($ch === ',' && $depth === 0) {
+                $parts[] = trim($buf);
+                $buf = '';
+                continue;
+            }
+            $buf .= $ch;
+        }
+        $parts[] = trim($buf);
+
+        $columns = [];
+        $indexes = [];
+        foreach ($parts as $part) {
+            $part = trim((string) preg_replace('/\s+/', ' ', $part));
+            if ($part === '') {
+                continue;
+            }
+            if (preg_match('/^((?:UNIQUE\s+)?(?:KEY|INDEX))\s+`?([A-Za-z0-9_$]+)`?\s*\((.+)\)$/i', $part, $km)) {
+                $cols = array_map(
+                    static fn($c) => trim((string) preg_replace('/\(\d+\)$/', '', trim($c)), '` '),
+                    explode(',', $km[3])
+                );
+                $indexes[$km[2]] = [$part, $cols];
+                continue;
+            }
+            if (preg_match('/^(PRIMARY|KEY|INDEX|UNIQUE|CONSTRAINT|FOREIGN|FULLTEXT|SPATIAL|CHECK)\b/i', $part)) {
+                continue;
+            }
+            if (preg_match('/^`([^`]+)`\s+(.+)$/s', $part, $cm) || preg_match('/^([A-Za-z0-9_$]+)\s+(.+)$/s', $part, $cm)) {
+                $columns[$cm[1]] = $cm[2];
+            }
+        }
+        return [$table, $columns, $indexes];
+    }
+
     /** True when a column exists on a table (cached). Safe on missing tables. */
     public static function columnExists(string $table, string $column, ?string $key = null): bool
     {
-        static $cache = [];
+        $cache = &self::$columnCache;
         $ck = ($key ?? '') . "\0" . $table . '.' . $column;
         if (isset($cache[$ck])) {
             return $cache[$ck];

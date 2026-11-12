@@ -37,7 +37,7 @@ final class ServerModel
             return;
         }
         try {
-            Database::run(
+            Database::createTable(
                 'CREATE TABLE IF NOT EXISTS `' . self::RCON_TABLE . '` (
                     `server_id` INT NOT NULL,
                     `rcon_password` VARCHAR(191) NULL,

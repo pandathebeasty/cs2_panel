@@ -22,7 +22,7 @@ final class MonitorModel
 
     public static function ensureTable(): void
     {
-        Database::run(
+        Database::createTable(
             'CREATE TABLE IF NOT EXISTS `' . self::SAMPLES . '` (
                 `id`          BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
                 `server_id`   INT NOT NULL,
@@ -36,7 +36,7 @@ final class MonitorModel
                 KEY `idx_time` (`sampled_at`)
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci'
         );
-        Database::run(
+        Database::createTable(
             'CREATE TABLE IF NOT EXISTS `' . self::STATE . '` (
                 `server_id`  INT NOT NULL,
                 `status`     VARCHAR(8) NOT NULL DEFAULT \'up\',

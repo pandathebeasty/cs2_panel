@@ -22,7 +22,7 @@ final class ProfileModel
         }
         self::$ensured = true;
         try {
-            Database::run(
+            Database::createTable(
                 'CREATE TABLE IF NOT EXISTS `' . self::TABLE . '` (
                     `steamid64` VARCHAR(20) NOT NULL,
                     `discord_tag` VARCHAR(64) NULL,
