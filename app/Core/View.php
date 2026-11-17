@@ -49,8 +49,8 @@ final class View
             ob_start();
             require $layoutFile;
             $page = self::rewriteBase(ob_get_clean());
-            // The full app chrome ('main') must carry the author credit.
-            if ($layout === 'main') {
+            // Every layout that renders the footer credit must keep it intact.
+            if (in_array($layout, ['main', 'login', 'install'], true)) {
                 $page = Brand::enforce($page);
             }
             echo $page;
