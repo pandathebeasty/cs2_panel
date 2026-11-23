@@ -1370,7 +1370,8 @@ final class Updater
         if ($onProgress !== null) {
             curl_setopt_array($ch, [
                 CURLOPT_NOPROGRESS       => false,
-                CURLOPT_XFERINFOFUNCTION => static function ($ch, $dlTotal, $dlNow) use ($onProgress): int {
+                (defined('CURLOPT_XFERINFOFUNCTION') ? constant('CURLOPT_XFERINFOFUNCTION') : CURLOPT_PROGRESSFUNCTION)
+                    => static function ($ch, $dlTotal, $dlNow) use ($onProgress): int {
                     $onProgress((int) $dlNow);
                     return 0;
                 },
