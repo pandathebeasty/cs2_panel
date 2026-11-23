@@ -103,6 +103,7 @@ final class MuteModel
     {
         $p = self::p();
         Database::transaction(static function () use ($p, $muteId, $adminId, $reason): void {
+            $adminId = ServerModel::removalAdminId($adminId);
             Database::run(
                 "INSERT INTO {$p}unmutes (mute_id, admin_id, reason) VALUES (?, ?, ?)",
                 [$muteId, $adminId, $reason !== '' ? $reason : 'Unknown']

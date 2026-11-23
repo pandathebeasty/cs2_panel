@@ -174,10 +174,7 @@ final class ServerModel
         return (int) Database::scalar("SELECT COUNT(*) FROM {$p}servers");
     }
 
-    /**
-     * Internal id of the current admin from sa_admins (for sa_unbans.admin_id).
-     * Console = 0. If not found, return 0.
-     */
+    /** Internal SimpleAdmin id, or 0 when the panel user has no game-admin record. */
     public static function adminIdBySteamId(?string $steamId64): int
     {
         if ($steamId64 === null) {
@@ -189,5 +186,57 @@ final class ServerModel
             [$steamId64]
         );
         return $row ? (int) $row['id'] : 0;
+    }
+
+    /**
+     * Resolve the plugin's console record inside the sanction transaction.
+     * Its migration may have assigned a nonzero id to Console.
+     */
+    public static function removalAdminId(int $adminId): int
+    {
+        if ($adminId !== 0) {
+            return $adminId;
+        }
+
+        $p = self::p();
+        $pdo = Database::connection('simpleadmin');
+        $mysql = $pdo->getAttribute(\PDO::ATTR_DRIVER_NAME) === 'mysql';
+        $lock = $mysql ? ' FOR UPDATE' : '';
+        $consoleSql = "SELECT id FROM {$p}admins
+                       WHERE player_name = ? AND CAST(player_steamid AS CHAR) IN (?, ?)
+                       ORDER BY id ASC LIMIT 1{$lock}";
+        $console = Database::one($consoleSql, ['Console', '0', 'Console']);
+        if ($console !== null) {
+            return (int) $console['id'];
+        }
+
+        $occupied = Database::one("SELECT id FROM {$p}admins WHERE id = 0{$lock}");
+        if ($occupied !== null) {
+            throw new \RuntimeException('SimpleAdmin console id 0 belongs to another administrator.');
+        }
+
+        // MySQL normally generates an AUTO_INCREMENT value for an explicit 0.
+        // Restore the connection's original mode even when the insert fails.
+        $mode = null;
+        $setMode = null;
+        if ($mysql) {
+            $mode = (string) $pdo->query('SELECT @@SESSION.sql_mode')->fetchColumn();
+            if (!in_array('NO_AUTO_VALUE_ON_ZERO', explode(',', strtoupper($mode)), true)) {
+                $setMode = $pdo->prepare('SET SESSION sql_mode = ?');
+                $setMode->execute([$mode === '' ? 'NO_AUTO_VALUE_ON_ZERO' : $mode . ',NO_AUTO_VALUE_ON_ZERO']);
+            }
+        }
+        try {
+            Database::run(
+                "INSERT INTO {$p}admins (id, player_name, player_steamid, flags, immunity, server_id, ends, group_id)
+                 VALUES (0, ?, ?, ?, 0, NULL, NULL, NULL)",
+                ['Console', '0', '']
+            );
+        } finally {
+            if ($setMode !== null) {
+                $setMode->execute([$mode]);
+            }
+        }
+        return 0;
     }
 }

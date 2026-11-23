@@ -236,6 +236,7 @@ final class BanModel
     private static function recordUnban(int $banId, int $adminId, string $reason): void
     {
         $p = self::p();
+        $adminId = ServerModel::removalAdminId($adminId);
         Database::run(
             "INSERT INTO {$p}unbans (ban_id, admin_id, reason) VALUES (?, ?, ?)",
             [$banId, $adminId, $reason !== '' ? $reason : 'Unknown']
