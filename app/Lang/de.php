@@ -1378,7 +1378,7 @@ return [
 
     // Skins (WeaponPaints Loadout-Editor)
     'nav.skins'                   => 'Skins',
-    'settings.skins_title'        => 'Skins (WeaponPaints)',
+    'settings.skins_title'        => 'Skins',
     'settings.enable_skins'       => 'Skins aktivieren',
     'settings.skins_hint'         => 'Spieler stellen ihr WeaponPaints-Loadout im Panel zusammen.',
     'settings.wp_prefix'          => 'Skins-Tabellenpraefix',

@@ -1377,7 +1377,7 @@ return [
 
     // Skins (editor loadout WeaponPaints)
     'nav.skins'                   => 'Skinuri',
-    'settings.skins_title'        => 'Skinuri (WeaponPaints)',
+    'settings.skins_title'        => 'Skinuri',
     'settings.enable_skins'       => 'Activează Skinuri',
     'settings.skins_hint'         => 'Permite jucatorilor autentificati sa isi configureze loadout-ul WeaponPaints din panou. Citeste si scrie in tabelele wp_player_* din aceeasi baza de date.',
     'settings.wp_prefix'          => 'Prefix Tabele Skinuri',

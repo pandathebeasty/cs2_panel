@@ -1378,7 +1378,7 @@ return [
 
                                                
     'nav.skins'                   => 'Скины',
-    'settings.skins_title'        => 'Скины (WeaponPaints)',
+    'settings.skins_title'        => 'Скины',
     'settings.enable_skins'       => 'Включить скины',
     'settings.skins_hint'         => 'Игроки настраивают своё снаряжение WeaponPaints из панели.',
     'settings.wp_prefix'          => 'Префикс таблиц скинов',
