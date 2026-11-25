@@ -89,6 +89,7 @@ final class ServerMap
         'de_anubis'   => 'Anubis',
         'de_train'    => 'Train',
         'de_cache'    => 'Cache',
+        'de_cbble'    => 'Cobblestone',
         'cs_office'   => 'Office',
         'cs_italy'    => 'Italy',
         'cs_agency'   => 'Agency',
