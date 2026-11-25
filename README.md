@@ -6,6 +6,10 @@ Version: see [VERSION](VERSION). The installed version is also displayed in the 
 
 Live demo: [gobans.ro/GO](https://gobans.ro/GO)
 
+## License
+
+CS2 Panel may be used, modified and redistributed under the [CS2 Panel License](LICENSE). The existing "Powered by -panda" footer credit and author link must remain visible on websites running the panel. Third-party components and assets remain subject to their own licenses.
+
 <p align="center"><img src=".github/readme/architecture.svg" alt="Architecture" width="100%"></p>
 
 ## Supported plugins
